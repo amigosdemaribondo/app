@@ -929,17 +929,51 @@ function renderGestao(){
     + '<div class="full"><div class="eyebrow" style="margin-bottom:5px">Quem</div><div class="pick" id="gPick">'+(d?d.equipe:[]).map(function(x){ return '<button type="button" data-pick="'+esc(x.id)+'" aria-pressed="'+(S.pick.indexOf(x.id)>=0)+'">'+chip(x.id)+'</button>'; }).join("")+'</div></div>'
     + '<label class="full" style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="gAtiv"> Atividade com público (lista, foto e aviso no grupo)</label>'
     + '<button class="btn primary big full" data-g="add">Adicionar ao dia</button></div>';
-  h += '<div class="row" style="border-top:1px dashed var(--line);padding-top:10px"><span class="sub">Copiar este dia para</span><input type="date" id="gPara"><button class="btn" data-g="copy">Copiar</button></div></div>';
+  h += '<div class="row" style="border-top:1px dashed var(--line);padding-top:10px"><span class="sub">Copiar este dia para</span><input type="date" id="gPara"><button class="btn" data-g="copy">Copiar</button></div>'
+    + '<details id="gImpBox" style="border-top:1px dashed var(--line);padding-top:10px"'+(S_IMP_OPEN?' open':'')+'><summary class="eyebrow" style="cursor:pointer">📋 Colar programação</summary>'
+    + '<p class="sub">Cole o texto que o Claude preparou. Uma tarefa por linha. Se o texto tiver a linha DIA, as tarefas vão para essa data; se não, vão para o dia escolhido acima.</p>'
+    + '<textarea id="gImp" rows="8" style="width:100%;box-sizing:border-box;font:13px/1.4 ui-monospace,Menlo,monospace;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);color:var(--ink)" placeholder="DIA 2026-11-10&#10;08:00-12:00 | manha | Recepção | Patrícia | Marcações; Consultas | | "></textarea>'
+    + '<button class="btn primary big" data-g="importar" style="margin-top:8px;width:100%">Importar tarefas</button></details></div>';
   // relatório
   var mesAtual = (p.hoje||"").slice(0,7);
   h += '<div class="gsec"><h2>Relatório do mês</h2><p class="sub">Presenças, faltas, atrasos e atividades com lista e foto. Ele também é gerado sozinho todo dia 5, se as automações estiverem ligadas.</p>'
     + '<div class="row"><input type="month" id="gMes" value="'+esc(mesAtual)+'"><button class="btn primary" data-g="rel">Gerar relatório</button></div>'
     + (S.relUrl ? '<a class="lnk" href="'+esc(S.relUrl)+'" target="_blank" rel="noopener">Abrir relatório na planilha</a>' : '') + '</div>';
   // keep form values across re-render
-  var keep = {}; ["gHora","gFim","gTurno","gTit","gItens","gMetas","gAtiv","gPara","gMes"].forEach(function(id){ var el=$(id); if (el) keep[id] = el.type==="checkbox"?el.checked:el.value; });
+  var keep = {}; ["gHora","gFim","gTurno","gTit","gItens","gMetas","gAtiv","gPara","gMes","gImp"].forEach(function(id){ var el=$(id); if (el) keep[id] = el.type==="checkbox"?el.checked:el.value; });
   w.innerHTML = h;
   Object.keys(keep).forEach(function(id){ var el=$(id); if (!el) return; if (el.type==="checkbox") el.checked = keep[id]; else if (keep[id]) el.value = keep[id]; });
   if (lista === null && gd) load(gd, true).then(renderGestao);
+}
+var S_IMP_OPEN = false;
+function semAc(s){ return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().trim(); }
+function lerProgramacao(txt, diaPadrao){
+  var dia = diaPadrao, tarefas = [], erros = [], equipe = (S.data && S.data.equipe) || [];
+  String(txt||"").split(/\r?\n/).forEach(function(lin, i){
+    var l = lin.trim(); if (!l || l.charAt(0) === "#") return;
+    var md = l.match(/^dia\s*[:=]?\s*(\d{4}-\d{2}-\d{2})$/i); if (md){ dia = md[1]; return; }
+    var c = l.split("|").map(function(x){ return x.trim(); }), n = "Linha "+(i+1)+": ";
+    var hm = (c[0]||"").match(/^(\d{1,2})[:h]?(\d{2})?\s*[-–a]+\s*(\d{1,2})[:h]?(\d{2})?$/i);
+    if (!hm) return erros.push(n+'horário "'+(c[0]||"")+'" inválido (use 08:00-12:00).');
+    var ini = hm[1].padStart(2,"0")+":"+(hm[2]||"00"), fim = hm[3].padStart(2,"0")+":"+(hm[4]||"00");
+    if (fim <= ini) return erros.push(n+"o fim precisa ser depois do início.");
+    var tu = semAc(c[1]); tu = /^man/.test(tu) ? "manha" : /^tar/.test(tu) ? "tarde" : /^ativ/.test(tu) ? "ativ" : "";
+    if (!tu) return erros.push(n+'turno "'+(c[1]||"")+'" inválido (manha, tarde ou ativ).');
+    if (!c[2]) return erros.push(n+"falta o nome da tarefa.");
+    var pessoas = [], faltou = [];
+    (c[3]||"").split(/[,;]/).map(function(x){ return x.trim(); }).filter(Boolean).forEach(function(nm){
+      var k = semAc(nm), p = equipe.filter(function(e){ return semAc(e.id) === k || semAc(e.nome) === k; })[0];
+      if (p){ if (pessoas.indexOf(p.id) < 0) pessoas.push(p.id); } else faltou.push(nm);
+    });
+    if (faltou.length) return erros.push(n+"não achei na equipe: "+faltou.join(", ")+".");
+    if (!pessoas.length) return erros.push(n+"falta quem faz a tarefa.");
+    var lista = function(s){ return String(s||"").split(";").map(function(x){ return x.trim(); }).filter(Boolean); };
+    tarefas.push({ dia: dia, hora: ini, fim: fim, turno: tu, titulo: c[2], pessoas: pessoas, itens: lista(c[4]), metas: lista(c[5]), atividade: /^(sim|s|publico|público|x|1)$/i.test(c[6]||"") });
+  });
+  if (!erros.length && !tarefas.length) erros.push("Nenhuma tarefa encontrada no texto.");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(dia||"")) erros.push("Escolha o dia acima ou coloque a linha DIA 2026-11-10.");
+  tarefas.forEach(function(t){ t.dia = dia; });
+  return { dia: dia, tarefas: tarefas, erros: erros };
 }
 function gAct(promise, ok){
   S.busy = true;
@@ -1007,6 +1041,16 @@ $("view").addEventListener("click", function(e){
     if (t.fim <= t.hora) return toast("O fim precisa ser depois do início.");
     if (!t.pessoas.length) return toast("Escolha quem faz a tarefa.");
     return gAct(run("addTarefa", S.me, S.pin, t), function(d){ S.data = d; S.pick = []; ["gHora","gFim","gTit","gItens","gMetas"].forEach(function(id){ $(id).value=""; }); $("gAtiv").checked = false; toast("Tarefa adicionada em "+fmtDate(gd)+"."); });
+  }
+  if (g==="importar"){
+    S_IMP_OPEN = true;
+    var r = lerProgramacao($("gImp").value, gd);
+    if (r.erros.length) return toast(r.erros.slice(0,3).join(" "));
+    if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Confirmar: importar "+r.tarefas.length+" tarefa(s) em "+fmtDate(r.dia); return; }
+    var feitas = 0, cadeia = Promise.resolve(null);
+    r.tarefas.forEach(function(t){ cadeia = cadeia.then(function(){ toast("Importando "+(feitas+1)+" de "+r.tarefas.length+"…"); return run("addTarefa", S.me, S.pin, t).then(function(d){ feitas++; return d; }); }); });
+    return gAct(cadeia, function(d){ if (d) S.data = d; S.gDia = r.dia; $("gImp").value = ""; S_IMP_OPEN = false; toast(feitas+" tarefa(s) importada(s) em "+fmtDate(r.dia)+"."); })
+      .then(function(){ if (feitas < r.tarefas.length) toast("Parou na tarefa "+(feitas+1)+" de "+r.tarefas.length+". As "+feitas+" primeiras entraram; não importe de novo as mesmas."); });
   }
   if (g==="copy"){
     var para = $("gPara").value; if (!para) return toast("Escolha a data de destino.");
