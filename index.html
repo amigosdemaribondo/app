@@ -161,7 +161,7 @@ a.lnk{color:var(--accent);font-weight:700}
   <div class="sum">
     <div class="stat"><div class="n tnum" id="sDone">–</div><div class="l">tarefas concluídas</div><div class="bar"><i id="sBar" style="width:0"></i></div></div>
     <div class="stat"><div class="n tnum" id="sLive">–</div><div class="l">iniciadas agora</div></div>
-    <div class="stat"><div class="n tnum" id="sPonto">–</div><div class="l">bateram ponto</div></div>
+    <div class="stat"><div class="n tnum" id="sPonto">–</div><div class="l" id="sPontoL">bateram ponto</div></div>
   </div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-v="dia">Dia</button>
@@ -212,7 +212,10 @@ function render(){
   var bateram = Object.keys(d.ponto).filter(function(p){ return d.ponto[p].entManha || d.ponto[p].entTarde; }).length;
   $("sDone").textContent = bl.length ? done+"/"+bl.length : "–";
   $("sBar").style.width = bl.length ? (100*done/bl.length)+"%" : "0";
-  $("sLive").textContent = live; $("sPonto").textContent = bateram+"/"+d.equipe.length;
+  $("sLive").textContent = live;
+  var vt = (d.verTodos !== undefined) ? d.verTodos : (S.gestor && logged());
+  if (vt){ $("sPonto").textContent = bateram+"/"+d.equipe.length; $("sPontoL").textContent = "bateram ponto"; }
+  else { var mp = d.ponto[S.me] || {}; $("sPonto").textContent = logged() ? (mp.entTarde || mp.entManha || "–") : "–"; $("sPontoL").textContent = "sua última entrada"; }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function(b){ b.setAttribute("aria-selected", b.dataset.v===S.view); });
   var isG = logged() && S.gestor; $("tabG").hidden = !isG;
   if (S.view==="gestao" && !isG) S.view = "dia";
@@ -280,7 +283,9 @@ function renderPonto(){
       + (mine.podeDesfazer && isToday ? '<button class="btn" data-act="unpunch">Desfazer último registro</button>' : "")
       + '</div>';
   }
-  var rows = d.equipe.map(function(p){
+  var podeTodos = (d.verTodos !== undefined) ? d.verTodos : (S.gestor && logged());
+  var visiveis = podeTodos ? d.equipe : d.equipe.filter(function(p){ return p.id === S.me && logged(); });
+  var rows = visiveis.map(function(p){
     var r = d.ponto[p.id] || {};
     return '<tr><td>'+chip(p.id)+'</td>' + SLOTS.map(function(s){
       var v = r[s[0]]; if (!v) return '<td class="t none">—</td>';
@@ -290,7 +295,7 @@ function renderPonto(){
     }).join("") + '</tr>';
   }).join("");
   return head + '<div class="tbl"><table><thead><tr><th>Equipe</th><th>Entrada 08h</th><th>Saída 12h</th><th>Entrada 14h</th><th>Saída 18h</th></tr></thead><tbody>'+rows+'</tbody></table></div>'
-    + '<p class="note">O horário vem do servidor, não do celular. Entrada depois do horário aparece em vermelho.</p>';
+    + '<p class="note">'+(podeTodos ? 'Você vê o ponto de toda a equipe.' : 'Você vê só o seu ponto. A coordenação vê o de todos.')+' O horário vem do servidor, não do celular.</p>';
 }
 
 /* toast */
@@ -308,7 +313,7 @@ $("tCopy").addEventListener("click", function(){
 
 /* data */
 function load(dia, quiet){
-  return run("getData", dia || (S.data && S.data.dia) || "").then(function(d){ S.data = d; $("note").textContent = ""; render(); })
+  return run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){ S.data = d; $("note").textContent = ""; render(); })
     .catch(function(e){ if (!quiet) $("note").textContent = "Não foi possível carregar: " + errMsg(e); });
 }
 function act(p){
@@ -357,11 +362,11 @@ $("view").addEventListener("change", function(e){
 $("meSel").addEventListener("change", function(e){ S.me = e.target.value; S.pin = ""; save(); render(); if (S.me) $("pinIn").focus(); });
 $("pinOk").addEventListener("click", function(){
   var pin = $("pinIn").value.trim(); if (!pin) return;
-  run("login", S.me, pin).then(function(r){ S.pin = pin; S.gestor = !!(r && r.gestor); $("pinIn").value = ""; save(); render(); toast("Bem-vindo(a), " + pessoa(S.me).nome + "!"); })
+  run("login", S.me, pin).then(function(r){ S.pin = pin; S.gestor = !!(r && r.gestor); $("pinIn").value = ""; save(); render(); toast("Bem-vindo(a), " + pessoa(S.me).nome + "!"); load(null, true); })
     .catch(function(){ $("pinMsg").textContent = "PIN incorreto. Tente de novo."; });
 });
 $("pinIn").addEventListener("keydown", function(e){ if (e.key === "Enter") $("pinOk").click(); });
-$("sair").addEventListener("click", function(){ S.me = ""; S.pin = ""; S.gestor = false; S.painel = null; if (S.view==="gestao") S.view="dia"; save(); render(); });
+$("sair").addEventListener("click", function(){ S.me = ""; S.pin = ""; S.gestor = false; S.painel = null; if (S.view==="gestao") S.view="dia"; save(); load(null, true); });
 document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; save(); if (S.view==="gestao") { $("view").innerHTML = '<div id="gWrap"></div>'; loadPainel(); } render(); });
 $("days").addEventListener("click", function(e){ var b = e.target.closest("[data-d]"); if (b) load(b.dataset.d); });
 
