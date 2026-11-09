@@ -1,0 +1,18 @@
+{
+ "name": "Gestão do Dia — Amigos de Maribondo",
+ "short_name": "Gestão do Dia",
+ "start_url": "./",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#0364D5",
+ "theme_color": "#0364D5",
+ "lang": "pt-BR",
+ "icons": [
+  {
+   "src": "icone.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
