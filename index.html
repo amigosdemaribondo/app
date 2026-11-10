@@ -153,6 +153,13 @@ td.t.none{color:var(--line)}
 .cc-f b{font-size:2.9mm;min-height:3.4mm;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cc-nome b{font-size:3.6mm;min-height:4.2mm}
 .cc-dup{display:grid;grid-template-columns:1fr 1fr;gap:2mm}
+.ccm-body{flex:1;display:flex;gap:2.4mm;padding:1.8mm 3mm 0;min-height:0}
+.ccm-foto{width:20mm;height:25mm;flex:none;border:0.3mm solid #1d4ed8;border-radius:1.2mm;overflow:hidden;background:#eff6ff;display:flex;align-items:center;justify-content:center}
+.ccm-foto img{width:100%;height:100%;object-fit:cover}
+.ccm-foto span{font-size:2.2mm;color:#1d4ed8;font-weight:800;text-align:center}
+.ccm-dados{flex:1;min-width:0;display:flex;flex-direction:column;gap:1.1mm}
+.ccm .cc-foot span:last-child{font-weight:700}
+.btn.mbCart{border-color:#FFD23F;color:#FFD23F}
 .cc-foot{background:#eff6ff;border-top:0.3mm solid #1d4ed8;display:flex;justify-content:space-between;align-items:center;padding:.9mm 3mm;font-size:1.9mm;color:#1e3a8a}
 .cc-foot b{font-size:2.4mm}
 @media print{
@@ -433,6 +440,12 @@ body.bloq .wrap,body.bloq #podBar{display:none!important}
 .gbox label{font-size:13px;font-weight:700;color:#C9D6F2}
 .gbox select,.gbox input{font:inherit;font-size:18px;border-radius:14px;border:1.5px solid rgba(255,255,255,.3);background:rgba(10,26,63,.75);color:#fff;padding:14px;width:100%}
 .gbox input{letter-spacing:.4em;text-align:center;font-size:24px}
+.gsub{margin:0 0 6px;color:#C9D6F2;font-size:15px;line-height:1.4}
+#gSfBt{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:6px;border:none;border-radius:999px;background:#FFD43E;color:#0A1A3F;font-weight:800;font-size:19px;padding:18px;cursor:pointer;box-shadow:0 10px 30px rgb(255 212 62 / .35)}
+#gTroca{border:0;background:none;color:#C9D6F2;font:inherit;font-size:14px;text-decoration:underline;padding:8px}
+.gstep{display:flex;flex-direction:column;gap:10px}
+.gstep[hidden]{display:none}
+.btn.selfiePt{background:#2FD07A;border-color:#2FD07A;color:#03140A}
 #gOk{margin-top:8px;border:none;border-radius:999px;background:#FFD43E;color:#0A1A3F;font:inherit;font-weight:800;font-size:18px;padding:16px}
 #gMsg{margin:4px 0 0;min-height:1.2em;color:#FFB4B4;font-weight:700;text-align:center}
 .gload{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(6,16,42,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
@@ -627,12 +640,21 @@ a.lnk,.lnk{color:#FFE27A}
   <img id="gateImg" alt="Equipe da ONG Amigos de Maribondo">
   <div class="gbox" id="gBox">
     <div class="glogo">Amigos de Maribondo</div>
+    <div id="gPinBox" class="gstep">
     <h2>Bom te ver por aqui 💙</h2>
     <label for="gSel">Quem é você?</label>
     <select id="gSel"><option value="">Carregando nomes…</option></select>
     <label for="gPin">Seu PIN</label>
     <input id="gPin" type="password" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" placeholder="••••">
     <button id="gOk" type="button">Entrar</button>
+    </div>
+    <div id="gSelfie" class="gstep" hidden>
+    <h2 id="gSfOla">Olá! 📸</h2>
+    <p class="gsub">Para entrar, tire uma selfie. Ela fica salva e já vale como a foto do seu ponto.</p>
+    <label id="gSfBt" for="selfieIn">📸 Tirar selfie e entrar</label>
+    <input type="file" id="selfieIn" accept="image/*" capture="user" hidden>
+    <button id="gTroca" type="button">Não é você? Trocar de pessoa</button>
+    </div>
     <p id="gMsg" role="alert"></p>
   </div>
   <div class="gload" id="gLoad" hidden>
@@ -740,9 +762,22 @@ function renderAtiva(){
   if (S_WAEDIT) h += '<div class="waf"><input id="waIn" inputmode="tel" placeholder="Seu WhatsApp: 82 99999-9999" autocomplete="tel"><button class="btn primary" data-act="waSalvar">Salvar</button><button class="btn" data-act="waEdit">Cancelar</button></div>';
   box.innerHTML = h + '</div>';
 }
+/* entrada com selfie: vale 5 horas e serve como foto do ponto */
+function hojeLocal(){ return new Date(Date.now() - 3*3600e3).toISOString().slice(0,10); }
+function selfieInfo(){ try { var x = JSON.parse(localStorage.getItem("selfie_" + S.me) || "null"); return x && x.dia === hojeLocal() && Date.now() - x.ms < 5*3600e3 ? x : null; } catch(e){ return null; } }
+function selfieOk(){ return !!selfieInfo(); }
+function selfieUsada(){ try { var x = selfieInfo(); if (x){ x.usada = true; localStorage.setItem("selfie_" + S.me, JSON.stringify(x)); } } catch(e){} }
+function fecharGate(){
+  var g = $("gate"); g.classList.add("sai"); document.body.classList.remove("bloq");
+  setTimeout(function(){ g.hidden = true; g.classList.remove("sai"); $("gLoad").hidden = true; }, 450);
+  try { SOM.play("ponto"); } catch(e){}
+  render(); checarLocal();
+}
 function gateAtualiza(){
   var g = $("gate"); if (!g) return;
-  var on = !logged(); document.body.classList.toggle("bloq", on);
+  var precisaSelfie = logged() && !selfieOk(), on = !logged() || precisaSelfie; document.body.classList.toggle("bloq", on);
+  $("gPinBox").hidden = precisaSelfie; $("gSelfie").hidden = !precisaSelfie;
+  if (precisaSelfie) $("gSfOla").textContent = "Olá, " + primeiroNome(pessoa(S.me).nome) + "! 📸";
   if (!on){ if (!g.hidden && !g.classList.contains("sai")) g.hidden = true; return; }
   g.hidden = false; g.classList.remove("sai");
   var hh = String(Math.floor(Date.now() / 3600e3)); if ($("gateImg").dataset.h !== hh){ $("gateImg").dataset.h = hh; var fs = (typeof GALERIA_ONG !== "undefined" && GALERIA_ONG.length) ? GALERIA_ONG : [{url: FOTO_ABERTURA}]; $("gateImg").src = fs[Math.floor(Date.now() / 3600e3) % fs.length].url; }
@@ -758,6 +793,7 @@ function entrarGate(){
   var t0 = Date.now();
   run("login", me, pin).then(function(r){
     S.me = me; S.pin = pin; S.gestor = !!(r && r.gestor); save(); $("gPin").value = "";
+    if (!selfieOk()){ $("gLoad").hidden = true; gateAtualiza(); load(null, true); return; } // próximo passo: a selfie
     var espera = function(p){ return Promise.race([p, new Promise(function(ok){ setTimeout(ok, 9000); })]); };
     return espera(Promise.all([load(null, true), NARRACAO_ON ? (VOZ_MEM = null, buscaVozes(true)) : null])).then(function(){
       var falta = Math.max(0, 1800 - (Date.now() - t0));
@@ -772,6 +808,16 @@ function entrarGate(){
   }).catch(function(e){ var m = errMsg(e); $("gLoad").hidden = true; $("gMsg").textContent = /incorreto/i.test(m) ? "PIN incorreto. Confira com a coordenação e tente de novo." : m; $("gPin").value = ""; $("gPin").focus(); try { SOM.play("erro"); } catch(e){} });
 }
 $("gOk").addEventListener("click", entrarGate);
+$("selfieIn").addEventListener("change", function(ev){
+  var f = ev.target.files && ev.target.files[0]; ev.target.value = ""; if (!f || !logged()) return;
+  $("gMsg").textContent = ""; $("gLoad").hidden = false;
+  shrink(f).then(function(b64){ if (!b64) throw new Error("Não consegui ler a foto. Tente de novo."); return run("selfieLogin", S.me, S.pin, b64); })
+    .then(function(r){ try { localStorage.setItem("selfie_" + S.me, JSON.stringify({id: r.id, ms: Date.now(), dia: r.dia, hora: r.hora, usada: false})); } catch(e){}
+      return Promise.race([load(null, true), new Promise(function(ok){ setTimeout(ok, 6000); })]); })
+    .then(function(){ fecharGate(); toast("📸 Selfie salva. No Ponto, é só tocar em ✅ Bater ponto com a selfie."); })
+    .catch(function(e){ $("gLoad").hidden = true; $("gMsg").textContent = errMsg(e); try { SOM.play("erro"); } catch(x){} });
+});
+$("gTroca").addEventListener("click", function(){ $("sair").click(); });
 $("gPin").addEventListener("keydown", function(e){ if (e.key === "Enter") entrarGate(); });
 setTimeout(gateAtualiza, 0);
 function render(){
@@ -1023,9 +1069,13 @@ function renderPonto(){
     if (!isToday) h += '<span class="when">O ponto só pode ser registrado hoje. Toque em "hoje" no topo.</span>';
     else if (S.busy) h += '<button class="btn primary big" disabled>Enviando…</button>';
     else if (!me.dentro){
-      h += '<label class="btn primary big'+(locOff?' off':'')+'" for="fotoIn" data-saida="">📷 Tirar foto e registrar entrada</label>';
+      var sfE = selfieInfo();
+      if (sfE && !sfE.usada) h += '<button class="btn big selfiePt'+(locOff?' off':'')+'" data-act="pontoSelfie">✅ Bater ponto com a selfie do login ('+esc(sfE.hora)+')</button>';
+      h += '<label class="btn '+(sfE && !sfE.usada ? '' : 'primary ')+'big'+(locOff?' off':'')+'" for="fotoIn" data-saida="">📷 '+(sfE && !sfE.usada ? 'Tirar outra foto e registrar entrada' : 'Tirar foto e registrar entrada')+'</label>';
     } else {
       if (me.podeSairSemMotivo && !S_MOT.aberto){
+        var sfS = selfieInfo();
+        if (sfS && !sfS.usada) h += '<button class="btn big selfiePt'+(locOff?' off':'')+'" data-act="pontoSelfie">✅ Saída com a selfie do login ('+esc(sfS.hora)+')</button>';
         h += '<label class="btn primary big'+(locOff?' off':'')+'" for="fotoIn" data-saida="normal">📷 '+(me.saidaEhIntervalo?"Foto e saída · intervalo (volta às "+esc(me.volta)+")":"Foto e saída · fim do expediente")+'</label>';
         if (me.saidaEhIntervalo) h += '<button class="btn" data-act="motivo">Outra saída (externa ou emergência)</button>';
       } else {
@@ -1252,6 +1302,28 @@ function abrirCarteirinha(c){
   $("ccPrint").onclick = function(){ window.print(); };
   $("ccFechar").onclick = function(){ box.hidden = true; document.body.classList.remove("cc-on"); };
 }
+function abrirCarteirinhaMembro(c){
+  var logo = (document.querySelector('img[alt="Amigos de Maribondo"]') || {}).src || "";
+  var dt = c.dia ? c.dia.slice(8)+"/"+c.dia.slice(5,7)+"/"+c.dia.slice(0,4) : "";
+  var campo = function(rot, val, cls){ return '<div class="cc-f'+(cls?' '+cls:'')+'"><span>'+rot+'</span><b>'+esc(val || "—")+'</b></div>'; };
+  var card = '<div class="cc ccm">'
+    + '<div class="cc-top">'+(logo?'<img src="'+logo+'" alt="">':'<b>Amigos de Maribondo</b>')+'<div class="cc-tit"><small>CARTEIRINHA</small><b>Membro da ONG</b></div></div>'
+    + '<div class="ccm-body"><div class="ccm-foto">'+(c.foto ? '<img src="'+c.foto+'" alt="">' : '<span>FOTO<br>3x4</span>')+'</div><div class="ccm-dados">'
+    + campo("Nome", c.nome, "cc-nome")
+    + '<div class="cc-dup">'+campo("Nº de cadastro", c.num)+campo("RG", c.rg)+'</div>'
+    + '<div class="cc-dup">'+campo("Cartão SUS", c.sus)+campo("Telefone", c.telefone)+'</div>'
+    + '</div></div>'
+    + '<div class="cc-foot"><span>Nº <b>'+esc(c.numero)+'</b></span><span>Emitida '+dt+'</span><span>Válida até '+esc(c.validade)+'</span></div>'
+    + '</div>';
+  var box = $("cartBox");
+  if (!box){ box = document.createElement("div"); box.id = "cartBox"; document.body.appendChild(box); }
+  box.innerHTML = '<div class="cc-wrap">'+card+'<p class="cc-info">Carteirinha nº '+esc(c.numero)+(c.via>1?' · '+c.via+'ª via':'')+' de '+esc(c.nome)+'. Registrada na aba Carteirinhas da planilha.</p>'
+    + '<div class="cc-acts"><button class="btn primary big" id="ccPrint">🖨 Imprimir</button><button class="btn big" id="ccFechar">Fechar</button></div>'
+    + '<p class="cc-info">Na impressão, use tamanho real (100%): sai com 8,6 × 5,4 cm. Para mandar pelo WhatsApp, tire um print da tela.</p></div>';
+  box.hidden = false; document.body.classList.add("cc-on");
+  $("ccPrint").onclick = function(){ window.print(); };
+  $("ccFechar").onclick = function(){ box.hidden = true; document.body.classList.remove("cc-on"); };
+}
 function normNome(s){ return semAc(s).replace(/[^a-z\s]/g," ").replace(/\s+/g," ").trim(); }
 function casaNome(linha, ativos){
   var q = normNome(linha); if (q.length < 2) return {tipo:"vazio"};
@@ -1455,8 +1527,8 @@ var MSG_MEMBRO = [
   ["🌻 Participe das atividades", function(n){ return "Oi, " + n + "! Aqui é da ONG Amigos de Maribondo. 🌻 Temos atividades acontecendo e queremos contar com a sua participação! Quer saber os dias e horários? É só responder aqui."; }],
   ["🤗 Sentimos sua falta", function(n){ return "Oi, " + n + "! Aqui é da ONG Amigos de Maribondo. 💙 Sentimos a sua falta por aqui! Está tudo bem? Esperamos você nas próximas atividades."; }]
 ];
-var DOC_ORD = ["rg","cpf","comprovante","sus","exame","anexo"];
-var DOC_ROT = {rg:"🪪 RG", cpf:"🧾 CPF", comprovante:"🏠 Comprovante de residência", sus:"💳 Cartão SUS", exame:"🩺 Exames", anexo:"📎 Anexos"};
+var DOC_ORD = ["foto","rg","cpf","comprovante","sus","exame","anexo"];
+var DOC_ROT = {foto:"📷 Foto 3x4 (sai na carteirinha)", rg:"🪪 RG", cpf:"🧾 CPF", comprovante:"🏠 Comprovante de residência", sus:"💳 Cartão SUS", exame:"🩺 Exames", anexo:"📎 Anexos"};
 function loadMb(){
   S_MB.loading = true; S_MB.erro = "";
   return run("membros", S.me, S.pin).then(function(r){ S_MB.lista = r.membros; S_AT.temas = r.temas; if (!S_AT.resumo || S_AT.resumo.dia === r.hoje) S_AT.resumo = r.resumoHoje; S_AT.hoje = r.hoje; })
@@ -1510,7 +1582,7 @@ function fichaMembro(m, dis){
   var n = primeiroNome(m.nome), h = '';
   h += '<button class="btn" data-mb="voltar" style="margin-top:12px">‹ Todos os cadastros</button>';
   h += '<div class="gsec mbHead"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h2>'+esc(m.nome)+'</h2><p class="sub">Cadastro nº <b>'+esc(m.num)+'</b> · desde '+esc(String(m.criado).slice(8,10)+"/"+String(m.criado).slice(5,7)+"/"+String(m.criado).slice(0,4))+(m.criadoPor?' por '+esc(m.criadoPor):'')+'</p></div><button class="btn" data-mb="editar">✏️ Editar</button></div>'
-    + '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn primary" data-mb="entrada"'+dis+'>📍 Registrar entrada na ONG</button><button class="btn" data-mb="atender">📋 Novo atendimento</button></div>'
+    + '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn primary" data-mb="entrada"'+dis+'>📍 Registrar entrada na ONG</button><button class="btn" data-mb="atender">📋 Novo atendimento</button><button class="btn mbCart" data-mb="cart"'+dis+'>🪪 Emitir carteirinha da ONG</button></div>'
     + '<div class="eyebrow">💬 Falar com o membro</div>'
     + (m.whats ? '<div class="row" style="gap:6px;flex-wrap:wrap">'+MSG_MEMBRO.map(function(x){ return '<a class="wa" data-x="respWaOk" href="'+esc(waHref(m.whats, x[1](n)))+'" target="_blank" rel="noopener">'+WA_ICON+esc(x[0])+'</a>'; }).join("")+'</div>' : '<p class="sub">Telefone inválido para o WhatsApp. Corrija em ✏️ Editar.</p>')
     + '</div>';
@@ -1583,6 +1655,12 @@ $("view").addEventListener("click", function(ev){
   if (a === "entrada") return call(run("presencaMembro", S.me, S.pin, m.num, "entrada", ""), "📍 Entrada de " + primeiroNome(m.nome) + " registrada.");
   if (a === "presAtiv"){ var at = $("prAtiv").value.trim(); if (!at) return toast("Diga em qual atividade.");
     return call(run("presencaMembro", S.me, S.pin, m.num, "atividade", at), "✅ Presença em " + at + " registrada."); }
+  if (a === "cart"){
+    if (!m.docs.some(function(d){ return d.tipo === "foto"; }) && b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Sem foto 3x4. Emitir assim mesmo?"; toast("Dica: adicione a 📷 Foto 3x4 em Documentos para ela sair na carteirinha."); return; }
+    S_MB.busy = true; render(); toast("Emitindo a carteirinha…");
+    return run("emitirCarteirinhaMembro", S.me, S.pin, m.num).then(function(c){ abrirCarteirinhaMembro(c); SOM.play("conclui"); })
+      .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_MB.busy = false; render(); });
+  }
   if (a === "atender"){ S_AT.sel = {num: m.num, nome: m.nome}; S_AT.ficha = null; S.view = "atend"; save(); return render(); }
   if (a === "addDoc"){ S_MB.docTipo = b.dataset.t; docInput.click(); return; }
   if (a === "verDoc") return verDoc(b.dataset.id);
@@ -1699,7 +1777,7 @@ var CMDVOZ = (function(){
   function executar(txt){
     var n = norm(txt);
     for (var i = 0; i < cmds.length; i++){ var m = n.match(cmds[i].re); if (m){ var r; try { r = cmds[i].fn(m, txt, n); } catch(x){ r = {erro:true, msg:"Não consegui fazer: " + (x && x.message || x)}; }
-      if (r && r.then) { estado("Fazendo…"); r.then(mostra, function(x){ mostra({erro:true, msg:(x && x.message) || String(x)}); }); } else mostra(r); return; } }
+      if (r && r.then) { estado("Fazendo…"); r.then(function(v){ if (v) mostra(v); }, function(x){ mostra({erro:true, msg:(x && x.message) || String(x)}); }); } else mostra(r); return; } }
     mostra(fallback ? fallback(txt, n) : {erro:true, msg:"Não reconheci o comando. Veja os exemplos abaixo."});
   }
   /* ---- ajudantes de data e nomes ---- */
@@ -1754,7 +1832,7 @@ function vozGarante(lista, carregar){ return lista() ? Promise.resolve() : carre
 CMDVOZ.config({
   som: function(k){ try { SOM.play(k === "erro" ? "nao" : k === "ouvir" ? "tap" : "ok"); } catch(x){} },
   ajuda: ["Abrir ponto / abrir gestão / abrir documentos", "Atualizar", "Alerta para a equipe", "Atenção aos pontos", "Cobrar Patrícia",
-    "Mensagem para Lucas: reunião às 15h", "Novo atendimento Maria José", "Abrir cadastro de Maria", "Novo cadastro João da Silva", "Abrir documento estatuto", "Fechar"],
+    "Mensagem para Lucas: reunião às 15h", "Novo atendimento Maria José", "Abrir cadastro de Maria", "Novo cadastro João da Silva", "Emitir carteirinha de Maria José", "Abrir documento estatuto", "Fechar"],
   cmds: [
     {re:/^(fechar|cancelar|parar|sair do comando)$/, fn:function(){ CMDVOZ.fechar(); }},
     {re:/^(atualizar|atualiza|recarregar)( o app| tudo| a pagina)?$/, fn:function(){ setTimeout(function(){ $("atuBtn").click(); }, 500); return {msg:"Atualizando o app…", fechar:true}; }},
@@ -1785,6 +1863,13 @@ CMDVOZ.config({
     }},
     {re:/^(novo cadastro|cadastrar|cadastra|novo membro)( de| da| do)? ?(.*)$/, fn:function(m, orig){
       S_MB.sel = null; S_MB.edit = {nome: m[3] ? CMDVOZ.orig(orig, m[3]).replace(/(^|\s)\S/g, function(c){ return c.toUpperCase(); }) : ""}; vozAba("cadastro"); return {msg:"Cadastro novo aberto.", fechar:true}; }},
+    {re:/^(emitir|emite|gerar|gera|fazer|faz|imprimir)( a)? carteirinha (de |da |do |para |pra )?(.+)$/, fn:function(m, orig){
+      var nome = CMDVOZ.orig(orig, m[4]); vozAba("cadastro");
+      return vozGarante(function(){ return S_MB.lista; }, loadMb).then(function(){
+        var mb = CMDVOZ.achar(S_MB.lista || [], function(x){ return x.nome + " " + x.num; }, nome);
+        if (!mb) return {erro:true, msg:"Não achei " + nome + " no cadastro."};
+        return run("emitirCarteirinhaMembro", S.me, S.pin, mb.num).then(function(c){ CMDVOZ.fechar(); abrirMembro(mb.num); abrirCarteirinhaMembro(c); SOM.play("conclui"); return null; }); });
+    }},
     {re:/^(abrir |abre |mostrar |ver |buscar |procurar )?(o )?(cadastro|ficha|membro) (de |da |do )?(.+)$/, fn:function(m){
       var nome = m[5]; vozAba("cadastro");
       return vozGarante(function(){ return S_MB.lista; }, loadMb).then(function(){
@@ -1796,7 +1881,7 @@ CMDVOZ.config({
       var nome = m[5]; vozAba("docsong");
       return vozGarante(function(){ return S_DO.lista; }, loadDo).then(function(){
         var d = CMDVOZ.achar(S_DO.lista || [], function(x){ return x.nome; }, nome);
-        if (d){ CMDVOZ.fechar(); visPorId("do_" + d.id, function(){ return run("baixarDocOng", S.me, S.pin, d.id); }); return {msg:"Abrindo " + d.nome + "."}; }
+        if (d){ CMDVOZ.fechar(); visPorId("do_" + d.id, function(){ return run("baixarDocOng", S.me, S.pin, d.id); }); return null; }
         S_DO.q = nome; render(); return {erro:true, msg:"Nenhum documento com \"" + nome + "\"."}; });
     }},
     {re:/^(abrir|abre|ir para|ir pra|vai para|vai pra|va para|mostrar|mostra|ver)( a| o| as| os)?( aba)? (.+)$/, fn:function(m){
@@ -1810,7 +1895,7 @@ CMDVOZ.config({
 });
 var vozFab = document.createElement("button"); vozFab.type = "button"; vozFab.className = "vozFab"; vozFab.hidden = true; vozFab.setAttribute("aria-label", "Comando de voz"); vozFab.textContent = "🎙️";
 document.body.appendChild(vozFab); vozFab.addEventListener("click", function(){ CMDVOZ.abrir(); });
-function vozFabAtualiza(){ vozFab.hidden = !(logged() && S.me === "victor"); }
+function vozFabAtualiza(){ vozFab.hidden = !(logged() && (S.me === "victor" || S.me === "teste")); }
 vozFabAtualiza(); setInterval(vozFabAtualiza, 1500);
 
 /* ================= v40 · Visualizador de arquivos dentro do app (PDF, Word, planilha, foto) ================= */
@@ -2429,6 +2514,16 @@ $("view").addEventListener("click", function(ev){
   }
   var btn = ev.target.closest("[data-act]"); if (!btn || btn.disabled || S.busy) return;
   var a = btn.dataset.act;
+  if (a === "pontoSelfie"){
+    var sf = selfieInfo(); if (!sf || sf.usada) { render(); return toast("A selfie do login venceu. Tire uma foto."); }
+    if (S_LOC !== "ok" && !locLivre()) return toast("Ative a localização para registrar o ponto.");
+    S.busy = true; render();
+    return pegaLoc().then(function(loc){
+      S.busy = false; if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
+      var ex = loc ? {lat:loc.lat, lng:loc.lng, acc:loc.acc, selfie: sf.id} : {selfie: sf.id};
+      return act(run("punch", S.me, S.pin, null, false, ex)).then(function(d){ selfieUsada(); render(); toast(d.msg); if (d.turnoOk) parabensTurno(d.turnoOk); });
+    }).catch(function(err){ S.busy = false; if (err && /venceu|já foi usada|não encontrada/.test(err.message || "")) selfieUsada(); render(); if (err && err.message) toast(err.message); });
+  }
   if (a === "unpunch") return act(run("punch", S.me, S.pin, null, true)).then(function(d){ toast(d.msg); }).catch(function(){});
   if (a === "motivo"){ S_MOT.aberto = !S_MOT.aberto; S_MOT.tipo = ""; return render(); }
   if (a === "mt"){ S_MOT.tipo = btn.dataset.m; var keep = $("motObs") ? $("motObs").value : ""; render(); if ($("motObs")) $("motObs").value = keep; return; }
@@ -3496,7 +3591,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611102139";
+var APP_VERSAO = "202611102207";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
