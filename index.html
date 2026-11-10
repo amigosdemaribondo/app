@@ -658,13 +658,13 @@ function entrarGate(){
   run("login", me, pin).then(function(r){
     S.me = me; S.pin = pin; S.gestor = !!(r && r.gestor); save(); $("gPin").value = "";
     var espera = function(p){ return Promise.race([p, new Promise(function(ok){ setTimeout(ok, 9000); })]); };
-    return espera(Promise.all([load(null, true), (VOZ_MEM = null, buscaVozes(true))])).then(function(){
+    return espera(Promise.all([load(null, true), NARRACAO_ON ? (VOZ_MEM = null, buscaVozes(true)) : null])).then(function(){
       var falta = Math.max(0, 1800 - (Date.now() - t0));
       setTimeout(function(){
         var g = $("gate"); g.classList.add("sai"); document.body.classList.remove("bloq");
         setTimeout(function(){ g.hidden = true; g.classList.remove("sai"); $("gLoad").hidden = true; }, 450);
         try { SOM.play("ponto"); } catch(e){}
-        var v = vozCache(); if (v && v.login) tocaClip(v.login).catch(function(){ falaLoginCelular(); }); else falaLoginCelular();
+        if (NARRACAO_ON){ var v = vozCache(); if (v && v.login) tocaClip(v.login).catch(function(){ falaLoginCelular(); }); else falaLoginCelular(); }
         render(); checarLocal();
       }, falta);
     });
@@ -2164,6 +2164,7 @@ function tocaClip(c){
     try { var p = ctx.decodeAudioData(buf, feito, function(){ porPlayer().then(ok, falha); }); if (p && p.catch) p.catch(function(){}); } catch(e){ porPlayer().then(ok, falha); }
   });
 }
+var NARRACAO_ON = false; // narrações desligadas por enquanto: o app usa só efeitos sonoros
 var VOZ_MEM = null, VOZ_ERRO = "";
 function hojeLocal(){ return new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10); }
 function vozCache(){
@@ -2185,11 +2186,11 @@ function buscaVozes(forcar){
   return VOZ_BUSCANDO;
 }
 function destravaVoz(){ var ctx = vozCtx(); try { if (ctx){ var o = ctx.createBufferSource(); o.buffer = ctx.createBuffer(1, 1, 22050); o.connect(ctx.destination); o.start(0); } } catch(e){} try { VOZEL.src = VOZ_SIL; var p = VOZEL.play(); if (p && p.catch) p.catch(function(){}); } catch(e){} }
-setTimeout(function(){ if (logged()) buscaVozes(); }, 300);
+setTimeout(function(){ if (NARRACAO_ON && logged()) buscaVozes(); }, 300);
 function fraseDoDia(){ var o = S.data && S.data.ontem; return escolheDia(FRASES[o === "bom" ? "bom" : o === "melhorar" ? "melhorar" : "geral"]); }
-function falaLogin(){ if (!S.me) return; VOZ_MEM = null; try { localStorage.removeItem("vozHoje"); } catch(e){}
+function falaLogin(){ if (!S.me || !NARRACAO_ON) return; VOZ_MEM = null; try { localStorage.removeItem("vozHoje"); } catch(e){}
   buscaVozes(true).then(function(v){ return tocaClip(v && v.login); }).catch(function(){ VOZ.fala(escolheDia(FRASES_LOGIN).replace("{n}", primeiroNome(pessoa(S.me).nome))); }); }
-function falaLoginCelular(){ if (!S.me) return; VOZ.fala(escolheDia(FRASES_LOGIN).replace("{n}", primeiroNome(pessoa(S.me).nome))); }
+function falaLoginCelular(){ if (!S.me || !NARRACAO_ON) return; VOZ.fala(escolheDia(FRASES_LOGIN).replace("{n}", primeiroNome(pessoa(S.me).nome))); }
 
 /* ---------- foto depois da capa (3 s, pode pular) ---------- */
 function abreFotoAbertura(){
@@ -2200,6 +2201,7 @@ function abreFotoAbertura(){
   var fecha = function(){ if (!el.parentNode) return; el.classList.add("sai"); setTimeout(function(){ el.remove(); }, 380); };
   el.addEventListener("click", fecha);
   setTimeout(fecha, 3000);
+  if (!NARRACAO_ON) return;
   destravaVoz();
   var vc = vozCache(), t0 = Date.now();
   var reserva = function(){ VOZ.fala((vc && vc.textoAbertura) || fraseDoDia()); };
@@ -2381,7 +2383,7 @@ setInterval(function(){
     SOM.play("sino"); try { if (navigator.vibrate) navigator.vibrate([120, 80, 120, 80, 200]); } catch(e){}
     toast(msg);
     var ia = animoIdx();
-    run("voz", S.me, S.pin, "a" + ia).then(function(c){ return tocaClip(c); }).catch(function(){ VOZ.fala(msg.replace(/^[^A-Za-zÀ-ú]+/, "")); });
+    if (NARRACAO_ON) run("voz", S.me, S.pin, "a" + ia).then(function(c){ return tocaClip(c); }).catch(function(){ VOZ.fala(msg.replace(/^[^A-Za-zÀ-ú]+/, "")); });
     try { if (document.hidden && window.Notification && Notification.permission === "granted" && navigator.serviceWorker && navigator.serviceWorker.ready) navigator.serviceWorker.ready.then(function(r){ r.showNotification("Amigos de Maribondo", {body: msg}); }); } catch(e){}
   }
   // aviso do podcast no horário
@@ -2394,7 +2396,7 @@ setInterval(function(){
 var S_FOLHA = null, S_FOLHA_LOAD = false;
 function gestaoExtras(){
   var c = cfg(), d = S.data, h = "";
-  h += '<div class="gsec"><h2>🔊 Narração do app</h2><p class="sub">Toque para ouvir a voz gravada (Pedro). Se aparecer erro, ele diz o que falta.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn primary" data-x="vozTeste" data-k="g1">▶ Abertura</button><button class="btn" data-x="vozTeste" data-k="b1">▶ Meta batida</button><button class="btn" data-x="vozTeste" data-k="a1">▶ Alerta</button></div>' + (VOZ_ERRO ? '<p class="sub" style="color:' + (/^Formato/.test(VOZ_ERRO) ? 'var(--muted)' : 'var(--bad)') + '">' + (/^Formato/.test(VOZ_ERRO) ? 'ℹ️ ' : '⚠️ ') + esc(VOZ_ERRO) + '</p>' : '') + '</div>';
+  h += '<div class="gsec"><h2>🔊 Narração do app</h2><p class="sub">Narração <b>desligada</b> no app (só efeitos sonoros). Estes botões servem só para testar a voz enquanto ela é ajustada.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn primary" data-x="vozTeste" data-k="g1">▶ Abertura</button><button class="btn" data-x="vozTeste" data-k="b1">▶ Meta batida</button><button class="btn" data-x="vozTeste" data-k="a1">▶ Alerta</button></div>' + (VOZ_ERRO ? '<p class="sub" style="color:' + (/^Formato/.test(VOZ_ERRO) ? 'var(--muted)' : 'var(--bad)') + '">' + (/^Formato/.test(VOZ_ERRO) ? 'ℹ️ ' : '⚠️ ') + esc(VOZ_ERRO) + '</p>' : '') + '</div>';
   // engajamento da semana
   var eng = (S_PTS && S_PTS.engajamento) || [], T = c.engTipos || {};
   h += '<div class="gsec"><h2>📣 Engajamento da semana (' + eng.length + ')</h2>' + (eng.length ? '<div class="dlist">' + eng.map(function(x){
@@ -2507,7 +2509,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611100706";
+var APP_VERSAO = "202611100712";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
