@@ -2008,8 +2008,24 @@ var FRASES_LOGIN = ["E aí, {n}! A gente confia demais no teu trabalho, viu? Arr
 /* ---------- voz de estúdio (gravada no servidor) com reserva na voz do celular ---------- */
 var VOZEL = new Audio(); VOZEL.preload = "auto";
 var VOZ_SIL = "data:audio/wav;base64,UklGRrQBAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YZABAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICA", VOZ_DESTRAVADA = false;
-document.addEventListener("pointerdown", function(){ if (VOZ_DESTRAVADA) return; VOZ_DESTRAVADA = true; try { VOZEL.src = VOZ_SIL; var p = VOZEL.play(); if (p && p.catch) p.catch(function(){ VOZ_DESTRAVADA = false; }); } catch(e){} }, true);
-function tocaClip(c){ if (!c || !c.b64) return Promise.reject(new Error("sem clip")); try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch(e){} VOZEL.src = "data:" + (c.mime || "audio/wav") + ";base64," + c.b64; VOZEL.currentTime = 0; return VOZEL.play(); }
+document.addEventListener("pointerdown", function(){ if (VOZ_DESTRAVADA) return; VOZ_DESTRAVADA = true; try { destravaVoz(); } catch(e){} }, true);
+var VOZCTX = null, VOZSRC = null;
+function vozCtx(){ try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch(e){}
+  try { VOZCTX = VOZCTX || new (window.AudioContext || window.webkitAudioContext)(); if (VOZCTX.state !== "running") VOZCTX.resume(); } catch(e){} return VOZCTX; }
+function b64Bytes(b64){ var bin = atob(b64), n = bin.length, u = new Uint8Array(n); for (var i = 0; i < n; i++) u[i] = bin.charCodeAt(i); return u; }
+/* toca a narração: 1º pelo motor de áudio (funciona no iPhone mesmo com formatos crus), 2º pelo player normal */
+function tocaClip(c){
+  if (!c || !c.b64) return Promise.reject(new Error("sem clip"));
+  try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch(e){}
+  var bytes = b64Bytes(c.b64), ctx = vozCtx();
+  var porPlayer = function(){ try { if (VOZEL._url) URL.revokeObjectURL(VOZEL._url); VOZEL._url = URL.createObjectURL(new Blob([bytes], {type: c.mime || "audio/wav"})); VOZEL.src = VOZEL._url; VOZEL.currentTime = 0; return VOZEL.play(); } catch(e){ return Promise.reject(e); } };
+  if (!ctx) return porPlayer();
+  return new Promise(function(ok, falha){
+    var buf = bytes.buffer.slice(0);
+    var feito = function(ab){ try { if (VOZSRC) VOZSRC.stop(); } catch(e){} var src = ctx.createBufferSource(); src.buffer = ab; var g = ctx.createGain(); g.gain.value = 1; src.connect(g); g.connect(ctx.destination); src.start(0); VOZSRC = src; ok(); };
+    try { var p = ctx.decodeAudioData(buf, feito, function(){ porPlayer().then(ok, falha); }); if (p && p.catch) p.catch(function(){}); } catch(e){ porPlayer().then(ok, falha); }
+  });
+}
 var VOZ_MEM = null, VOZ_ERRO = "";
 function hojeLocal(){ return new Date(Date.now() - 3 * 3600e3).toISOString().slice(0, 10); }
 function vozCache(){
@@ -2030,7 +2046,7 @@ function buscaVozes(forcar){
     .catch(function(e){ VOZ_ERRO = errMsg(e); return null; }).finally(function(){ VOZ_BUSCANDO = null; });
   return VOZ_BUSCANDO;
 }
-function destravaVoz(){ try { VOZEL.src = VOZ_SIL; var p = VOZEL.play(); if (p && p.catch) p.catch(function(){}); } catch(e){} }
+function destravaVoz(){ var ctx = vozCtx(); try { if (ctx){ var o = ctx.createBufferSource(); o.buffer = ctx.createBuffer(1, 1, 22050); o.connect(ctx.destination); o.start(0); } } catch(e){} try { VOZEL.src = VOZ_SIL; var p = VOZEL.play(); if (p && p.catch) p.catch(function(){}); } catch(e){} }
 setTimeout(function(){ if (logged()) buscaVozes(); }, 300);
 function fraseDoDia(){ var o = S.data && S.data.ontem; return escolheDia(FRASES[o === "bom" ? "bom" : o === "melhorar" ? "melhorar" : "geral"]); }
 function falaLogin(){ if (!S.me) return; VOZ_MEM = null; try { localStorage.removeItem("vozHoje"); } catch(e){}
@@ -2352,7 +2368,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611100615";
+var APP_VERSAO = "202611100628";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
