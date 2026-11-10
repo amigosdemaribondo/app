@@ -706,11 +706,11 @@ function renderDia(mine){
   var tab = S_DIATAB, lista = tab === "concluidas" ? conc : tab === "nao" ? nao : agora;
   var semFoto = conc.filter(semFotoTar).filter(function(b){ return !mine || b.pessoas.indexOf(S.me) >= 0; });
   var out = '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
-    + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>Para confirmar</button>'
+    + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>No horário</button>'
     + '<button class="dcc" data-act="diatab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+conc.length+'</b>Concluídas</button>'
-    + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Não confirmadas</button></div>';
+    + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Não respondidas</button></div>';
   if (semFoto.length) out += '<div class="alert semFotoAl" role="alert"><b>📷 '+semFoto.length+' atividade'+(semFoto.length>1?'s':'')+' concluída'+(semFoto.length>1?'s':'')+' sem foto</b>'+semFoto.map(function(b){ return esc(b.titulo)+' ('+b.pessoas.map(function(p){ return esc(pessoa(p).nome); }).join(", ")+')'; }).join(" · ")+'<span>Quem fez: abra em <b>Concluídas</b> e toque em <b>📷 Enviar foto</b>.</span></div>';
-  if (!lista.length) return out + '<div class="empty"><b>'+(tab==="agora" ? "🎉 Nada pendente agora" : tab==="concluidas" ? "Nenhuma concluída ainda" : "Nenhuma sem confirmação 👏")+'</b>'+(tab==="agora" ? "As atividades concluídas estão em Concluídas." : "")+'</div>';
+  if (!lista.length) return out + '<div class="empty"><b>'+(tab==="agora" ? "🎉 Nada pendente agora" : tab==="concluidas" ? "Nenhuma concluída ainda" : "Nenhuma sem resposta 👏")+'</b>'+(tab==="agora" ? "As atividades concluídas estão em Concluídas." : "")+'</div>';
   var last = null;
   lista.forEach(function(b){
     if (b.turno !== last){ var t = TURNOS[b.turno] || [b.turno,"","--muted"]; out += (last!==null?"</div>":"") + '<div class="turno" style="--tc:var('+t[2]+')"><b>'+esc(t[0])+'</b><span>'+t[1]+'</span><hr></div><div class="list">'; last = b.turno; }
@@ -2582,7 +2582,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611101706";
+var APP_VERSAO = "202611101717";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
