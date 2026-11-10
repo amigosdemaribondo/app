@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,7 +19,7 @@
 <style>
 /* Layout: painel de comando escuro — frase do dia, placar e alerta no topo; agenda em linha do tempo com ações por atividade; abas fixas embaixo. */
 :root{
-  --bg:#04060B; --navy:#0A1428; --navy2:#0F1E3A; --navy3:#16294D; --ink:#EEF3FF; --muted:#93A3C4; --line:#1F3360;
+  --bg:#04060B; --navy:#0A1428; --navy2:#0F1E3A; --navy3:#16294D; --ink:#EEF3FF; --muted:#93A3C4; --line:#1F3360; --field:#04060B;
   --gold:#F5C518; --gold-soft:rgba(245,197,24,.14); --red:#FF3B3B; --red-soft:rgba(255,59,59,.16); --green:#2FD07A; --green-soft:rgba(47,208,122,.15);
   --amber:#FF9F1C; --blue:#4D8DFF;
   --f-display:"Sora", "Segoe UI", system-ui, sans-serif; --f-body:"Inter", -apple-system, system-ui, sans-serif;
@@ -33,11 +34,12 @@ button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webk
 button:active{transform:scale(.96)}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .tnum{font-variant-numeric:tabular-nums}
-input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%;min-width:0}
+input,select,textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--field);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%;min-width:0}
 input[type="datetime-local"],input[type="date"],input[type="month"]{color-scheme:dark}
 h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 .u{border-bottom:2px solid var(--gold);padding-bottom:1px}
 .muted{color:var(--muted)}
+.chipc span,.bp2 span{color:var(--muted)}
 .sm{font-size:12.5px}
 
 /* topo */
@@ -518,7 +520,8 @@ var SOM = (function(){
   };
   return { on:function(){ return on; }, set:function(v){ on = v; try { localStorage.setItem("ma_som", v ? "1" : "0"); } catch(e){} },
     play:function(k){ try { if (navigator.vibrate && k !== "tick" && k !== "bip") navigator.vibrate(k === "alerta" ? [120,60,120,60,200] : k === "clique" ? 6 : 18); } catch(e){}
-      if (!on || !S2[k]) return; try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); S2[k](); } catch(e){} } };
+      if (!on || !S2[k]) return; try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch(e){}
+      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); S2[k](); window.__sons = (window.__sons || 0) + 1; } catch(e){} } };
 })();
 var tTimer;
 function toast(m){ $("toast").textContent = m; $("toast").hidden = false; clearTimeout(tTimer); tTimer = setTimeout(function(){ $("toast").hidden = true; }, 3200); }
@@ -1446,6 +1449,31 @@ carregarNuvem();
 setInterval(function(){ if (!document.hidden && PIN && !Object.keys(gravando).some(function(k){ return gravando[k]; })) carregarNuvem(); }, 120000);
 document.addEventListener("visibilitychange", function(){ if (!document.hidden && PIN) carregarNuvem(); });
 window.addEventListener("online", enviarPendentes);
+})();
+
+/* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
+var APP_VERSAO = "202611100414";
+(function(){
+  var checando = false;
+  function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
+  function checar(){
+    if (checando || location.protocol === "file:") return; checando = true;
+    fetch(location.pathname + "?nv=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(txt){
+      var m = txt.match(/APP_VERSAO = "(\d+)"/);
+      if (m && m[1] !== APP_VERSAO && m[1] > APP_VERSAO){
+        if (ocupado()) { setTimeout(checar, 20000); return; }
+        try { sessionStorage.setItem("atualizou", m[1]); } catch(e){}
+        var aviso = document.createElement("div"); aviso.textContent = "⬇️ Atualizando para a versão nova…";
+        aviso.setAttribute("style", "position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:9999;background:#FFD23F;color:#1B1400;font-weight:800;padding:10px 16px;border-radius:12px;box-shadow:0 6px 20px rgba(0,0,0,.3);font-family:system-ui,sans-serif");
+        document.body.appendChild(aviso);
+        setTimeout(function(){ location.replace(location.pathname + "?v=" + m[1]); }, 700);
+      }
+    }).catch(function(){}).finally(function(){ checando = false; });
+  }
+  setTimeout(checar, 1500);
+  setInterval(function(){ if (!document.hidden) checar(); }, 5 * 60 * 1000);
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden) checar(); });
+  try { if (sessionStorage.getItem("atualizou")) { sessionStorage.removeItem("atualizou"); setTimeout(function(){ var t = document.createElement("div"); t.textContent = "✅ App atualizado"; t.setAttribute("style", "position:fixed;left:50%;top:calc(14px + env(safe-area-inset-top,0px));transform:translateX(-50%);z-index:9999;background:#3BE38A;color:#06301A;font-weight:800;padding:10px 16px;border-radius:12px;font-family:system-ui,sans-serif"); document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 2500); }, 600); } } catch(e){}
 })();
 </script>
 
