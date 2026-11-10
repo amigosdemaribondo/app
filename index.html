@@ -1761,7 +1761,7 @@ function renderCadastro(){
   if (!S_CAD){ setTimeout(loadCadastro, 0); return h + '<p class="sub">Carregando…</p></div>'; }
   if (S_CADED) return h + cadForm(S_CADED) + '</div>';
   h += '<div class="cad">' + S_CAD.map(function(x){
-    return '<div class="p">'+chip(x.id)+'<span class="when">'+(x.livre?'horário livre':horas(x.cargaMin)+' por semana')+' · '+(x.telefone?'📱 '+esc(x.telefone):'<span style="color:var(--warn)">sem WhatsApp</span>')+' · PIN '+esc(x.pin)+'</span><button class="btn" data-g="cadEd" data-p="'+esc(x.id)+'">Editar</button></div>';
+    return '<div class="p">'+chip(x.id)+'<span class="when">'+(x.livre?'horário livre':horas(x.cargaMin)+' por semana')+' · '+(x.telefone?'📱 '+esc(x.telefone):'<span style="color:var(--warn)">sem WhatsApp</span>')+(S.data && S.data.dono ? ' · PIN '+esc(x.pin) : '')+'</span><span class="row" style="gap:6px"><button class="btn" data-g="cadEd" data-p="'+esc(x.id)+'">Editar</button>'+(S.data && S.data.dono ? '<button class="btn" data-g="novoPin" data-p="'+esc(x.id)+'">🔑 Novo PIN</button>' : '')+'</span></div>';
   }).join("") + '</div></div>';
   return h;
 }
@@ -1983,6 +1983,11 @@ $("view").addEventListener("click", function(e){
   }
   if (g==="prazoOk" || g==="prazoNao"){
     return gAct(run("decidirPrazo", S.me, S.pin, b.dataset.d, b.dataset.b, g==="prazoOk").then(function(r){ return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast(g==="prazoOk" ? "Prazo aprovado até "+fmtPrazo(r.prazo)+"." : "Pedido recusado."); }); }));
+  }
+  if (g==="novoPin"){
+    var alvo = b.dataset.p, nm = pessoa(alvo).nome, esc1 = window.prompt("Novo PIN para " + nm + " (4 a 6 números). Deixe vazio para o app sortear:", "");
+    if (esc1 === null) return;
+    return gAct(run("novoPinColaborador", S.me, S.pin, alvo, esc1.trim()).then(function(r){ S_CAD = null; toast("🔑 Novo PIN de " + r.nome + ": " + r.pin + " · celular liberado. Ela entra com esse PIN."); renderGestao(); }));
   }
   if (g==="liberar"){
     if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Confirmar liberação"; return; }
@@ -2486,7 +2491,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611101303";
+var APP_VERSAO = "202611101322";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
