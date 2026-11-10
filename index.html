@@ -855,6 +855,18 @@ function renderGestao(){
   var p = S.painel, d = S.data;
   if (!p){ w.innerHTML = '<div class="empty"><b>Carregando o painel…</b>Frequência da semana, atrasos e quem falta bater ponto.</div>'; return; }
   var h = "";
+  // relatório final do dia
+  var OPD = p.opcoesDia || {seguir:"Dia de atividades executadas · seguir", ajustes:"Dia de necessidade de ajustes", urgencias:"Dia de reavaliação de urgências"};
+  var fe = p.fechamento;
+  h += '<div class="gsec"><h2>📋 Relatório final do dia</h2>'
+    + (fe ? '<div class="alert" style="background:var(--surface);border-color:var(--line);color:var(--ink)"><b>'+esc(OPD[fe.opcao]||fe.opcao)+'</b><br><span class="when">às '+esc(fe.hora)+' por '+esc(pessoa(fe.por).nome||fe.por)+(fe.obs?' · '+esc(fe.obs):'')+'</span></div><p class="sub">Para mudar, toque em outra opção.</p>'
+          : '<p class="sub">Feche o dia às 18h escolhendo uma opção. A coordenação recebe por e-mail.</p>')
+    + '<textarea id="gFObs" rows="2" maxlength="300" placeholder="Observação (obrigatória para ajustes e urgências)" style="width:100%;box-sizing:border-box;font:inherit;font-size:16px;border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--bg);color:var(--ink)"></textarea>'
+    + '<div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">'
+    + '<button class="btn primary big" data-g="fdia" data-o="seguir" style="background:var(--ok,#15803d);border-color:transparent">✅ '+esc(OPD.seguir)+'</button>'
+    + '<button class="btn big" data-g="fdia" data-o="ajustes" style="border:2px solid #d97706;color:#b45309">🛠 '+esc(OPD.ajustes)+'</button>'
+    + '<button class="btn big" data-g="fdia" data-o="urgencias" style="border:2px solid #dc2626;color:#b91c1c">🚨 '+esc(OPD.urgencias)+'</button>'
+    + '</div></div>';
   // agora
   var ag = p.agoraOng || {faltando:[], dentro:[], fora:[]};
   h += '<div class="gsec"><div class="row" style="justify-content:space-between"><h2>Agora · '+esc(p.agora)+'</h2>'
@@ -940,7 +952,7 @@ function renderGestao(){
     + '<div class="row"><input type="month" id="gMes" value="'+esc(mesAtual)+'"><button class="btn primary" data-g="rel">Gerar relatório</button></div>'
     + (S.relUrl ? '<a class="lnk" href="'+esc(S.relUrl)+'" target="_blank" rel="noopener">Abrir relatório na planilha</a>' : '') + '</div>';
   // keep form values across re-render
-  var keep = {}; ["gHora","gFim","gTurno","gTit","gItens","gMetas","gAtiv","gPara","gMes","gImp"].forEach(function(id){ var el=$(id); if (el) keep[id] = el.type==="checkbox"?el.checked:el.value; });
+  var keep = {}; ["gHora","gFim","gTurno","gTit","gItens","gMetas","gAtiv","gPara","gMes","gImp","gFObs"].forEach(function(id){ var el=$(id); if (el) keep[id] = el.type==="checkbox"?el.checked:el.value; });
   w.innerHTML = h;
   Object.keys(keep).forEach(function(id){ var el=$(id); if (!el) return; if (el.type==="checkbox") el.checked = keep[id]; else if (keep[id]) el.value = keep[id]; });
   if (lista === null && gd) load(gd, true).then(renderGestao);
@@ -1041,6 +1053,12 @@ $("view").addEventListener("click", function(e){
     if (t.fim <= t.hora) return toast("O fim precisa ser depois do início.");
     if (!t.pessoas.length) return toast("Escolha quem faz a tarefa.");
     return gAct(run("addTarefa", S.me, S.pin, t), function(d){ S.data = d; S.pick = []; ["gHora","gFim","gTit","gItens","gMetas"].forEach(function(id){ $(id).value=""; }); $("gAtiv").checked = false; toast("Tarefa adicionada em "+fmtDate(gd)+"."); });
+  }
+  if (g==="fdia"){
+    var fobs = ($("gFObs") ? $("gFObs").value : "").trim();
+    if (b.dataset.o !== "seguir" && fobs.length < 3) return toast("Escreva o que precisa de ajuste ou qual é a urgência.");
+    if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Toque de novo para confirmar"; return; }
+    return gAct(run("fecharDia", S.me, S.pin, b.dataset.o, fobs), function(pp){ S.painel = pp; if ($("gFObs")) $("gFObs").value = ""; toast("Relatório final do dia registrado."); load(null, true); });
   }
   if (g==="importar"){
     S_IMP_OPEN = true;
