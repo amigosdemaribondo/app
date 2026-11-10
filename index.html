@@ -52,10 +52,15 @@ h1 span{color:var(--muted);font-weight:600}
 .day small{color:var(--muted);font-size:12px}
 .day[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
 .day[aria-pressed="true"] small{color:inherit;opacity:.75}
-.expd{display:flex;gap:10px;align-items:center;background:var(--bad-bg);border-radius:14px;padding:10px 12px;font-size:13px}
-.expd .clk{font-weight:800;color:var(--surface);background:var(--bad);border-radius:9px;padding:5px 8px;line-height:1.15;text-align:center;white-space:nowrap;font-size:12.5px}
-.expd p{margin:0;min-width:0}
-.expd b{color:var(--bad)}
+.expd{background:var(--surface);border:1.5px solid var(--accent);border-radius:16px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.expd-h{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.expd-h b{font-family:var(--f-display);font-size:17px;letter-spacing:.02em}
+.expd-h span{font-weight:800;font-size:14px;color:#1B1400;background:var(--accent);border-radius:999px;padding:4px 12px}
+.passos{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;counter-reset:p}
+.passos li{display:flex;align-items:center;gap:12px;font-size:16px;line-height:1.3;counter-increment:p}
+.passos li i{font-style:normal;width:38px;height:38px;flex:none;border-radius:12px;background:rgba(255,255,255,.1);display:grid;place-items:center;font-size:19px;position:relative;border-bottom:2px solid var(--accent)}
+.passos li i::after{content:counter(p);position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--accent);color:#1B1400;font-size:11px;font-weight:900;display:grid;place-items:center;font-family:var(--f-body)}
+.passos b{color:#fff}
 .sum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
 .stat .n{font-family:var(--f-display);font-weight:800;font-size:24px;line-height:1}
@@ -297,6 +302,57 @@ td.reg span{display:inline-block;margin-right:6px}
 input::placeholder,textarea::placeholder{color:rgba(255,255,255,.6)}
 input,select,textarea{background:#16408D;color:#fff;border-color:rgba(255,255,255,.25)}
 a.lnk,.lnk{color:#FFE27A}
+
+/* pontos e metas */
+.metabox{display:grid;grid-template-columns:1fr;gap:10px}
+.metabox:empty{display:none}
+.mcard{background:var(--surface);border:1.5px solid rgba(255,255,255,.18);border-radius:18px;padding:14px;display:flex;gap:14px;align-items:center;box-shadow:0 4px 14px rgba(8,26,70,.18)}
+.mring{position:relative;width:104px;height:104px;flex:none}
+.mring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.mring .t{stroke:rgba(255,255,255,.14)}
+.mring .v{stroke:var(--accent);transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.mring.ok .v{stroke:var(--ok)}
+.mring b{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--f-display);font-size:24px}
+.mring small{position:absolute;left:0;right:0;bottom:22px;text-align:center;font-size:10px;font-weight:700;color:var(--muted)}
+.mtx2{min-width:0;display:flex;flex-direction:column;gap:3px}
+.mtx2 .ey{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.mtx2 .big{font-family:var(--f-display);font-size:22px;font-weight:800;line-height:1.1}
+.mtx2 .big i{font-style:normal;font-size:14px;color:var(--muted);font-weight:700}
+.mtx2 .sm{font-size:13px;color:var(--muted)}
+.checks{display:flex;flex-wrap:wrap;gap:3px;margin-top:4px}
+.checks span{width:18px;height:18px;border-radius:50%;background:var(--ok);color:#06301A;font-size:11px;font-weight:900;display:grid;place-items:center;animation:pop .4s ease both}
+@keyframes pop{from{transform:scale(0)}70%{transform:scale(1.25)}to{transform:scale(1)}}
+.mcard.mini{padding:10px 12px}.mcard.mini .mring{width:64px;height:64px}.mcard.mini .mring b{font-size:15px}.mcard.mini .mring small{display:none}
+.rank{display:flex;flex-direction:column;gap:8px}
+.rk{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;padding:10px;border-radius:12px;background:rgba(255,255,255,.06)}
+.rk .bar2{grid-column:1/-1;height:8px;border-radius:99px;background:rgba(255,255,255,.12);overflow:hidden}
+.rk .bar2 i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.rk.ok .bar2 i{background:var(--ok)}.rk.baixo .bar2 i{background:var(--bad)}
+.rk .sel{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px;font-size:12px}
+.rk .sel span{background:rgba(255,255,255,.1);border-radius:999px;padding:1px 8px}
+.rk .sel span.neg{background:var(--bad-bg);color:#FFD0D0}
+.rk b.pp{font-family:var(--f-display);white-space:nowrap}
+.regrasP{display:grid;grid-template-columns:1fr auto;gap:4px 10px;font-size:13px}
+.regrasP .p{font-weight:800;text-align:right}.regrasP .p.pos{color:var(--ok)}.regrasP .p.neg{color:var(--bad)}
+
+.mcard.col{flex-direction:column;align-items:stretch}
+.mrow{display:flex;gap:14px;align-items:center}
+.aring{position:relative;flex:none}
+.aring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.aring .sg{transition:stroke-dashoffset 1.1s cubic-bezier(.2,.8,.2,1);transition-delay:var(--d)}
+.aring .ic{position:absolute;transform:translate(-50%,-50%) scale(0);width:26px;height:26px;border-radius:50%;background:#0F2F6E;border:2px solid rgba(255,255,255,.85);display:grid;place-items:center;font-size:13px;box-shadow:0 2px 6px rgba(0,0,0,.3)}
+.aring.on .ic{animation:icpop .45s cubic-bezier(.2,1.6,.4,1) both;animation-delay:var(--d)}
+@keyframes icpop{from{transform:translate(-50%,-50%) scale(0)}to{transform:translate(-50%,-50%) scale(1)}}
+.aring .ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.aring .pc{font-family:var(--f-display);font-size:26px;font-weight:800;line-height:1}
+.aring .ctr small{font-size:10.5px;font-weight:700;color:var(--muted);margin-top:3px}
+.aring.full svg{filter:drop-shadow(0 0 8px rgba(59,227,138,.7))}
+.aring .coroa{position:absolute;top:-6px;right:-4px;font-size:22px;animation:icpop .5s 1.6s both}
+.schips{display:flex;flex-wrap:wrap;gap:6px}
+.sc{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:3px 10px 3px 4px;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.08);border:1.5px solid var(--c);animation:pop .4s ease both}
+.sc i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--c);display:grid;place-items:center;font-size:11px}
+.sc b{color:var(--c)}
+@media (prefers-reduced-motion: reduce){.aring .sg{transition:none}.aring.on .ic,.sc,.aring .coroa{animation:none;transform:translate(-50%,-50%)}}
 </style>
 </head>
 <body>
@@ -320,12 +376,18 @@ a.lnk,.lnk{color:#FFE27A}
     <button class="btn primary" id="pinOk">Entrar</button>
   </div>
   <div class="days" id="days" role="group" aria-label="Dias"></div>
-  <div class="expd"><div class="clk tnum">08h–12h<br>14h–18h</div><p><b>Expediente a rigor.</b> Atraso ou falta sem aviso prévio será notificado. Registre entrada e saída na aba Ponto e marque o <b>início e a conclusão das atividades dentro do expediente</b>: fora dele gera alerta. Horários definidos pela coordenação na Gestão.</p></div>
+  <div class="expd"><div class="expd-h"><b>Todo dia</b><span class="tnum">08h–12h · 14h–18h</span></div>
+    <ol class="passos">
+      <li><i>⏱</i><span><b>Bater o ponto</b> na entrada e na saída de cada turno</span></li>
+      <li><i>✅</i><span><b>Iniciar e concluir</b> as atividades do dia</span></li>
+      <li><i>📲</i><span><b>Usar o app</b> para tudo da ONG</span></li>
+    </ol></div>
   <div class="sum">
     <div class="stat"><div class="n tnum" id="sDone">–</div><div class="l">tarefas concluídas</div><div class="bar"><i id="sBar" style="width:0"></i></div></div>
     <div class="stat"><div class="n tnum" id="sLive">–</div><div class="l">iniciadas agora</div></div>
     <div class="stat"><div class="n tnum" id="sPonto">–</div><div class="l" id="sPontoL">na ONG agora</div></div>
   </div>
+  <div id="metaBox" class="metabox"></div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-v="dia"><i aria-hidden="true">📋</i>Dia</button>
     <button role="tab" aria-selected="false" data-v="minhas"><i aria-hidden="true">✅</i>Minhas</button>
@@ -373,6 +435,7 @@ function logged(){ return !!(S.me && S.pin); }
 
 function render(){
   var d = S.data; if (!d) return;
+  if (!$("metaBox").innerHTML && S_PTS) renderMeta();
   var sel = $("meSel"), k = d.equipe.map(function(p){return p.id}).join(",");
   if (sel.dataset.k !== k){ sel.innerHTML = '<option value="">escolher…</option>' + d.equipe.map(function(p){return '<option value="'+esc(p.id)+'">'+esc(p.nome)+'</option>'}).join(""); sel.dataset.k = k; }
   sel.value = S.me; sel.disabled = logged(); $("sair").hidden = !logged();
@@ -596,13 +659,13 @@ function renderDemandas(){
   var d = S.data;
   if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
   var cat = d.catalogo || [], porK = {}; cat.forEach(function(c){ porK[c.k] = c; });
-  var abertas = (d.demandas||[]).filter(function(x){ return x.estado !== "atendida"; });
+  var abertas = (d.demandas||[]).filter(function(x){ return x.estado !== "atendida" && x.estado !== "validada"; });
   var feitas = (d.demandas||[]).filter(function(x){ return x.estado === "atendida"; });
   var item = function(x){
     var c = porK[x.item] || {t:x.item};
     return '<div class="it'+(x.estado==="atendida"?" ok":"")+'"><span class="pill '+(x.estado==="atendida"?"ok":/terminou|mkt|video|reuniao/.test(x.item)?"bad":"warn")+'">'+(x.estado==="atendida"?"atendida":"aberta")+'</span><b>'+esc(c.t)+'</b>'+(x.detalhe?'<span>— '+esc(x.detalhe)+'</span>':'')
       + '<span class="when">'+esc(pessoa(x.pessoa).nome)+' · '+(x.dia===d.hoje?esc(x.hora):esc(x.dia.slice(8))+'/'+esc(x.dia.slice(5,7))+' '+esc(x.hora))+(x.estado==="atendida"?' · atendida às '+esc(x.atendidaHora):'')+'</span>'
-      + (d.verTodos && x.estado!=="atendida" ? '<button class="btn fin" data-act="atender" data-id="'+esc(x.id)+'">Atendida</button>' : '') + '</div>';
+      + (d.verTodos && x.item==="ideia" && x.estado!=="validada" ? '<button class="btn fin" data-act="validarIdeia" data-id="'+esc(x.id)+'">⭐ Validar ideia +27</button>' : d.verTodos && x.estado!=="atendida" && x.item!=="ideia" ? '<button class="btn fin" data-act="atender" data-id="'+esc(x.id)+'">Atendida</button>' : '') + '</div>';
   };
   var h = '<div class="eyebrow">Pedidos abertos ('+abertas.length+')</div>' + (abertas.length ? '<div class="dlist">'+abertas.map(item).join("")+'</div>' : '<p class="sub">Nenhum pedido aberto.</p>');
   var grupos = []; cat.forEach(function(c){ if (grupos.indexOf(c.g) < 0) grupos.push(c.g); });
@@ -972,6 +1035,94 @@ $("view").addEventListener("click", function(ev){
   }
 });
 
+
+/* ---------------- Pontos da semana (selos) ---------------- */
+var S_PTS = null, ptsAt = 0, ptsRef = "", ptsAnim = {};
+function loadPts(forcar){
+  if (!forcar && Date.now() - ptsAt < 60000) return Promise.resolve();
+  ptsAt = Date.now();
+  return run("pontuacao", S.me || "", S.pin || "", ptsRef).then(function(r){ S_PTS = r; renderMeta(); if (S.view === "gestao") renderGestao(); }).catch(function(){});
+}
+function anel(pct, txt, sub, ok){
+  var R = 42, C = 2*Math.PI*R, id = "r" + Math.random().toString(36).slice(2,7);
+  setTimeout(function(){ var c = document.getElementById(id); if (c) c.style.strokeDashoffset = (C*(1 - pct/100)).toFixed(1); }, 60);
+  return '<div class="mring' + (ok ? " ok" : "") + '"><svg viewBox="0 0 100 100"><circle class="t" cx="50" cy="50" r="' + R + '" fill="none" stroke-width="11"/><circle id="' + id + '" class="v" cx="50" cy="50" r="' + R + '" fill="none" stroke-width="11" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + C.toFixed(1) + '"/></svg><b class="tnum">' + txt + '</b>' + (sub ? '<small>' + sub + '</small>' : '') + '</div>';
+}
+var SELO_COR = {responsabilidade:"#FFD23F", compromisso:"#3BE38A", integracao:"#5FD3FF", criatividade:"#FF9F43", validadas:"#FFF3A3", suporte:"#FF7EB6"};
+var SELO_ORD = ["responsabilidade","compromisso","integracao","criatividade","validadas","suporte"];
+var SELO_PTS = {responsabilidade:59, compromisso:59, integracao:39, criatividade:7, validadas:27, suporte:3};
+function contaAte(el, alvo, ms){ var ini = performance.now(); (function p(now){ var k = Math.min(1, (now - ini) / ms); k = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(alvo * k) + "%"; if (k < 1) requestAnimationFrame(p); })(ini); }
+function anelSelos(pct, selos, rot, tam){
+  tam = tam || 150; selos = selos || {};
+  var R = 42, C = 2 * Math.PI * R, uid = "a" + Math.random().toString(36).slice(2, 8);
+  var pesos = SELO_ORD.map(function(k){ return {k:k, n:selos[k] || 0, w:(selos[k] || 0) * SELO_PTS[k]}; }).filter(function(x){ return x.n > 0; });
+  var tot = pesos.reduce(function(a, x){ return a + x.w; }, 0), frac = Math.max(0, Math.min(1, pct / 100));
+  var segs = "", icones = "", acc = 0;
+  pesos.forEach(function(x, i){
+    var len = tot ? frac * x.w / tot : 0; if (len <= 0) return;
+    var ini = acc; acc += len;
+    segs += '<circle class="sg" data-off="' + (C * (1 - len)).toFixed(1) + '" style="--d:' + (300 + i * 260) + 'ms;transform:rotate(' + (ini * 360) + 'deg);transform-origin:50% 50%" cx="50" cy="50" r="' + R + '" fill="none" stroke="' + SELO_COR[x.k] + '" stroke-width="11" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + C.toFixed(1) + '"/>';
+    var ang = (ini + len / 2) * 2 * Math.PI - Math.PI / 2, px = 50 + 50 * Math.cos(ang) * .84, py = 50 + 50 * Math.sin(ang) * .84;
+    if (len >= .07) icones += '<span class="ic" style="left:' + px.toFixed(1) + '%;top:' + py.toFixed(1) + '%;--d:' + (700 + i * 260) + 'ms">' + SELO[x.k][0] + '</span>';
+  });
+  if (!pesos.length && frac > 0) segs = '<circle class="sg" data-off="' + (C * (1 - frac)).toFixed(1) + '" style="--d:300ms" cx="50" cy="50" r="' + R + '" fill="none" stroke="var(--accent)" stroke-width="11" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + C.toFixed(1) + '"/>';
+  setTimeout(function(){ var box = document.getElementById(uid); if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll(".sg"), function(c){ c.style.strokeDashoffset = c.dataset.off; });
+    box.classList.add("on"); var n = box.querySelector(".pc"); if (n) contaAte(n, pct, 1400); }, 60);
+  var chips = SELO_ORD.map(function(k){ var n = selos[k] || 0; return n ? '<span class="sc" style="--c:' + SELO_COR[k] + '"><i>' + SELO[k][0] + '</i>' + SELO[k][1] + ' <b>×' + n + '</b></span>' : ''; }).join("");
+  return {html:'<div class="aring' + (pct >= 100 ? " full" : "") + '" id="' + uid + '" style="width:' + tam + 'px;height:' + tam + 'px"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="' + R + '" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="11"/>' + segs + '</svg>' + icones + '<div class="ctr"><b class="pc tnum">0%</b><small>' + rot + '</small></div>' + (pct >= 100 ? '<span class="coroa">🏆</span>' : '') + '</div>', chips:chips};
+}
+function renderMeta(){
+  var box = $("metaBox"); if (!box) return;
+  var r = S_PTS; if (!r){ box.innerHTML = ""; return; }
+  var h = "", eq = r.equipe || {pct:0, checks:0, selos:{}};
+  if (r.eu && r.eu.meta){
+    var eu = r.eu, ok = eu.pts >= eu.meta, a = anelSelos(eu.pct, eu.selos, "da minha meta", 150);
+    h += '<div class="mcard col"><div class="mrow">' + a.html + '<div class="mtx2"><span class="ey">Minha meta da semana</span><span class="big tnum">' + eu.pts + ' <i>/ ' + eu.meta + ' pts</i></span><span class="sm">' + (ok ? "🏆 Meta batida! Continue assim." : "Faltam <b>" + eu.falta + " pts</b> até domingo") + '</span>'
+      + (eu.neg && (eu.neg.advertencias || eu.neg.atrasos) ? '<span class="sm" style="color:#FFD0D0">' + (eu.neg.advertencias ? "⚠️ " + eu.neg.advertencias + " advertência(s) " : "") + (eu.neg.atrasos ? "🐢 " + eu.neg.atrasos + " atraso(s)" : "") + '</span>' : '') + '</div></div>'
+      + (a.chips ? '<div class="schips">' + a.chips + '</div>' : '<p class="sm" style="margin:0;color:var(--muted)">Conquiste seus primeiros selos: conclua as atividades e bata o ponto no horário.</p>') + '</div>';
+  }
+  var ae = anelSelos(eq.pct, eq.selos, "da equipe", r.eu && r.eu.meta ? 110 : 150);
+  h += '<div class="mcard col"><div class="mrow">' + ae.html + '<div class="mtx2"><span class="ey">Meta da equipe na semana</span><span class="sm"><b class="tnum">' + (eq.checks || 0) + '</b> selos conquistados pela equipe</span><span class="sm">Cada selo faz o anel avançar. Ninguém é identificado.</span></div></div>' + (ae.chips ? '<div class="schips">' + ae.chips + '</div>' : '') + '</div>';
+  var antes = box.dataset.chk ? +box.dataset.chk : null; box.dataset.chk = eq.checks || 0;
+  box.innerHTML = h;
+  if (antes != null && (eq.checks || 0) > antes){ try { SOM.play("ok"); } catch(e){} }
+}
+var SELO = {responsabilidade:["🛡️","Responsabilidade"], compromisso:["⏰","Compromisso"], integracao:["🔗","Integração"], criatividade:["💡","Criatividade"], validadas:["⭐","Ideia validada"], suporte:["🆘","Suporte"]};
+function gestaoPontos(){
+  var r = S_PTS;
+  if (!r || !r.pessoas) return '<div class="gsec"><h2>🏆 Pontos da semana</h2><p class="sub">Carregando…</p></div>';
+  var eq = r.equipe, R = r.regras || {};
+  var h = '<div class="gsec"><div class="row" style="justify-content:space-between"><button class="btn" data-g="ptsPrev" aria-label="Semana anterior">‹</button><h2>🏆 Pontos · ' + fmtDate(r.de) + ' a ' + fmtDate(r.ate) + '</h2><button class="btn" data-g="ptsNext" aria-label="Próxima semana">›</button></div>'
+    + (function(){ var a = anelSelos(eq.pct, eq.selos, "equipe", 140); return '<div class="mcard col" style="box-shadow:none"><div class="mrow">' + a.html + '<div class="mtx2"><span class="ey">Ritmo da equipe · sua base</span>'; })() + '<span class="big tnum">' + eq.pts + ' <i>/ ' + eq.meta + ' pts</i></span><span class="sm">' + eq.colaboradores + ' colaboradores · ' + eq.checks + ' selos</span></div></div>' + (function(){ var c = SELO_ORD.map(function(k){ var n = (eq.selos||{})[k] || 0; return n ? '<span class="sc" style="--c:' + SELO_COR[k] + '"><i>' + SELO[k][0] + '</i>' + SELO[k][1] + ' <b>×' + n + '</b></span>' : ''; }).join(""); return c ? '<div class="schips">' + c + '</div>' : ''; })() + '</div>'
+    + '<div class="rank">' + r.pessoas.map(function(p){
+      var cls = p.pct >= 100 ? " ok" : p.pct < 50 ? " baixo" : "", s = p.selos, n = p.neg, tags = "";
+      Object.keys(SELO).forEach(function(k){ if (s[k]) tags += '<span>' + SELO[k][0] + ' ' + SELO[k][1] + ' ×' + s[k] + '</span>'; });
+      if (n.advertencias) tags += '<span class="neg">⚠️ Advertência ×' + n.advertencias + '</span>';
+      if (n.naoFeitasComPrazo) tags += '<span class="neg">⏱ Não feita com prazo ×' + n.naoFeitasComPrazo + '</span>';
+      if (n.atrasos) tags += '<span class="neg">🐢 Atraso ×' + n.atrasos + ' (' + n.minAtraso + ' min)</span>';
+      if (n.indiretas) tags += '<span class="neg">📵 Fora do app ×' + n.indiretas + '</span>';
+      if (n.faltas) tags += '<span class="neg">🚫 Falta ×' + n.faltas + '</span>';
+      return '<div class="rk' + cls + '">' + chip(p.id) + '<b class="pp tnum">' + p.pts + ' / ' + p.meta + ' · ' + p.pct + '%</b><div class="bar2"><i style="width:' + p.pct + '%"></i></div><div class="sel">' + (tags || '<span>Sem registros ainda</span>') + '</div></div>'; }).join("") + '</div>'
+    + '<div class="row" style="border-top:1px dashed var(--line);padding-top:10px;flex-wrap:wrap"><span class="sub">📵 Pedido feito fora do app</span><select id="indQuem" style="flex:1 1 120px">' + (S.data ? S.data.equipe : []).map(function(x){ return '<option value="' + esc(x.id) + '">' + esc(x.nome) + '</option>'; }).join("") + '</select><input id="indObs" maxlength="200" placeholder="O que foi pedido" style="flex:1 1 160px"><button class="btn" data-g="indireta">Lançar −5</button></div>';
+  var ideias = (r.ideias || []).filter(function(x){ return x.estado !== "validada"; });
+  h += '<div class="eyebrow" style="margin-top:6px">💡 Ideias para validar (' + ideias.length + ')</div>' + (ideias.length ? ideias.map(function(x){ return '<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0">' + chip(x.pessoa) + '<span style="flex:1 1 160px;min-width:0">' + esc(x.texto) + '</span><button class="btn fin" data-g="validar" data-id="' + esc(x.id) + '">⭐ Validar +27</button></div>'; }).join("") : '<p class="sub">Nenhuma ideia esperando.</p>');
+  h += '<details style="margin-top:6px"><summary class="sub" style="cursor:pointer">Regras de pontuação</summary><div class="regrasP" style="margin-top:8px">'
+    + [["🛡️ Responsabilidade: dia com todas as atividades concluídas no prazo", R.RESPONSABILIDADE],["⏰ Compromisso: dia com todos os pontos no horário", R.COMPROMISSO],["🔗 Integração: pedido pelo app (1 por dia)", R.INTEGRACAO],["💡 Criatividade: ideia enviada", R.IDEIA_ENVIO],["⭐ Ideia validada", R.IDEIA_VALIDADA],["🆘 Pedido de suporte pelo app", R.SUPORTE],["⚠️ Advertência: atividade não feita, sem pedir prazo", R.ADVERTENCIA],["⏱ Atividade não feita, com prazo pedido", R.NAO_FEITA_COM_PRAZO],["🐢 A cada 30 min de atraso no ponto (por turno)", R.ATRASO_30MIN],["📵 Pedido fora do app", R.INDIRETA]]
+      .map(function(x){ return '<span>' + x[0] + '</span><span class="p ' + (x[1] < 0 ? "neg" : "pos") + '">' + (x[1] > 0 ? "+" : "") + x[1] + '</span>'; }).join("")
+    + '<span><b>🎯 Meta semanal de cada um</b>: máximo possível − ' + R.FALHAS_PERMITIDAS + ' (1 atraso de turno + 1 atividade com prazo)</span><span></span></div></details></div>';
+  return h;
+}
+$("view").addEventListener("click", function(e){
+  var b = e.target.closest("[data-g]"); if (!b || S.busy) return;
+  var g = b.dataset.g;
+  if (g === "ptsPrev" || g === "ptsNext"){ ptsRef = isoAdd((S_PTS && S_PTS.de) || S.data.hoje, g === "ptsPrev" ? -7 : 7); loadPts(true); return; }
+  if (g === "indireta"){ var q = $("indQuem").value, o = $("indObs").value.trim(); if (o.length < 3) return toast("Escreva o que foi pedido fora do app.");
+    if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Confirmar −5"; return; }
+    S.busy = true; return run("registrarIndireta", S.me, S.pin, q, o).then(function(r){ S_PTS = r; toast("Lançado: −5 pts para " + pessoa(q).nome + "."); }).catch(function(err){ toast(errMsg(err)); }).finally(function(){ S.busy = false; renderMeta(); renderGestao(); }); }
+  if (g === "validar"){ S.busy = true; return run("validarIdeia", S.me, S.pin, b.dataset.id).then(function(r){ S_PTS = r; toast("⭐ Ideia validada (+27 pts)."); }).catch(function(err){ toast(errMsg(err)); }).finally(function(){ S.busy = false; renderMeta(); renderGestao(); }); }
+});
+
 /* ---------------- Avisos (histórico do dia) ---------------- */
 var S_AVF = "todos";
 var WA_ICON = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm0 18.2a8.2 8.2 0 0 1-4.2-1.2l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2zm4.5-6.1c-.2-.1-1.5-.7-1.7-.8s-.4-.1-.6.1-.7.8-.8 1-.3.2-.5.1a6.7 6.7 0 0 1-3.3-2.9c-.3-.4.3-.4.7-1.3a.5.5 0 0 0 0-.5l-.8-1.8c-.2-.5-.4-.4-.6-.4h-.5a1 1 0 0 0-.7.3 3 3 0 0 0-.9 2.2 5.1 5.1 0 0 0 1.1 2.7 11.7 11.7 0 0 0 4.5 4c1.7.7 2.3.8 3.2.7a2.7 2.7 0 0 0 1.8-1.3 2.2 2.2 0 0 0 .1-1.3c0-.1-.2-.2-.5-.3z"/></svg>';
@@ -1077,7 +1228,7 @@ function cacheKey(){ return "cache_" + (S.me || "anon"); }
 function salvarCache(d){ try { if (d && d.dia === d.hoje) localStorage.setItem(cacheKey(), JSON.stringify(d)); } catch(e){} }
 function lerCache(){ try { var d = JSON.parse(localStorage.getItem(cacheKey()) || "null"); return d; } catch(e){ return null; } }
 function load(dia, quiet){
-  return run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){ S.data = d; salvarCache(d); $("note").textContent = ""; render(); })
+  return run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){ S.data = d; salvarCache(d); $("note").textContent = ""; render(); loadPts(!quiet); })
     .catch(function(e){ if (!quiet) $("note").textContent = "Não foi possível carregar: " + errMsg(e); });
 }
 function act(p){
@@ -1120,6 +1271,7 @@ $("view").addEventListener("click", function(ev){
     if (inp && det.length < 2) return toast("Escreva o que precisa.");
     return act(run("criarDemanda", S.me, S.pin, k, det)).then(function(){ toast("Pedido enviado para a coordenação."); }).catch(function(){});
   }
+  if (a === "validarIdeia") return run("validarIdeia", S.me, S.pin, btn.dataset.id).then(function(r){ S_PTS = r; renderMeta(); toast("⭐ Ideia validada (+27 pts)."); return load(null, true); }).catch(function(e){ toast(errMsg(e)); });
   if (a === "atender") return act(run("atenderDemanda", S.me, S.pin, btn.dataset.id)).then(function(){ toast("Demanda marcada como atendida."); }).catch(function(){});
   if (a === "vsalvar"){
     var v = {regiao: $("vReg").value.trim(), data: $("vData").value, nome: $("vNome").value.trim(), telefone: $("vTel").value.trim(), responsaveis: S_VRESP.slice()};
@@ -1293,7 +1445,7 @@ function renderGestao(){
   var w = $("gWrap"); if (!w) return;
   var p = S.painel, d = S.data;
   if (!p){ w.innerHTML = '<div class="empty"><b>Carregando o painel…</b>Frequência da semana, atrasos e quem falta bater ponto.</div>'; return; }
-  var h = "";
+  var h = gestaoPontos();
   // relatório final do dia
   var OPD = p.opcoesDia || {seguir:"Dia de atividades executadas · seguir", ajustes:"Dia de necessidade de ajustes", urgencias:"Dia de reavaliação de urgências"};
   var fe = p.fechamento;
