@@ -221,6 +221,36 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 .fb.ok{background:var(--green);color:#03140A}.fb.pz{background:transparent;border:2px solid var(--amber);color:var(--amber)}.fb.ft{width:56px;background:transparent;border:2px solid var(--gold);color:var(--gold);font-size:20px}
 .fprox{display:flex;flex-direction:column;gap:4px;border-top:1px dashed var(--line);padding-top:10px;font-size:13.5px;color:var(--muted)}
 .fprox i{font-style:normal;font-family:var(--f-display);font-weight:700;color:var(--gold);margin-right:4px}
+.fsec{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:6px}
+.fsec button,.acts2 button,.amini button,.tbt button,.pzr button{border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:11px;padding:9px 6px;font-weight:800;font-size:13px}
+.ftimer{border-color:var(--gold)!important;color:var(--gold)!important}
+.ftimer.on{background:var(--gold)!important;color:#1B1400!important}
+.acts2{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.acts2 button{flex:1}
+.acts2 .bp{border-color:var(--amber);color:var(--amber)}
+.amini{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.amini button{padding:6px 10px;font-size:12.5px}
+.acao.desc{opacity:.55}
+.acao.desc b{text-decoration:line-through}
+.tag.desc{background:rgba(148,163,184,.2);color:var(--muted)}
+.at.st-desc{opacity:.55}
+.mfoco{width:100%;border:1px dashed var(--line);background:transparent;color:var(--muted);border-radius:12px;padding:9px;font-weight:700;font-size:13px}
+.mfoco.on{border-style:solid;border-color:var(--gold);color:var(--gold)}
+.triag{border:2px solid var(--red);border-radius:18px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--red-soft)}
+.tlimpa{border:0;background:none;color:#FFB4B4;font-size:12.5px;font-weight:700;text-decoration:underline;padding:2px}
+.triag .tcab{font-size:13px;font-weight:700;color:#FFB4B4}
+.triag .tit{display:flex;gap:12px;align-items:center}
+.triag .tit small{font-size:11px;font-weight:800;letter-spacing:.1em;color:#FF8A8A}
+.triag .tit b{display:block;font-size:18px;font-family:var(--f-display)}
+.tbt{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tbt .ok{background:var(--green);border-color:var(--green);color:#03140A}
+.tbt .pz{border-color:var(--amber);color:var(--amber)}
+.prazoF .pzat{font-size:12px;font-weight:800;color:var(--amber)}
+.pzr{display:flex;gap:6px}
+.pzr button{flex:1;border-color:var(--amber);color:var(--amber)}
+.mprog{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--muted);padding:0 2px}
+.mtr{height:8px;border-radius:99px;background:var(--navy3);overflow:hidden}
+.mtr i{display:block;height:100%;background:var(--green);border-radius:99px;transition:width .5s}
 .rapidos{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .rapidos button{border:1px solid var(--line);background:var(--navy);border-radius:14px;padding:10px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11.5px;font-weight:700;line-height:1.15}
 .rapidos i{font-style:normal;font-size:22px;border-bottom:2px solid var(--gold);padding-bottom:2px}
@@ -570,11 +600,13 @@ function itensDoDia(iso){
 }
 function estadoDe(it){
   var hoje = hojeISO(), am = agoraMin();
-  if (it.tipo === "acao"){ var a = S.acoes[it.id] || {}; if (a.feito) return "feito";
+  if (it.tipo === "acao"){ var a = S.acoes[it.id] || {}; if (a.feito) return "feito"; if (a.descartada) return "desc"; if (a.naoFeita) return "nao";
     var passou = it.dia < hoje || (it.dia === hoje && am > it.fim + 10); if (passou) return "nao";
     if (it.dia === hoje && am >= it.ini) return "agora"; if (it.dia === hoje && it.ini - am <= 10 && it.ini - am >= 0) return "chegando"; return "pend"; }
   var r = regDe(it.dia, it.k);
   if (r && r.s === "feito") return "feito";
+  if (r && r.s === "desc") return "desc";
+  if (r && r.s === "nao") return "nao";
   if (it.tipo !== "reag" && r && r.s === "prazo"){
     var p = r.para || ""; if (p.slice(0,10) < hoje || (p.slice(0,10) === hoje && am > mm(p.slice(11,16)) + 40)) return "nao"; return "prazo";
   }
@@ -587,7 +619,7 @@ function estadoDe(it){
 }
 function contagem(iso){
   var c = {feito:0, prazo:0, nao:0, pend:0, total:0};
-  itensDoDia(iso).forEach(function(it){ if (it.tipo === "reag") return; var e = estadoDe(it); c.total++; if (e === "feito") c.feito++; else if (e === "prazo") c.prazo++; else if (e === "nao") c.nao++; else c.pend++; });
+  itensDoDia(iso).forEach(function(it){ if (it.tipo === "reag") return; var e = estadoDe(it); if (e === "desc") return; c.total++; if (e === "feito") c.feito++; else if (e === "prazo") c.prazo++; else if (e === "nao") c.nao++; else c.pend++; });
   return c;
 }
 
@@ -601,6 +633,13 @@ function renderHoje(){
     var urg = it.filter(function(x){ var e = estadoDe(x); return e === "chegando" || e === "agora"; })[0];
     if (urg){ var e0 = estadoDe(urg); h += '<div class="alerta" role="alert"><span style="font-size:24px">⏰</span><div><b>' + (e0 === "agora" ? "AGORA: " : "EM " + (urg.ini - agoraMin()) + " MIN: ") + esc(urg.t) + '</b><br><span>' + hh(urg.ini) + ' às ' + hh(urg.fim) + ' · marque Feito ou peça prazo</span></div></div>'; }
   }
+  if (S.modoFoco && !S.verTudo){
+    var feitosH = c.feito, totH = c.total;
+    return '<button class="mfoco on" data-a="modoFoco">🧠 Modo foco ligado · <u>ver tudo</u></button>' + triagem() + focoHtml + finAlertaHoje()
+      + '<div class="mprog"><div class="mtr"><i style="width:' + pct + '%"></i></div><span><b class="tnum">' + feitosH + '/' + totH + '</b> feitos hoje · ' + (c.nao ? '<b style="color:var(--red)">' + c.nao + ' não feitos</b> · ' : '') + '<b class="tnum">' + metaDiamante().p + '</b> pts 💎</span></div>'
+      + rapidos() + '<button class="toggle" data-b="verTudo">📋 Ver o dia completo (' + it.length + ' atividades)</button>';
+  }
+  if (iso === hoje) h = '<button class="mfoco" data-a="modoFoco">🧠 Ligar modo foco (uma coisa por vez)</button>' + h;
   h += focoHtml + finAlertaHoje() + rapidos() + xpBar();
   h += '<div class="placar"><div class="ring">' + ring(pct, "var(--gold)") + '<b class="tnum">' + pct + '%</b><small>feito</small></div><div class="chips4">'
     + chip("feito","✅ Feitos",c.feito) + chip("prazo","⏱ Prazos",c.prazo) + chip("nao","✖ Não feitos",c.nao) + chip("pend","⏳ A fazer",c.pend) + '</div></div>';
@@ -630,12 +669,13 @@ function cardAt(x){
   var tags = "";
   if (x.tipo === "acao") tags += '<span class="tag plano">Plano de ação · ' + esc(x.selo || "") + '</span>';
   if (x.tipo === "reag") tags += '<span class="tag reag">↻ Reagendado de ' + fmtD(x.de) + '</span>';
-  tags += e === "feito" ? '<span class="tag feito">Feito</span>' : e === "prazo" ? '<span class="tag prazo">Prazo ' + fmtDT(r.para) + '</span>' : e === "nao" ? '<span class="tag nao">Não feito</span>' : e === "agora" ? '<span class="tag agora">Agora</span>' : e === "chegando" ? '<span class="tag agora">Chegando</span>' : "";
+  tags += e === "desc" ? '<span class="tag desc">Descartado</span>' : e === "feito" ? '<span class="tag feito">Feito</span>' : e === "prazo" ? '<span class="tag prazo">Prazo ' + fmtDT(r.para) + '</span>' : e === "nao" ? '<span class="tag nao">Não feito</span>' : e === "agora" ? '<span class="tag agora">Agora</span>' : e === "chegando" ? '<span class="tag agora">Chegando</span>' : "";
   var h = '<div class="at st-' + e + '">' + (e === "feito" ? '<span class="ok">✓</span>' : '') + '<div class="cab"><span class="ico">' + x.ico + '</span><div class="tx"><span class="hora tnum">' + hh(x.ini) + ' – ' + hh(x.fim) + '</span><b>' + esc(x.t) + '</b><div>' + tags + '</div></div></div>';
   if (r && r.foto) h += '<div class="foto"><img src="' + fotoSrc(r.foto) + '" alt="Foto de comprovação"><span class="muted sm">Foto de comprovação' + (r.em ? ' · ' + r.em.slice(11,16) : '') + '</span></div>';
-  if (e === "feito"){ h += '<button class="desfazer" data-a="desfazer" data-key="' + esc(key) + '">Desfazer</button>'; }
+  if (e === "feito" || e === "desc" || (e === "nao" && marcadoNao(x))){ h += '<div class="acts2">' + (e !== "feito" ? '<button class="bp" data-a="' + (x.tipo === "acao" ? "adiarAcao" : "prazo") + '" data-key="' + esc(key) + '">⏱ Novo prazo</button>' : '') + '<button class="desfazer" data-a="desfazer" data-key="' + esc(key) + '">↩️ Desfazer</button></div>'; if (S.prazoAberto === key) h += prazoForm(x, key); }
   else {
-    h += '<div class="acts"><button class="bf" data-a="feito" data-key="' + esc(key) + '">✓ Feito</button>' + (x.tipo === "acao" ? '<button class="bp" data-a="adiarAcao" data-key="' + esc(key) + '">⏱ Prazo</button>' : '<button class="bp" data-a="prazo" data-key="' + esc(key) + '">⏱ Prazo adicional</button>') + (x.tipo === "acao" ? '<span></span>' : '<button class="bc" data-a="foto" data-key="' + esc(key) + '" aria-label="Foto de comprovação">📷</button>') + '</div>';
+    h += '<div class="acts"><button class="bf" data-a="feito" data-key="' + esc(key) + '">✓ Feito</button>' + (x.tipo === "acao" ? '<button class="bp" data-a="adiarAcao" data-key="' + esc(key) + '">⏱ Novo prazo</button>' : '<button class="bp" data-a="prazo" data-key="' + esc(key) + '">⏱ Novo prazo</button>') + (x.tipo === "acao" ? '<span></span>' : '<button class="bc" data-a="foto" data-key="' + esc(key) + '" aria-label="Foto de comprovação">📷</button>') + '</div>';
+    h += '<div class="acts2"><button data-a="naoFiz" data-key="' + esc(key) + '">✖ Não fiz</button><button data-a="descartar" data-key="' + esc(key) + '">🗑 Descartar</button></div>';
     if (S.prazoAberto === key){
       var hj = hojeISO(), base0 = (x.alvo || x.dia) < hj ? hj : (x.alvo || x.dia), mn = base0 === hj ? Math.max(agoraMin() + 60, x.ini) : x.fim + 60;
       var sug = base0 + "T" + hh(Math.min(Math.ceil(mn/15)*15, 1425));
@@ -652,7 +692,7 @@ function renderAcao(){
   var L = Object.keys(S.acoes).map(function(id){ return Object.assign({id:id}, S.acoes[id]); });
   var ordem = {imediato:0, urgente:1, realizar:2};
   L.sort(function(a,b){ return (a.feito?1:0) - (b.feito?1:0) || (ordem[a.selo]||9) - (ordem[b.selo]||9) || String(a.quando).localeCompare(String(b.quando)); });
-  var ab = L.filter(function(a){ return !a.feito; }), fe = L.filter(function(a){ return a.feito; });
+  var ab = L.filter(function(a){ return !a.feito && !a.descartada; }), fe = L.filter(function(a){ return a.feito; }), ds = L.filter(function(a){ return a.descartada && !a.feito; });
   var cnt = {imediato:0, urgente:0, realizar:0}; ab.forEach(function(a){ cnt[a.selo] = (cnt[a.selo]||0) + 1; });
   var h = '<div class="card"><h2 class="u" style="align-self:flex-start">Novo tópico</h2>'
     + '<textarea id="acTit" rows="2" maxlength="200" placeholder="Escreva o tópico. Ex.: Fechar parceria com o posto de saúde"></textarea>'
@@ -662,11 +702,17 @@ function renderAcao(){
   h += '<div class="placar" style="grid-template-columns:repeat(3,1fr)">' + [["imediato","Imediato","var(--red)"],["urgente","Urgente","var(--amber)"],["realizar","Realizar","var(--blue)"]].map(function(s){ return '<div class="chipc"><b class="tnum" style="color:' + s[2] + '">' + (cnt[s[0]]||0) + '</b><span>' + s[1] + '</span></div>'; }).join("") + '</div>';
   h += '<div class="card"><h2>Em aberto <span class="muted sm">(' + ab.length + ')</span></h2>' + (ab.length ? ab.map(cardAcao).join("") : '<p class="vazio">Nenhum tópico em aberto.</p>') + '</div>';
   if (fe.length) h += '<details class="card"><summary class="muted" style="cursor:pointer;font-weight:700">Concluídos (' + fe.length + ')</summary>' + fe.map(cardAcao).join("") + '</details>';
+  if (ds.length) h += '<details class="card"><summary class="muted" style="cursor:pointer;font-weight:700">🗑 Descartados (' + ds.length + ')</summary>' + ds.map(cardAcao).join("") + '</details>';
   return h;
 }
 function cardAcao(a){
-  var vence = !a.feito && a.quando && (a.quando.slice(0,10) < hojeISO() || (a.quando.slice(0,10) === hojeISO() && mm(a.quando.slice(11,16)) <= agoraMin() + 10));
-  return '<div class="acao' + (a.feito ? " feita" : "") + (vence ? " vence" : "") + '"><button class="ck" data-a="ckAcao" data-id="' + esc(a.id) + '" aria-label="Concluir">✓</button><div class="tx"><b>' + esc(a.titulo) + '</b><span><span class="pill ' + esc(a.selo) + '">' + esc(a.selo) + '</span> <span class="muted sm">' + (a.quando ? fmtDT(a.quando) : "sem data") + (vence ? ' · <b style="color:var(--red)">no horário / atrasado</b>' : '') + '</span></span></div><button class="del" data-a="delAcao" data-id="' + esc(a.id) + '" aria-label="Excluir">🗑</button></div>';
+  var key = "acao:" + a.id, st = a.feito ? "feito" : a.descartada ? "desc" : a.naoFeita ? "nao" : "";
+  var vence = !st && a.quando && (a.quando.slice(0,10) < hojeISO() || (a.quando.slice(0,10) === hojeISO() && mm(a.quando.slice(11,16)) <= agoraMin() + 10));
+  var h = '<div class="acao' + (a.feito ? " feita" : "") + (a.descartada ? " desc" : "") + (vence || st === "nao" ? " vence" : "") + '"><button class="ck" data-a="ckAcao" data-id="' + esc(a.id) + '" aria-label="Concluir">✓</button><div class="tx"><b>' + esc(a.titulo) + '</b><span><span class="pill ' + esc(a.selo) + '">' + esc(a.selo) + '</span> <span class="muted sm">' + (a.quando ? fmtDT(a.quando) : "sem data") + (st === "nao" ? ' · <b style="color:var(--red)">não feito</b>' : vence ? ' · <b style="color:var(--red)">atrasado</b>' : '') + '</span></span>';
+  if (!a.feito && !a.descartada) h += '<div class="amini"><button data-a="adiarAcao" data-key="' + esc(key) + '">⏱ Novo prazo</button>' + (st === "nao" ? '' : '<button data-a="naoFiz" data-key="' + esc(key) + '">✖ Não fiz</button>') + '<button data-a="descartar" data-key="' + esc(key) + '">🗑 Descartar</button></div>';
+  else if (a.descartada) h += '<div class="amini"><button data-a="desfazer" data-key="' + esc(key) + '">↩️ Recuperar</button><button data-a="delAcao" data-id="' + esc(a.id) + '">Excluir de vez</button></div>';
+  if (S.prazoAberto === key) h += prazoForm({tipo:"acao", dia:(a.quando || hojeISO()).slice(0,10), ini:a.quando ? mm(a.quando.slice(11,16)) : agoraMin(), fim:(a.quando ? mm(a.quando.slice(11,16)) : agoraMin()) + 30}, key);
+  return h + '</div></div>';
 }
 
 function objMes(m){
@@ -740,17 +786,31 @@ $("view").addEventListener("click", function(e){
     var dep = contagem(S.dia); SOM.play(dep.total && dep.feito === dep.total ? "meta" : "feito"); toast(dep.total && dep.feito === dep.total ? "🏆 Dia 100% concluído!" : "✅ Feito");
     S.prazoAberto = null; render(); return;
   }
+  if (a === "naoFiz" || a === "descartar"){ var pn = parseKey(b.dataset.key), nao = a === "naoFiz";
+    if (pn.acao){ S.acoes[pn.acao] = Object.assign({}, S.acoes[pn.acao], nao ? {naoFeita:true, naoEm:agoraStamp(), descartada:false} : {descartada:true, descEm:agoraStamp(), naoFeita:false}); gravar("acoes", pn.acao, S.acoes[pn.acao]); }
+    else { var rn = regDe(pn.dia, pn.k) || {}; setReg(pn.dia, pn.k, Object.assign({}, rn, {s: nao ? "nao" : "desc", em:agoraStamp()})); }
+    if (TIMER && TIMER.key === b.dataset.key) pararTimer();
+    SOM.play(nao ? "prazo" : "clique"); toast(nao ? "✖ Marcado como não feito. Dê um novo prazo quando puder." : "🗑 Descartado. Uma coisa a menos na cabeça."); S.prazoAberto = null; render(); return; }
+  if (a === "limpaPend"){ var LP = pendencias();
+    if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Tem certeza? Toque de novo para marcar as " + LP.length; return; }
+    LP.forEach(function(x){ if (x.tipo === "acao"){ S.acoes[x.id] = Object.assign({}, S.acoes[x.id], {naoFeita:true, naoEm:agoraStamp()}); gravar("acoes", x.id, S.acoes[x.id]); } else { var rr = regDe(x.dia, x.k) || {}; setReg(x.dia, x.k, Object.assign({}, rr, {s:"nao", em:agoraStamp()})); } });
+    SOM.play("feito"); toast("✅ Lista limpa. Agora, só o que vem pela frente."); render(); return; }
+  if (a === "modoFoco"){ S.modoFoco = !S.modoFoco; try { localStorage.setItem("ma_foco", S.modoFoco ? "1" : "0"); } catch(e){} S.verTudo = false; render(); return; }
+  if (a === "timer"){ if (TIMER) pararTimer(); else iniciarTimer(b.dataset.key, Number(b.dataset.min) || 25); render(); return; }
   if (a === "desfazer"){ var pd = parseKey(b.dataset.key);
-    if (pd.acao){ S.acoes[pd.acao] = Object.assign({}, S.acoes[pd.acao], {feito:false}); gravar("acoes", pd.acao, S.acoes[pd.acao]); }
+    if (pd.acao){ S.acoes[pd.acao] = Object.assign({}, S.acoes[pd.acao], {feito:false, naoFeita:false, descartada:false}); gravar("acoes", pd.acao, S.acoes[pd.acao]); }
     else { var rd = regDe(pd.dia, pd.k) || {}; setReg(pd.dia, pd.k, rd.foto ? {foto:rd.foto} : null); }
     render(); return; }
   if (a === "prazo" || a === "adiarAcao"){ S.prazoAberto = S.prazoAberto === b.dataset.key ? null : b.dataset.key; render(); if ($("prazoIn")) $("prazoIn").focus(); return; }
+  if (a === "pzRap"){ var hjr = hojeISO(), amn = new Date(agoraBR().getTime() + 86400e3).toISOString().slice(0,10), k2 = b.dataset.k;
+    var vv = k2 === "1h" ? hjr + "T" + hh(Math.min(Math.ceil((agoraMin() + 60)/15)*15, 1425)) : k2 === "tarde" ? (agoraMin() < 900 ? hjr : amn) + "T15:00" : amn + "T09:00";
+    if ($("prazoIn")) $("prazoIn").value = vv; a = "salvaPrazo"; }
   if (a === "salvaPrazo"){
     var v = $("prazoIn").value; if (!v || v.length < 16){ SOM.play("erro"); toast("Escolha a data e o horário do novo prazo."); return; }
     var pk = parseKey(b.dataset.key);
-    if (pk.acao){ S.acoes[pk.acao] = Object.assign({}, S.acoes[pk.acao], {quando:v.slice(0,16)}); gravar("acoes", pk.acao, S.acoes[pk.acao]); }
+    if (pk.acao){ S.acoes[pk.acao] = Object.assign({}, S.acoes[pk.acao], {quando:v.slice(0,16), naoFeita:false, descartada:false}); gravar("acoes", pk.acao, S.acoes[pk.acao]); }
     else { var rp = regDe(pk.dia, pk.k) || {}; setReg(pk.dia, pk.k, Object.assign({}, rp, {s:"prazo", para:v.slice(0,16), em:agoraStamp()})); }
-    SOM.play("prazo"); toast("⏱ Prazo adicional: " + fmtDT(v.slice(0,16))); S.prazoAberto = null; render(); return;
+    SOM.play("prazo"); toast("⏱ Novo prazo: " + fmtDT(v.slice(0,16))); S.prazoAberto = null; render(); return;
   }
   if (a === "foto"){ if (!ASSETS){ SOM.play("erro"); toast("Foto disponível só no app aberto pela sua conta."); return; } fotoAlvo = b.dataset.key; $("camIn").click(); return; }
   if (a === "ics"){ baixarICS(); return; }
@@ -901,9 +961,46 @@ function xpBar(){
 }
 
 /* ---------- HOJE (modo foco para TDAH) ---------- */
+try { S.modoFoco = localStorage.getItem("ma_foco") !== "0"; } catch(e){ S.modoFoco = true; }
+function marcadoNao(x){ if (x.tipo === "acao") return !!(S.acoes[x.id] || {}).naoFeita; var r = regDe(x.dia, x.k); return !!(r && r.s === "nao"); }
+function prazoForm(x, key){
+  var hj = hojeISO(), base0 = (x.alvo || x.dia) < hj ? hj : (x.alvo || x.dia), mn = base0 === hj ? Math.max(agoraMin() + 60, x.ini) : x.fim + 60;
+  return '<div class="prazoF"><span class="pzat">Novo prazo:</span><div class="pzr"><button data-a="pzRap" data-k="1h" data-key="' + esc(key) + '">+1h</button><button data-a="pzRap" data-k="tarde" data-key="' + esc(key) + '">Hoje 15h</button><button data-a="pzRap" data-k="amanha" data-key="' + esc(key) + '">Amanhã 9h</button></div>'
+    + '<input type="datetime-local" id="prazoIn" value="' + base0 + "T" + hh(Math.min(Math.ceil(mn/15)*15, 1425)) + '" aria-label="Novo prazo (data e hora)"><button data-a="salvaPrazo" data-key="' + esc(key) + '">Confirmar prazo</button></div>';
+}
+/* pendências: o que passou da hora sem resposta. Resolve uma por vez. */
+function pendencias(){
+  var hoje = hojeISO(), L = itensDoDia(hoje).filter(function(x){ return x.tipo !== "reag" && estadoDe(x) === "nao" && !marcadoNao(x); });
+  Object.keys(S.acoes).forEach(function(id){ var a = S.acoes[id]; if (!a || a.feito || a.descartada || a.naoFeita || !a.quando || a.quando.slice(0,10) >= hoje) return;
+    L.push({k:"acao_"+id, id:id, ini:mm(a.quando.slice(11,16)), fim:mm(a.quando.slice(11,16)) + 30, ico:"⚡", t:a.titulo, tipo:"acao", dia:a.quando.slice(0,10)}); });
+  return L.sort(function(a, b){ return (b.dia + hh(b.ini)).localeCompare(a.dia + hh(a.ini)); }); // a mais recente primeiro
+}
+function triagem(){
+  var L = pendencias(); if (!L.length) return "";
+  var x = L[0], key = x.tipo === "acao" ? "acao:" + x.id : x.dia + ":" + x.k;
+  var h = '<div class="triag"><div class="tcab"><span>⚠️ <b>' + L.length + '</b> pendência' + (L.length > 1 ? 's' : '') + ' · resolva uma por vez</span></div>'
+    + '<div class="tit"><span class="ico">' + x.ico + '</span><div><small>' + (x.dia === hojeISO() ? "Hoje " : fmtD(x.dia) + " · ") + hh(x.ini) + '</small><b>' + esc(x.t) + '</b></div></div>'
+    + '<div class="tbt"><button class="ok" data-a="feito" data-key="' + esc(key) + '">✓ Fiz</button><button class="pz" data-a="' + (x.tipo === "acao" ? "adiarAcao" : "prazo") + '" data-key="' + esc(key) + '">⏱ Novo prazo</button><button data-a="naoFiz" data-key="' + esc(key) + '">✖ Não fiz</button><button data-a="descartar" data-key="' + esc(key) + '">🗑 Descartar</button></div>';
+  if (S.prazoAberto === key) h += prazoForm(x, key);
+  if (L.length > 2) h += '<button class="tlimpa" data-a="limpaPend">Muitas? Marcar as ' + L.length + ' como não feitas e seguir em frente</button>';
+  return h + '</div>';
+}
+/* cronômetro de foco (25 min) */
+var TIMER = null; try { TIMER = JSON.parse(localStorage.getItem("ma_timer") || "null"); if (TIMER && TIMER.fim < Date.now() - 3600e3) TIMER = null; } catch(e){}
+function timerBtn(key){
+  if (TIMER && TIMER.key === key){ var r = Math.max(0, TIMER.fim - Date.now()); return '<button class="ftimer on" data-a="timer" data-key="' + esc(key) + '">⏳ <span id="ftempo" class="tnum">' + String(Math.floor(r/60000)).padStart(2,"0") + ':' + String(Math.floor(r/1000)%60).padStart(2,"0") + '</span> · parar</button>'; }
+  return '<button class="ftimer" data-a="timer" data-min="25" data-key="' + esc(key) + '">▶ Foco 25 min</button>';
+}
+function iniciarTimer(key, min){ TIMER = {key:key, fim:Date.now() + min*60000}; try { localStorage.setItem("ma_timer", JSON.stringify(TIMER)); } catch(e){} SOM.play("foto"); toast("⏳ " + min + " minutos de foco. Só isso agora."); }
+function pararTimer(){ TIMER = null; try { localStorage.removeItem("ma_timer"); } catch(e){} }
+setInterval(function(){
+  if (!TIMER) return; var r = TIMER.fim - Date.now(), el = document.getElementById("ftempo");
+  if (r <= 0){ pararTimer(); SOM.play("alerta"); toast("⏰ Tempo! Marque ✓ Feito ou dê um novo prazo."); try { if (navigator.vibrate) navigator.vibrate([200,100,200,100,400]); } catch(e){} if (S.view === "hoje") render(); return; }
+  if (el) el.textContent = String(Math.floor(r/60000)).padStart(2,"0") + ":" + String(Math.floor(r/1000)%60).padStart(2,"0");
+}, 1000);
 function focoCard(){
   var hoje = hojeISO(), it = itensDoDia(hoje), am = agoraMin();
-  var abertos = it.filter(function(x){ var e = estadoDe(x); return e !== "feito" && e !== "prazo" && e !== "nao"; });
+  var abertos = it.filter(function(x){ var e = estadoDe(x); return e !== "feito" && e !== "prazo" && e !== "nao" && e !== "desc"; });
   var atual = abertos.filter(function(x){ var e = estadoDe(x); return e === "agora"; })[0] || abertos[0];
   if (!atual) return '<div class="foco done"><span class="fz">🏁</span><div><small>Hoje</small><b>Tudo resolvido por agora.</b><p>Respire. Revise as metas da semana ou grave uma ideia.</p></div></div>';
   var e = estadoDe(atual), key = atual.tipo === "acao" ? "acao:" + atual.id : atual.dia + ":" + atual.k;
@@ -911,8 +1008,9 @@ function focoCard(){
   var prox = abertos.filter(function(x){ return x !== atual; }).slice(0, 2);
   var h = '<div class="foco' + (e === "agora" || e === "chegando" ? " quente" : "") + '"><div class="fcab"><span class="fico">' + atual.ico + '</span><div><small>' + quando + ' · ' + hh(atual.ini) + '–' + hh(atual.fim) + '</small><b>' + esc(atual.t) + '</b></div></div>'
     + '<div class="facts"><button class="fb ok" data-a="feito" data-key="' + esc(key) + '">✓ FEITO</button>'
-    + '<button class="fb pz" data-a="' + (atual.tipo === "acao" ? "adiarAcao" : "prazo") + '" data-key="' + esc(key) + '">⏱ PRAZO</button>'
-    + (atual.tipo === "acao" ? '' : '<button class="fb ft" data-a="foto" data-key="' + esc(key) + '" aria-label="Foto de comprovação">📷</button>') + '</div>';
+    + '<button class="fb pz" data-a="' + (atual.tipo === "acao" ? "adiarAcao" : "prazo") + '" data-key="' + esc(key) + '">⏱ NOVO PRAZO</button>'
+    + (atual.tipo === "acao" ? '' : '<button class="fb ft" data-a="foto" data-key="' + esc(key) + '" aria-label="Foto de comprovação">📷</button>') + '</div>'
+    + '<div class="fsec"><button data-a="naoFiz" data-key="' + esc(key) + '">✖ Não fiz</button><button data-a="descartar" data-key="' + esc(key) + '">🗑 Descartar</button>' + timerBtn(key) + '</div>';
   if (S.prazoAberto === key){ var mn = Math.max(am + 60, atual.ini); h += '<div class="prazoF"><input type="datetime-local" id="prazoIn" value="' + hoje + 'T' + hh(Math.min(Math.ceil(mn/15)*15, 1425)) + '" aria-label="Novo prazo"><button data-a="salvaPrazo" data-key="' + esc(key) + '">Confirmar prazo</button></div>'; }
   if (prox.length) h += '<div class="fprox">' + prox.map(function(x){ return '<span><i class="tnum">' + hh(x.ini) + '</i> ' + x.ico + ' ' + esc(x.t) + '</span>'; }).join("") + '</div>';
   return h + '</div>';
@@ -1571,9 +1669,17 @@ function vozZap(n){ var d = String(n || "").replace(/\D/g, ""); if (d.length ===
 function vozIrSub(s){ S.sub = s; irPara("mais"); }
 function vozNota(txt){ var nid = "n" + Date.now().toString(36); S.notas[nid] = {texto: vozCapMa(txt), criado: agoraStamp()}; gravar("notas", nid, S.notas[nid]); render(); return nid; }
 var VOZ_DESFAZ = null;
+function vozAcaoAberta(txt){ return CMDVOZ.achar(Object.keys(S.acoes).map(function(id){ return Object.assign({id:id}, S.acoes[id]); }).filter(function(a){ return a && !a.feito && !a.descartada && a.titulo; }), function(x){ return x.titulo; }, txt); }
+function vozMarca(txt, tipo){
+  var a = vozAcaoAberta(txt); if (!a) return {erro:true, msg:"Não achei uma ação em aberto com \"" + txt + "\"."};
+  var ant = Object.assign({}, S.acoes[a.id]);
+  S.acoes[a.id] = Object.assign({}, S.acoes[a.id], tipo === "nao" ? {naoFeita:true, naoEm:agoraStamp()} : {descartada:true, descEm:agoraStamp()}); gravar("acoes", a.id, S.acoes[a.id]);
+  VOZ_DESFAZ = function(){ S.acoes[a.id] = ant; gravar("acoes", a.id, ant); }; render();
+  return {msg:(tipo === "nao" ? "Não feito: " : "Descartado: ") + a.titulo + ".", html:'<button type="button" class="vozAcao alt" data-voz="desfazer">↩️ Desfazer</button>'};
+}
 CMDVOZ.config({
   som: function(k){ try { SOM.play(k === "erro" ? "erro" : k === "ouvir" ? "foto" : "feito"); } catch(x){} },
-  ajuda: ["Nova ação ligar para o prefeito amanhã às 10h", "Me lembra de pagar a internet sexta", "Anotar ideia de vídeo sobre a sopa", "Concluir ligar para o prefeito",
+  ajuda: ["Nova ação ligar para o prefeito amanhã às 10h", "Me lembra de pagar a internet sexta", "Anotar ideia de vídeo sobre a sopa", "Concluir ligar para o prefeito", "Não fiz relatório", "Descartar comprar cabo", "Adiar ligar para João amanhã às 10h", "Modo foco 25 minutos",
     "Falei com João", "WhatsApp para Ana: chego em 10 minutos", "Ligar para Carlos", "Novo contato Pedro 82 99999-0000", "Pagar 150 reais de luz para Equatorial dia 20",
     "Abrir financeiro / metas / rede / ações / viagens", "Qualquer outra frase vira ideia salva"],
   cmds: [
@@ -1596,6 +1702,20 @@ CMDVOZ.config({
       S.acoes[a.id] = Object.assign({}, S.acoes[a.id], {feito:true, feitoEm:agoraStamp()}); gravar("acoes", a.id, S.acoes[a.id]);
       VOZ_DESFAZ = function(){ S.acoes[a.id] = Object.assign({}, S.acoes[a.id], {feito:false}); gravar("acoes", a.id, S.acoes[a.id]); }; render();
       return {msg:"Feito: " + a.titulo + " ✅", html:'<button type="button" class="vozAcao alt" data-voz="desfazer">↩️ Desfazer</button>'}; }},
+    {re:/^(nao fiz|nao feito|nao deu|nao consegui|nao vou fazer) (.+)$/, fn:function(m){ return vozMarca(m[2], "nao"); }},
+    {re:/^(descartar|descarta|descarte|cancelar tarefa|cancelar acao|tirar da lista|esquece) (.+)$/, fn:function(m){ return vozMarca(m[2], "desc"); }},
+    {re:/^(adiar|adia|remarcar|remarca|reagendar|novo prazo|novo prazo para|novo prazo pra|mudar prazo de|passar) (.+)$/, fn:function(m){
+      var q = CMDVOZ.quando(m[2]); if (!q.dia && !q.hora) return {erro:true, msg:"Diga para quando. Ex.: adiar ligar para João amanhã às 10h."};
+      var a = vozAcaoAberta(q.resto.replace(/ (para|pra|pro)$/, "")); if (!a) return {erro:true, msg:"Não achei essa ação em aberto."};
+      var ant = Object.assign({}, S.acoes[a.id]), quando = vozIso(q);
+      S.acoes[a.id] = Object.assign({}, S.acoes[a.id], {quando: quando, naoFeita:false, descartada:false}); gravar("acoes", a.id, S.acoes[a.id]);
+      VOZ_DESFAZ = function(){ S.acoes[a.id] = ant; gravar("acoes", a.id, ant); }; render();
+      return {msg:"Novo prazo: " + a.titulo + " · " + vozBr(quando) + ".", html:'<button type="button" class="vozAcao alt" data-voz="desfazer">↩️ Desfazer</button>'}; }},
+    {re:/^(modo foco|foco|comecar foco|iniciar foco|cronometro)( de| por)? ?(\d+)? ?(minutos?)?$/, fn:function(m){
+      var it = itensDoDia(hojeISO()).filter(function(x){ var e = estadoDe(x); return e === "agora" || e === "chegando" || e === "pend"; })[0];
+      if (!it) return {erro:true, msg:"Nada em aberto agora."}; var key = it.tipo === "acao" ? "acao:" + it.id : it.dia + ":" + it.k;
+      S.modoFoco = true; try { localStorage.setItem("ma_foco", "1"); } catch(e){} iniciarTimer(key, Number(m[3]) || 25); irPara("hoje");
+      return {msg:"Foco em: " + it.t + " (" + (Number(m[3]) || 25) + " min).", fechar:true}; }},
     {re:/^(falei com|conversei com|liguei para|liguei pra|encontrei) (.+)$/, fn:function(m){
       var c = vozContato(m[2]); if (!c) return {erro:true, msg:"\"" + m[2] + "\" não está na sua rede. Diga: novo contato " + m[2] + "."};
       S.contatos[c.id] = Object.assign({}, S.contatos[c.id], {ultimo: hojeISO()}); gravar("contatos", c.id, S.contatos[c.id]); render();
@@ -1648,7 +1768,7 @@ document.addEventListener("click", function(ev){ var b = ev.target.closest("[dat
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611102139";
+var APP_VERSAO = "202611102148";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
