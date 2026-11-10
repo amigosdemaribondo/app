@@ -645,7 +645,7 @@ function entrarGate(){
         render(); checarLocal();
       }, falta);
     });
-  }).catch(function(){ $("gLoad").hidden = true; $("gMsg").textContent = "PIN incorreto. Tente de novo."; $("gPin").value = ""; $("gPin").focus(); try { SOM.play("erro"); } catch(e){} });
+  }).catch(function(e){ var m = errMsg(e); $("gLoad").hidden = true; $("gMsg").textContent = /incorreto/i.test(m) ? "PIN incorreto. Confira com a coordenação e tente de novo." : m; $("gPin").value = ""; $("gPin").focus(); try { SOM.play("erro"); } catch(e){} });
 }
 $("gOk").addEventListener("click", entrarGate);
 $("gPin").addEventListener("keydown", function(e){ if (e.key === "Enter") entrarGate(); });
@@ -1575,7 +1575,12 @@ function cacheKey(){ return "cache_" + (S.me || "anon"); }
 function salvarCache(d){ try { if (d && d.dia === d.hoje) localStorage.setItem(cacheKey(), JSON.stringify(d)); } catch(e){} }
 function lerCache(){ try { var d = JSON.parse(localStorage.getItem(cacheKey()) || "null"); return d; } catch(e){ return null; } }
 function load(dia, quiet){
-  return run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){ S.data = d; salvarCache(d); $("note").textContent = ""; render(); loadPts(!quiet); })
+  return run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){
+      if (d && d.bloqueado && logged()){ // PIN trocado ou celular não liberado: volta para a tela de entrada com o motivo
+        S.pin = ""; save(); try { localStorage.removeItem("cache"); } catch(e){}
+        setTimeout(function(){ if ($("gMsg")) $("gMsg").textContent = (d.motivo && !/incorreto/i.test(d.motivo)) ? d.motivo : "Seu PIN mudou. Digite o PIN novo para entrar."; }, 50);
+      }
+      S.data = d; salvarCache(d); $("note").textContent = ""; render(); loadPts(!quiet); })
     .catch(function(e){ if (!quiet) $("note").textContent = "Não foi possível carregar: " + errMsg(e); });
 }
 function act(p){
@@ -2408,6 +2413,15 @@ function gestaoExtras(){
   h += '<div class="gsec"><h2>🖼️ Galeria do app</h2><p class="sub">Suba fotos da ONG. A cada 1 hora o app mostra 3 delas, trocando suavemente.</p>'
     + '<div class="f"><label class="full">Legenda (opcional)<input id="galLeg" maxlength="80"></label><label class="btn primary full" for="galIn" style="justify-content:center">📷 Escolher foto e enviar</label><input type="file" id="galIn" accept="image/*" hidden></div>'
     + '<div class="galgrid">' + ((d.galeria) || []).map(function(f){ return '<div><img alt="' + esc(f.legenda || "Foto") + '" src="' + esc(f.url) + '" loading="lazy"><button class="btn" data-x="galDel" data-id="' + esc(f.id) + '">Remover</button></div>'; }).join("") + '</div></div>';
+  // remanejar atividades de um cadastro para outro (só o dono)
+  if (d.dono){
+    var opts = (d.equipe || []).map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + ' (' + esc(p.id) + ')</option>'; }).join("");
+    h += '<div class="gsec"><h2>🔁 Remanejar atividades</h2><p class="sub">Passa as atividades de hoje em diante de um cadastro para outro (ex.: Patrícia antiga → Patrícia nova).</p>'
+      + '<div class="f"><label>De<select id="rmDe"><option value="">escolher…</option>' + opts + '</select></label><label>Para<select id="rmPara"><option value="">escolher…</option>' + opts + '</select></label>'
+      + '<label class="full row" style="gap:8px;align-items:center"><input type="checkbox" id="rmHor" checked style="width:auto"> Horário de trabalho à tarde (seg a sex, 14h–18h)</label>'
+      + '<label class="full row" style="gap:8px;align-items:center"><input type="checkbox" id="rmAtv" checked style="width:auto"> Levar para a tarde as atividades da manhã que são só dela</label>'
+      + '<button class="btn primary full" data-x="remanejar">Remanejar</button></div></div>';
+  }
   // folha (só o dono)
   if (d.dono) h += folhaHtml();
   return h;
@@ -2438,6 +2452,11 @@ document.addEventListener("click", function(ev){
   ev.preventDefault();
   if (x === "ir"){ S.view = b.dataset.v; try { localStorage.setItem("view", S.view); } catch(e){} render(); window.scrollTo({top: $("view").offsetTop - 80, behavior: "smooth"}); return; }
   if (x === "pod") return tocarPodcast(+b.dataset.i);
+  if (x === "remanejar"){ var de = $("rmDe").value, para = $("rmPara").value;
+    if (!de || !para || de === para) return toast("Escolha De e Para (pessoas diferentes).");
+    return run("remanejarPessoa", S.me, S.pin, de, para, {horarioTarde: $("rmHor").checked, atividadesTarde: $("rmAtv").checked}).then(function(r){
+      SOM.play("conclui"); toast("🔁 " + r.movidas + " atividade(s) passadas para " + pessoa(para).nome + (r.tarde ? " · " + r.tarde + " foram para a tarde" : "") + (r.horario ? " · horário 14h–18h" : "") + "." + (r.manhaJunto && r.manhaJunto.length ? " ⚠️ Ficaram de manhã por serem com outras pessoas: " + r.manhaJunto.join(", ") + ". Ajuste em Montar o dia." : ""));
+      S_CAD = null; return load(null, true); }).catch(function(e){ toast(errMsg(e)); }); }
   if (x === "vozTeste"){ destravaVoz(); toast("Buscando a narração…");
     return run("voz", S.me, S.pin, b.dataset.k).then(function(c){ if (!c) throw new Error("Narração não gravada ainda. No Apps Script, rode gerarNarracoes."); if (!c.versao){ VOZ_ERRO = "O Apps Script publicado ainda é antigo (sem a correção do áudio). Faça Implantar → Gerenciar implantações → ✏️ → Nova versão."; toast("⚠️ " + VOZ_ERRO); renderGestao(); return; }
       VOZ_ERRO = "Formato recebido: " + (c.fmt || "?") + " · servidor v" + c.versao; return tocaClip(c).then(function(){ toast("🔊 Tocando · " + (c.fmt || "")); renderGestao(); }); })
@@ -2491,7 +2510,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611101322";
+var APP_VERSAO = "202611101453";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
