@@ -377,6 +377,10 @@ body.bloq .wrap,body.bloq #podBar{display:none!important}
 .respBox{flex:1 1 100%;display:flex;flex-direction:column;gap:6px;background:var(--sunk);border-radius:12px;padding:10px}
 .respBox textarea{font:inherit;font-size:16px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px}
 .respTx{flex:1 1 100%;font-size:13.5px;background:var(--ok-bg);border-radius:10px;padding:6px 10px}
+.moverBox{flex:1 1 100%;display:flex;flex-direction:column;gap:8px;background:var(--sunk);border-radius:12px;padding:10px}
+.moverBox label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.moverBox input{font:inherit;font-size:16px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:8px}
+.btn.alertaEq{display:flex;justify-content:center;background:#FFD23F;color:#1A2A55;border-color:#FFD23F;font-weight:800}
 .gsec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .gsec h2{margin:0;font-family:var(--f-display);font-size:19px;font-weight:800}
 .gsec .sub{margin:0;font-size:13px;color:var(--muted)}
@@ -704,8 +708,9 @@ function renderDia(mine){
   var nao = bl.filter(function(b){ return estDe(b) !== "concluida" && (b.vencida || d.dia < d.hoje); });
   var agora = bl.filter(function(b){ return conc.indexOf(b) < 0 && nao.indexOf(b) < 0; });
   var tab = S_DIATAB, lista = tab === "concluidas" ? conc : tab === "nao" ? nao : agora;
+  var topoG = (d.verTodos && !mine) ? '<div style="margin-bottom:10px">' + botaoAlerta() + '</div>' : '';
   var semFoto = conc.filter(semFotoTar).filter(function(b){ return !mine || b.pessoas.indexOf(S.me) >= 0; });
-  var out = '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
+  var out = topoG + '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
     + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>No horário</button>'
     + '<button class="dcc" data-act="diatab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+conc.length+'</b>Concluídas</button>'
     + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Não respondidas</button></div>';
@@ -724,6 +729,17 @@ function renderDia(mine){
 var S_PRAZO = "";
 var S_FOTOALVO = null;
 function fmtPrazo(p){ if (!p) return ""; var d = S.data; return p.slice(0,10) === d.hoje ? p.slice(11) : p.slice(8,10)+"/"+p.slice(5,7)+" "+p.slice(11); }
+var S_MOVER = "", S_PRZDATA = "";
+function hhmmDe(t){ var m = String(t || "").match(/(\d{1,2})\s*[h:]?\s*(\d{2})?/); return m ? String(m[1]).padStart(2, "0") + ":" + (m[2] || "00") : ""; }
+function formMover(dia, b, prefixo, acaoOk, acaoX){
+  return '<div class="moverBox"><b>📅 Nova data e prazo</b><div class="row" style="gap:6px;flex-wrap:wrap">'
+    + '<label>Data<input type="date" id="'+prefixo+'D" value="'+esc(dia)+'"></label>'
+    + '<label>Início<input type="time" id="'+prefixo+'H" value="'+esc(hhmmDe(b.hora))+'"></label>'
+    + '<label>Fim (prazo)<input type="time" id="'+prefixo+'F" value="'+esc(hhmmDe(b.fim))+'"></label></div>'
+    + '<div class="row" style="gap:6px;flex-wrap:wrap">'+acaoOk+acaoX+'</div></div>';
+}
+var MSG_ALERTA = "🔔 Atenção, equipe Amigos de Maribondo! Confiram agora as atividades de hoje no app: iniciar no horário, concluir com foto e bater o ponto na entrada e na saída. Bora fazer acontecer! 💙";
+function botaoAlerta(){ return '<a class="btn alertaEq" data-x="alertaEq" href="'+esc(waHref("", MSG_ALERTA))+'" target="_blank" rel="noopener">🔔 Alerta: atenção às atividades</a>'; }
 function msgCobrar(b, p, tipo){
   var n = primeiroNome(pessoa(p).nome);
   return tipo === "semfoto"
@@ -763,6 +779,10 @@ function renderBloco(b){
     else if (minha && S_SUP !== b.id) acts += '<button class="btn sos" data-act="abrirsup" data-b="'+esc(b.id)+'"'+dis+'>Preciso de suporte</button>';
   }
   if (est!=="pendente" && (minha || gest)) acts += '<button class="btn" data-act="undo" data-b="'+esc(b.id)+'"'+dis+'>Desfazer</button>';
+  if (S.data.dono){
+    if (S_MOVER === b.id) acts += formMover(S.data.dia, b, "mv_", '<button class="btn primary" data-act="moverOk" data-b="'+esc(b.id)+'">Salvar nova data</button>', '<button class="btn" data-act="moverX">Cancelar</button>');
+    else acts += '<button class="btn" data-act="abrirMover" data-b="'+esc(b.id)+'">📅 Mudar data/prazo</button><button class="btn" data-act="excluirTar" data-b="'+esc(b.id)+'">🗑 Excluir</button>';
+  }
   var cobra = gest && ((vencida || (est !== "concluida" && S.data.dia < S.data.hoje)) ? "vencida" : (est === "concluida" && st.temFotoConclusao === false) ? "semfoto" : "");
   if (cobra) acts += b.pessoas.map(function(p){ return botaoCobrar(b, p, cobra); }).join("");
   var supForm = S_SUP === b.id && !st.suporte
@@ -1683,6 +1703,13 @@ $("view").addEventListener("click", function(ev){
     }).catch(function(){});
   }
   if (a === "validarIdeia") return run("validarIdeia", S.me, S.pin, btn.dataset.id).then(function(r){ S_PTS = r; renderMeta(); toast("⭐ Ideia validada (+27 pts)."); return load(null, true); }).catch(function(e){ toast(errMsg(e)); });
+  if (a === "abrirMover"){ S_MOVER = btn.dataset.b; return render(); }
+  if (a === "moverX"){ S_MOVER = ""; return render(); }
+  if (a === "moverOk"){ var nd = $("mv_D").value, nh = $("mv_H").value, nf = $("mv_F").value;
+    return run("moverTarefa", S.me, S.pin, S.data.dia, btn.dataset.b, nd, nh, nf).then(function(r){ S_MOVER = ""; SOM.play("conclui"); toast("📅 Atividade movida para " + r.quando + "." + (r.aprovado ? " Pedido de prazo aprovado." : "")); return load(null, true); }).catch(function(e){ toast(errMsg(e)); }); }
+  if (a === "excluirTar"){ var tt = (S.data.tarefas.filter(function(t){ return t.id === btn.dataset.b; })[0] || {}).titulo || "esta atividade";
+    if (!window.confirm("Excluir \"" + tt + "\"? Isso não pode ser desfeito.")) return;
+    return act(run("delTarefa", S.me, S.pin, S.data.dia, btn.dataset.b)).then(function(){ toast("🗑 Atividade excluída."); }).catch(function(){}); }
   if (a === "abrirResp"){ S_RESP = btn.dataset.id; S_RESPWA = null; render(); var ta = $("resp_" + S_RESP); if (ta) ta.focus(); return; }
   if (a === "fecharResp"){ S_RESP = ""; return render(); }
   if (a === "atender"){ var idA = btn.dataset.id, ta2 = $("resp_" + idA), resp = ta2 ? ta2.value.trim() : "";
@@ -1863,7 +1890,7 @@ function renderGestao(){
   var w = $("gWrap"); if (!w) return;
   var p = S.painel, d = S.data;
   if (!p){ w.innerHTML = '<div class="empty"><b>Carregando o painel…</b>Frequência da semana, atrasos e quem falta bater ponto.</div>'; return; }
-  var h = gestaoDiagnostico() + gestaoPontos();
+  var h = '<div class="gsec"><h2>🔔 Alerta para a equipe</h2><p class="sub">Abre o WhatsApp com a mensagem pronta (escolha o grupo) e avisa todo mundo no app.</p>' + botaoAlerta() + '</div>' + gestaoDiagnostico() + gestaoPontos();
   // relatório final do dia
   var OPD = p.opcoesDia || {seguir:"Dia de atividades executadas · seguir", ajustes:"Dia de necessidade de ajustes", urgencias:"Dia de reavaliação de urgências"};
   var fe = p.fechamento;
@@ -1890,7 +1917,8 @@ function renderGestao(){
         +'<div style="flex-basis:100%">'+waLink(x.por, 'Sobre o suporte em "'+x.titulo+'": ')+'</div></div>'; }).join("")+'</div>';
   if (ag.prazos && ag.prazos.length) h += '<div class="eyebrow" style="color:var(--warn)">⏱ Pedidos de prazo ('+ag.prazos.length+')</div><div class="olist">'+ag.prazos.map(function(x){
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px">'+chip(x.por)+'<b>'+esc(x.titulo)+'</b><span class="when">prazo '+esc(x.prazo)+' · pede '+(x.opcao==="proximo"?"próximo turno":"turno adicional (+2h)")+'</span>'
-        +'<div class="row" style="flex-basis:100%"><button class="btn fin" data-g="prazoOk" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Aprovar</button><button class="btn" data-g="prazoNao" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Recusar</button></div></div>'; }).join("")+'</div>';
+        +'<div class="row" style="flex-basis:100%"><button class="btn fin" data-g="prazoOk" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Aprovar</button>'+(d.dono?'<button class="btn" data-g="prazoData" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">📅 Aprovar com nova data</button>':'')+'<button class="btn" data-g="prazoNao" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Recusar</button></div>'
+        +(d.dono && S_PRZDATA === x.dia+"__"+x.bloco ? formMover(x.dia, {hora: x.hora || "", fim: x.fim || ""}, "pz_", '<button class="btn primary" data-g="prazoDataOk" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Aprovar e mudar</button>', '<button class="btn" data-g="prazoDataX">Cancelar</button>') : '')+'</div>'; }).join("")+'</div>';
   h += '<div class="eyebrow">Na ONG ('+ag.dentro.length+')</div>' + (ag.dentro.length ? '<div class="olist">'+ag.dentro.map(function(x){
       return '<div>'+chip(x.id)+(x.faltaSaida?'<span class="pill bad">⛔ falta bater a saída ('+esc(x.faltaSaida)+')</span>':'')+'<span class="when">desde '+esc(x.desde)+' · sai '+esc(x.saida||"—")+'</span>'+(x.dist!=null&&x.dist>ag.raio?'<small class="nof">entrou a '+fmtD(x.dist)+' da sede</small>':'')+'</div>'; }).join("")+'</div>' : '<p class="sub">Ninguém registrou entrada agora.</p>');
   if (ag.fora.length) h += '<div class="eyebrow">Fora com motivo ('+ag.fora.length+')</div><div class="olist">'+ag.fora.map(function(x){
@@ -1939,7 +1967,7 @@ function renderGestao(){
       + '<div class="row"><label class="sub">Início <input type="time" id="eIni" value="'+esc(toHHMM(t.hora))+'"></label><label class="sub">Fim <input type="time" id="eFim" value="'+esc(t.fim||"")+'"></label></div>'
       + '<div class="pick">'+(d?d.equipe:[]).map(function(x){ return '<button type="button" data-ep="'+esc(x.id)+'" aria-pressed="'+(S_EDT.pessoas.indexOf(x.id)>=0)+'">'+chip(x.id)+'</button>'; }).join("")+'</div>'
       + '<div class="row"><button class="btn primary" data-g="edSalvar">Salvar</button><button class="btn" data-g="edCancel">Cancelar</button></div></div>';
-    return '<div><span><b>'+esc(t.hora)+'–'+esc(t.fim||"")+'</b> '+esc(t.titulo)+'</span><span class="row"><button class="btn" data-g="ed" data-id="'+esc(t.id)+'">Editar</button><button class="btn" data-g="del" data-id="'+esc(t.id)+'">Remover</button></span></div>';
+    return '<div><span><b>'+esc(t.hora)+'–'+esc(t.fim||"")+'</b> '+esc(t.titulo)+'</span><span class="row"><button class="btn" data-g="ed" data-id="'+esc(t.id)+'">Editar</button>'+(S.data.dono?'<button class="btn" data-g="del" data-id="'+esc(t.id)+'">Remover</button>':'')+'</span></div>';
   }).join("")+'</div>';
   h += '<div class="f">'
     + '<label>Início<input id="gHora" type="time"></label>'
@@ -2041,6 +2069,9 @@ $("view").addEventListener("click", function(e){
     if (txt.trim().length < 2) return toast("Escreva a resposta.");
     return gAct(run("responderSuporte", S.me, S.pin, b.dataset.d, b.dataset.b, txt.trim()).then(function(d){ S.data = d; return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast("Resposta enviada. Aparece para a pessoa no app."); }); }));
   }
+  if (g==="prazoData"){ S_PRZDATA = b.dataset.d + "__" + b.dataset.b; return renderGestao(); }
+  if (g==="prazoDataX"){ S_PRZDATA = ""; return renderGestao(); }
+  if (g==="prazoDataOk"){ return gAct(run("moverTarefa", S.me, S.pin, b.dataset.d, b.dataset.b, $("pz_D").value, $("pz_H").value, $("pz_F").value).then(function(r){ S_PRZDATA = ""; return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast("👍 Prazo aprovado: " + r.quando + "."); }); })); }
   if (g==="prazoOk" || g==="prazoNao"){
     return gAct(run("decidirPrazo", S.me, S.pin, b.dataset.d, b.dataset.b, g==="prazoOk").then(function(r){ return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast(g==="prazoOk" ? "Prazo aprovado até "+fmtPrazo(r.prazo)+"." : "Pedido recusado."); }); }));
   }
@@ -2511,6 +2542,7 @@ function folhaHtml(){
 document.addEventListener("click", function(ev){
   var b = ev.target.closest("[data-x]"); if (!b) return;
   var x = b.dataset.x;
+  if (x === "alertaEq"){ SOM.play("sino"); run("alertaEquipe", S.me, S.pin, MSG_ALERTA).then(function(){ toast("🔔 Alerta enviado no app para todos. Escolha o grupo no WhatsApp."); }).catch(function(e){ toast(errMsg(e)); }); return; }
   if (x === "cobrar"){ if (b.tagName !== "A") ev.preventDefault(); SOM.play("envio");
     run("cobrarColaborador", S.me, S.pin, S.data.dia, b.dataset.b, b.dataset.t, b.dataset.p).then(function(){ toast((b.tagName === "A" ? "WhatsApp aberto · " : "") + "Pedido de resposta enviado no app para " + pessoa(b.dataset.p).nome + "."); }).catch(function(e){ toast(errMsg(e)); });
     return; }
@@ -2582,7 +2614,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611101717";
+var APP_VERSAO = "202611101729";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
