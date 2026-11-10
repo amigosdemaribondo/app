@@ -12,6 +12,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="theme-color" content="#2459B8">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://script.google.com" crossorigin>
+<link rel="preconnect" href="https://script.googleusercontent.com" crossorigin>
+<link rel="dns-prefetch" href="https://drive.google.com">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>
@@ -184,6 +187,81 @@ td.t.none{color:var(--line)}
 .pgb.ok[aria-pressed="true"]{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
 .pgb.bad[aria-pressed="true"]{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
 .tabs .badge{position:absolute;top:2px;right:8px;margin:0}
+.atuBtn{border:none;background:#FFD23F;color:#1B1400;font:inherit;font-weight:800;font-size:13px;border-radius:999px;padding:6px 12px;margin-left:6px;display:inline-flex;align-items:center;gap:4px;cursor:pointer}
+.atuBtn.gira span{display:inline-block;animation:gira .8s linear infinite}
+@keyframes gira{to{transform:rotate(360deg)}}
+.turnoOk{position:fixed;inset:0;z-index:998;background:rgba(6,15,38,.82);display:flex;align-items:center;justify-content:center;padding:20px}
+.turnoOk > div{background:#fff;color:#0A1A3F;border-radius:24px;padding:28px 22px;text-align:center;max-width:340px;box-shadow:0 20px 60px rgb(0 0 0 / .4);animation:pulo .5s cubic-bezier(.2,1.6,.4,1) both}
+.turnoOk .em{font-size:64px;line-height:1}
+.turnoOk h3{font-family:var(--f-display);font-size:26px;margin:10px 0 6px}
+.turnoOk p{margin:0 0 16px;color:#334}
+.turnoOk button{border:none;background:#2459B8;color:#fff;font:inherit;font-weight:800;font-size:17px;border-radius:999px;padding:12px 28px}
+@keyframes pulo{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.impRes{background:var(--bg);border-radius:10px;padding:8px 10px;font-size:13.5px}
+.impRes p{margin:4px 0}
+.envOv{position:fixed;inset:0;z-index:997;background:rgba(6,15,38,.7);display:flex;align-items:flex-end;justify-content:center}
+.envBox{background:var(--surface);color:var(--ink);width:100%;max-width:520px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:16px;display:flex;flex-direction:column;gap:10px;padding-bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+.envTxt{background:var(--bg);border-radius:12px;padding:10px;font-size:13px;max-height:140px;overflow:auto;margin:0}
+.envLista{display:flex;flex-direction:column;gap:6px}
+.envRow{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.envChk{display:flex;align-items:center;gap:8px;background:none;border:0;color:inherit;font:inherit;cursor:pointer;padding:4px 0}
+.envChk .box{width:22px;height:22px;border-radius:6px;border:2px solid var(--line);display:inline-flex;align-items:center;justify-content:center;font-weight:900}
+.envChk[aria-pressed="true"] .box{background:#25D366;border-color:#25D366;color:#fff}
+.envProg{display:flex;flex-wrap:wrap;gap:6px}
+.envProg span{padding:3px 10px;border-radius:999px;background:var(--bg);font-size:13px}
+.envProg span.ok{background:rgba(37,211,102,.25)}
+.envProg span.at{outline:2px solid #25D366}
+.envOk{font-weight:800;font-size:17px;color:var(--ok);margin:0}
+.vozFab{position:fixed;right:max(14px, env(safe-area-inset-right, 0px));bottom:calc(18px + env(safe-area-inset-bottom, 0px));z-index:60;width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:#E11D48;color:#fff;font-size:26px;box-shadow:0 8px 24px rgb(0 0 0 / .35);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vozFab:active{transform:scale(.94)}
+.vozOv{position:fixed;inset:0;z-index:1000;background:rgba(6,15,38,.72);display:flex;align-items:flex-end;justify-content:center}
+.vozBox{background:#fff;color:#0A1A3F;width:100%;max-width:520px;border-radius:22px 22px 0 0;padding:14px 16px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:8px;max-height:90vh;overflow:auto;font-family:inherit}
+.vozTopo{display:flex;justify-content:space-between;align-items:center;width:100%}
+.vozX{border:0;background:#EEF2F8;color:#0A1A3F;width:36px;height:36px;border-radius:50%;font-size:16px;cursor:pointer}
+.vozMic{width:86px;height:86px;border-radius:50%;border:0;background:#E11D48;color:#fff;font-size:38px;cursor:pointer;box-shadow:0 8px 24px rgb(225 29 72 / .35)}
+.vozMic.on{animation:vozPulso 1.1s ease-in-out infinite}
+@keyframes vozPulso{0%,100%{box-shadow:0 0 0 0 rgb(225 29 72 / .55)}50%{box-shadow:0 0 0 18px rgb(225 29 72 / 0)}}
+.vozEst{margin:0;font-weight:700;color:#475569;font-size:14px;text-align:center}
+.vozTxt{margin:0;font-size:18px;font-weight:700;text-align:center;min-height:1.2em}
+.vozRes{width:100%;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.vozOk{margin:0;font-weight:800;color:#15803D;text-align:center}
+.vozOk.err{color:#B91C1C}
+.vozAcao{display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;border:0;border-radius:999px;padding:14px 18px;font:inherit;font-weight:800;font-size:16px;background:#25D366;color:#06301A;cursor:pointer}
+.vozAcao.alt{background:#2459B8;color:#fff}
+.vozForm{display:flex;gap:6px;width:100%}
+.vozIn{flex:1;min-width:0;border:1.5px solid #CBD5E1;border-radius:12px;padding:10px 12px;font:inherit;font-size:16px;color:#0A1A3F;background:#fff}
+.vozGo{border:0;border-radius:12px;background:#0A1A3F;color:#fff;font:inherit;font-weight:800;padding:0 16px;cursor:pointer}
+.vozAj{width:100%;font-size:13.5px;color:#334155}
+.vozAj summary{cursor:pointer;font-weight:700}
+.vozAj ul{margin:6px 0 0;padding-left:18px}
+.vozAj li{margin:3px 0}
+.visOv{position:fixed;inset:0;z-index:999;background:#0B1530;display:flex;flex-direction:column}
+.visTop{display:flex;align-items:center;gap:8px;padding:10px 12px;padding-top:calc(10px + env(safe-area-inset-top,0px));background:#12306B;color:#fff}
+.visTop b{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.visBx{border:none;background:rgba(255,255,255,.15);color:#fff;font-size:17px;width:40px;height:40px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;cursor:pointer}
+.visCorpo{flex:1;overflow:auto;-webkit-overflow-scrolling:touch;padding:10px 8px calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;align-items:center;gap:10px}
+.visPag{background:#fff;border-radius:4px;box-shadow:0 4px 18px rgb(0 0 0 / .4);max-width:100%}
+.visImg{max-width:100%;height:auto;border-radius:8px}
+.visInfo,.visCarr{color:#C9D6F2;font-size:13px;margin:0}
+.visDocx{box-sizing:border-box;background:#fff;color:#111;width:100%;max-width:820px;border-radius:6px;padding:22px 18px;line-height:1.5;font-size:15px;overflow-wrap:anywhere}
+.visDocx h2,.visDocx h3,.visDocx h4{margin:.8em 0 .4em;color:#0A1A3F}
+.visDocx p{margin:0 0 .6em}
+.visXls{box-sizing:border-box;background:#fff;color:#111;border-radius:6px;max-width:100%;overflow:auto}
+.visTab{border-collapse:collapse;font-size:13px;width:100%}
+.visTab td,.visTab th{border:1px solid #CBD5E1;padding:4px 6px;vertical-align:top;text-align:left}
+.visTab th{background:#E9EDF4;position:sticky;top:0}
+.visFrame{width:100%;flex:1;min-height:70vh;border:0;background:#fff;border-radius:6px}
+.visFalha{display:flex;flex-direction:column;align-items:center;gap:12px;color:#fff;text-align:center;padding:30px 10px}
+body.visAberto{overflow:hidden}
+.doRow{display:flex;justify-content:space-between;align-items:center;gap:6px;border-bottom:1px solid var(--line);padding:6px 0}
+.doRow input{flex:1;min-width:0}
+.doAbre{display:flex;align-items:center;gap:10px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;flex:1;min-width:0;padding:4px 0}
+.doIc{font-size:26px}
+.engPub{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.engPub figure{margin:0;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.engPub img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#0A1A3F;cursor:zoom-in}
+.engPub figcaption{padding:6px 8px;font-size:12.5px;display:flex;flex-direction:column}
+.engPub figcaption b{font-size:13.5px}
 .sombtn{border:none;background:var(--sunk);border-radius:999px;padding:6px 10px;font-size:15px;margin-left:4px}
 .need{background:var(--warn-bg);color:var(--warn);border-radius:12px;padding:10px 12px;font-weight:700;font-size:13.5px}
 .note{font-size:13px;color:var(--muted);text-align:center;margin:8px 0 0}
@@ -572,7 +650,7 @@ a.lnk,.lnk{color:#FFE27A}
 <div class="wrap">
   <div class="top">
     <div><div class="eyebrow">ONG Amigos de Maribondo</div><h1>Gestão do dia <span id="dayTitle"></span></h1></div>
-    <div class="me"><label for="meSel">Você é</label><select id="meSel"><option value="">escolher…</option></select><button id="sair" hidden>Sair</button><button id="somBtn" class="sombtn" aria-label="Ligar ou desligar os sons">🔊</button></div>
+    <div class="me"><label for="meSel">Você é</label><select id="meSel"><option value="">escolher…</option></select><button id="sair" hidden>Sair</button><button id="atuBtn" class="atuBtn" type="button" aria-label="Atualizar o app"><span>🔄</span> Atualizar</button><button id="somBtn" class="sombtn" aria-label="Ligar ou desligar os sons">🔊</button></div>
   </div>
   <div class="pinbox" id="pinbox" hidden>
     <p id="pinMsg">Digite seu PIN de 4 números</p>
@@ -604,6 +682,7 @@ a.lnk,.lnk{color:#FFE27A}
     <button role="tab" aria-selected="false" data-v="suporte"><i aria-hidden="true">🆘</i>Suporte<span class="badge" id="supBadge" hidden></span></button>
     <button role="tab" aria-selected="false" data-v="gestao" id="tabG" hidden><i aria-hidden="true">⚙️</i>Gestão</button>
     <button type="button" class="maisBtn" data-v="__mais" aria-expanded="false"><i aria-hidden="true">☰</i>Mais</button>
+    <button role="tab" aria-selected="false" data-v="docsong"><i aria-hidden="true">📂</i>Documentos</button>
     <button role="tab" aria-selected="false" data-v="atend"><i aria-hidden="true">📋</i>Atendimento</button>
     <button role="tab" aria-selected="false" data-v="cadastro"><i aria-hidden="true">🪪</i>Cadastro ONG</button>
     <button role="tab" aria-selected="false" data-v="playlist"><i aria-hidden="true">🎧</i>Playlist</button>
@@ -724,7 +803,7 @@ function render(){
   var vw = $("view"); if (S_VIEWANT !== S.view){ S_VIEWANT = S.view; vw.classList.remove("troca"); void vw.offsetWidth; vw.classList.add("troca"); clearTimeout(vw._t); vw._t = setTimeout(function(){ vw.classList.remove("troca"); }, 700); }
   renderGalBox();
   $("view").innerHTML = S.view==="playlist" ? renderPlaylist() : S.view==="engaja" ? renderEngaja() : S.view==="ideias" ? renderIdeias() : S.view==="galeria" ? renderGaleria() : S.view==="ponto" ? renderPonto() : S.view==="avisos" ? renderAvisos() : S.view==="demandas" ? renderDemandas()
-    : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="suporte" ? renderSuporte() : S.view==="cadastro" ? renderMembrosONG() : S.view==="atend" ? renderAtend() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
+    : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="suporte" ? renderSuporte() : S.view==="docsong" ? renderDocsOng() : S.view==="cadastro" ? renderMembrosONG() : S.view==="atend" ? renderAtend() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
 }
 
 var S_DIATAB = "agora";
@@ -1473,17 +1552,7 @@ docInput.addEventListener("change", function(){
     .then(function(m){ S_MB.sel = m; SOM.play("conclui"); toast("📁 " + DOC_ROT[tipo] + " salvo."); })
     .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_MB.busy = false; render(); });
 });
-function verDoc(id){
-  toast("Abrindo…");
-  run("arquivoMembro", S.me, S.pin, id).then(function(r){
-    var bin = atob(r.b64), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
-    var url = URL.createObjectURL(new Blob([u], {type: r.mime}));
-    var ov = document.createElement("div"); ov.className = "docOv";
-    ov.innerHTML = (r.mime === "application/pdf" ? '<div class="docPdf"><b>📄 '+esc(r.nome)+'</b><a class="btn primary big" href="'+url+'" target="_blank" rel="noopener" download="'+esc(r.nome)+'">Abrir o PDF</a></div>' : '<img alt="'+esc(r.nome)+'" src="'+url+'">') + '<button class="btn docX">Fechar</button>';
-    ov.addEventListener("click", function(e){ if (e.target === ov || e.target.classList.contains("docX")){ ov.remove(); URL.revokeObjectURL(url); } });
-    document.body.appendChild(ov);
-  }).catch(function(e){ toast(errMsg(e)); });
-}
+function verDoc(id){ return visPorId("mb_" + id, function(){ return run("arquivoMembro", S.me, S.pin, id); }); }
 $("view").addEventListener("input", function(ev){
   if (ev.target.id === "mbBusca"){ S_MB.q = ev.target.value; $("mbLista").innerHTML = listaMembrosHtml(filtraMembros(S_MB.q)); }
   if (ev.target.id === "atBusca"){ S_AT.q = ev.target.value; $("atLista").innerHTML = listaAtendBusca(); }
@@ -1579,6 +1648,315 @@ $("view").addEventListener("click", function(ev){
     return run("novoAtendimento", S.me, S.pin, {num: S_AT.sel.num, tema: S_AT.tema, data: data, descricao: desc}).then(function(r){ S_AT.ficha = r; S_AT.resumo = r.resumo; S_AT.tema = ""; SOM.play("conclui"); toast("📋 Ficha " + r.ficha + " gerada."); window.scrollTo({top:0}); })
       .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_AT.busy = false; render(); });
   }
+});
+
+
+
+
+/* ================= Comando de voz (núcleo comum aos 2 apps) ================= */
+var CMDVOZ = (function(){
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, rec = null, ouvindo = false, cmds = [], ajuda = [], fallback = null, somF = function(){};
+  function norm(s){ return String(s || "").normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase().replace(/[.,!?;:"]/g, " ").replace(/\s+/g, " ").trim(); }
+  function e(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+  function painel(){
+    var ov = document.querySelector(".vozOv"); if (ov) return ov;
+    ov = document.createElement("div"); ov.className = "vozOv";
+    ov.innerHTML = '<div class="vozBox"><div class="vozTopo"><b>🎙️ Comando de voz</b><button type="button" class="vozX" aria-label="Fechar">✕</button></div>'
+      + '<button type="button" class="vozMic" aria-label="Falar">🎙️</button><p class="vozEst">Toque e fale</p><p class="vozTxt"></p><div class="vozRes"></div>'
+      + '<form class="vozForm"><input class="vozIn" placeholder="Ou digite / use o 🎤 do teclado" autocomplete="off" enterkeyhint="go"><button class="vozGo" type="submit">Ir</button></form>'
+      + '<details class="vozAj"><summary>Exemplos de comandos</summary><ul>' + ajuda.map(function(a){ return "<li>" + e(a) + "</li>"; }).join("") + '</ul></details></div>';
+    document.body.appendChild(ov);
+    ov.querySelector(".vozX").addEventListener("click", fechar);
+    ov.addEventListener("click", function(ev){ if (ev.target === ov) fechar(); });
+    ov.querySelector(".vozMic").addEventListener("click", function(){ ouvindo ? parar() : ouvir(); });
+    ov.querySelector(".vozForm").addEventListener("submit", function(ev){ ev.preventDefault(); var t = ov.querySelector(".vozIn").value.trim(); if (t){ ov.querySelector(".vozIn").value = ""; ov.querySelector(".vozTxt").textContent = "“" + t + "”"; executar(t); } });
+    return ov;
+  }
+  function estado(t, on){ var ov = painel(); ov.querySelector(".vozEst").textContent = t; ov.querySelector(".vozMic").classList.toggle("on", !!on); }
+  function fechar(){ parar(); var ov = document.querySelector(".vozOv"); if (ov) ov.remove(); }
+  function parar(){ try { rec && rec.stop(); } catch(x){} ouvindo = false; }
+  function ouvir(){
+    var ov = painel(); ov.querySelector(".vozRes").innerHTML = ""; ov.querySelector(".vozTxt").textContent = "";
+    if (!SR){ estado("Seu navegador não ouve direto: toque na caixa e use o 🎤 do teclado."); ov.querySelector(".vozIn").focus(); return; }
+    try {
+      rec = new SR(); rec.lang = "pt-BR"; rec.continuous = false; rec.interimResults = true; rec.maxAlternatives = 1;
+      var final = "";
+      rec.onresult = function(ev){ var par = ""; for (var i = ev.resultIndex; i < ev.results.length; i++){ if (ev.results[i].isFinal) final += ev.results[i][0].transcript; else par += ev.results[i][0].transcript; } ov.querySelector(".vozTxt").textContent = "“" + (final + par).trim() + "”"; };
+      rec.onstart = function(){ ouvindo = true; estado("Ouvindo… pode falar", true); somF("ouvir"); };
+      rec.onerror = function(ev){ ouvindo = false; estado(ev.error === "not-allowed" || ev.error === "service-not-allowed" ? "Microfone bloqueado: libere nos ajustes do navegador, ou use o 🎤 do teclado na caixa abaixo." : ev.error === "no-speech" ? "Não ouvi nada. Toque e fale de novo." : "Não entendi. Toque e fale de novo."); };
+      rec.onend = function(){ ouvindo = false; ov.querySelector(".vozMic").classList.remove("on"); if (final.trim()) executar(final.trim()); else if (/Ouvindo/.test(ov.querySelector(".vozEst").textContent)) estado("Toque e fale"); };
+      rec.start();
+    } catch(x){ estado("Não consegui abrir o microfone. Use o 🎤 do teclado na caixa abaixo."); }
+  }
+  function mostra(r){
+    if (!r) return;
+    var ov = painel(), box = ov.querySelector(".vozRes");
+    box.innerHTML = '<p class="vozOk ' + (r.erro ? "err" : "") + '">' + (r.erro ? "⚠️ " : "✅ ") + e(r.msg || "") + '</p>' + (r.html || "");
+    estado(r.erro ? "Toque e fale de novo" : "Pronto. Toque para outro comando");
+    somF(r.erro ? "erro" : "ok");
+    if (r.fechar && !r.html) setTimeout(fechar, 1100);
+  }
+  function executar(txt){
+    var n = norm(txt);
+    for (var i = 0; i < cmds.length; i++){ var m = n.match(cmds[i].re); if (m){ var r; try { r = cmds[i].fn(m, txt, n); } catch(x){ r = {erro:true, msg:"Não consegui fazer: " + (x && x.message || x)}; }
+      if (r && r.then) { estado("Fazendo…"); r.then(mostra, function(x){ mostra({erro:true, msg:(x && x.message) || String(x)}); }); } else mostra(r); return; } }
+    mostra(fallback ? fallback(txt, n) : {erro:true, msg:"Não reconheci o comando. Veja os exemplos abaixo."});
+  }
+  /* ---- ajudantes de data e nomes ---- */
+  var DIAS = ["domingo","segunda","terca","quarta","quinta","sexta","sabado"];
+  function isoLocal(d){ var p = function(n){ return String(n).padStart(2, "0"); }; return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate()); }
+  function quando(n){ // devolve {dia:"AAAA-MM-DD"|"", hora:"HH:MM"|"", resto:"texto sem data/hora"}
+    var hoje = new Date(), dia = "", hora = "", t = " " + n + " ", removidos = [];
+    var tira = function(re){ var mm = t.match(re); if (mm) removidos.push(mm[0].trim()); t = t.replace(re, " "); };
+    if (/ depois de amanha /.test(t)){ var d2 = new Date(hoje); d2.setDate(d2.getDate() + 2); dia = isoLocal(d2); tira(/ depois de amanha /); }
+    else if (/ amanha /.test(t)){ var d1 = new Date(hoje); d1.setDate(d1.getDate() + 1); dia = isoLocal(d1); tira(/ amanha /); }
+    else if (/ hoje /.test(t)){ dia = isoLocal(hoje); tira(/ hoje /); }
+    if (!dia){ for (var k = 0; k < 7; k++){ var re = new RegExp(" (na |no |nesta |neste |proxima |proximo )?" + DIAS[k] + "( feira)? "); if (re.test(t)){ var dd = new Date(hoje), dif = (k - dd.getDay() + 7) % 7 || 7; dd.setDate(dd.getDate() + dif); dia = isoLocal(dd); tira(re); break; } } }
+    if (!dia){ var md = t.match(/ dia (\d{1,2})( de (\w+))?( de \d{4})? /); if (md){ var MES = ["janeiro","fevereiro","marco","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"], mi = md[3] ? MES.indexOf(md[3]) : -1;
+      var dx = new Date(hoje.getFullYear(), mi >= 0 ? mi : hoje.getMonth(), Number(md[1])); if (dx < new Date(hoje.getFullYear(), hoje.getMonth(), hoje.getDate())) { if (mi >= 0) dx.setFullYear(dx.getFullYear() + 1); else dx.setMonth(dx.getMonth() + 1); } dia = isoLocal(dx); tira(/ dia \d{1,2}( de \w+)?( de \d{4})? /); } }
+    var mh = t.match(/ (as |a |para as |pras |ao )?(\d{1,2})(?:(?::|h| horas? e | e )(\d{2}))?(?:h| horas?)?( da (manha|tarde|noite))? /);
+    if (/ meio dia /.test(t)){ hora = "12:00"; tira(/ (ao |as )?meio dia /); }
+    else if (mh && (mh[1] || /h|hora|:/.test(mh[0]) || mh[4])){ var hh = Number(mh[2]), mm = mh[3] ? Number(mh[3]) : 0; if (mh[5] && mh[5] !== "manha" && hh < 12) hh += 12; if (hh < 24 && mm < 60){ hora = String(hh).padStart(2, "0") + ":" + String(mm).padStart(2, "0"); removidos.push(mh[0].trim()); t = t.replace(mh[0], " "); } }
+    return {dia: dia, hora: hora, resto: t.replace(/\s+/g, " ").trim(), removidos: removidos};
+  }
+  function dist(a, b){ var m = a.length, n2 = b.length, d = []; for (var i = 0; i <= m; i++){ d[i] = [i]; } for (var j = 0; j <= n2; j++) d[0][j] = j;
+    for (i = 1; i <= m; i++) for (j = 1; j <= n2; j++) d[i][j] = Math.min(d[i-1][j] + 1, d[i][j-1] + 1, d[i-1][j-1] + (a[i-1] === b[j-1] ? 0 : 1)); return d[m][n2]; }
+  function achar(lista, nomeDe, alvo){ // melhor item pelo nome falado
+    alvo = norm(alvo).replace(/^(o|a|os|as|do|da|de|pro|pra|para) /, ""); if (alvo.length < 2) return null;
+    var melhor = null, nota = 99;
+    lista.forEach(function(it){ var nm = norm(nomeDe(it)); if (!nm) return; var s = 99;
+      if (nm === alvo) s = 0; else if (nm.indexOf(alvo) === 0 || alvo.indexOf(nm) === 0) s = 1; else if (nm.split(" ").some(function(w){ return w === alvo.split(" ")[0]; })) s = 2; else if (nm.indexOf(alvo) >= 0) s = 3;
+      else { var d0 = dist(nm.split(" ")[0], alvo.split(" ")[0]); if (d0 <= (alvo.length > 5 ? 2 : 1)) s = 4 + d0; }
+      if (s < nota){ nota = s; melhor = it; } });
+    return melhor;
+  }
+  /* devolve o trecho ORIGINAL (com acentos e maiúsculas) que corresponde a um trecho normalizado */
+  function porLetra(s){ return Array.prototype.map.call(String(s), function(ch){ var x = ch.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase(); x = x.length === 1 ? x : (x.charAt(0) || " "); return /[.,!?;:"]/.test(x) ? " " : x; }).join(""); }
+  function reDe(frag){ return new RegExp(norm(frag).split(" ").filter(Boolean).map(function(w){ return w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); }).join("\\s+")); }
+  function orig(original, frag, removidos){
+    var pl = porLetra(original), mm = frag ? pl.match(reDe(frag)) : null, out = mm ? String(original).substr(mm.index, mm[0].length) : String(frag || "");
+    (removidos || []).forEach(function(r){ if (!r) return; var p2 = porLetra(out), m2 = p2.match(reDe(r)); if (m2) out = out.slice(0, m2.index) + " " + out.slice(m2.index + m2[0].length); });
+    return out.replace(/\s+/g, " ").replace(/^[\s,:;-]+|[\s,:;-]+$/g, "").trim();
+  }
+  return { orig: orig, abrir: function(){ painel(); ouvir(); }, fechar: fechar, executar: executar, config: function(o){ cmds = o.cmds; ajuda = o.ajuda || []; fallback = o.fallback; somF = o.som || somF; },
+    norm: norm, quando: quando, achar: achar, esc: e, temMic: !!SR };
+})();
+
+/* ================= v41 · Comandos de voz do Victor (app da ONG) ================= */
+var VOZ_ABAS = [["dia",/^(o )?dia|^hoje|^inicio/],["minhas",/^minhas/],["ponto",/^ponto/],["avisos",/^aviso/],["demandas",/^demanda/],["engaja",/^engaja/],["ideias",/^ideia/],
+  ["gestao",/^gest/],["suporte",/^suporte|^pedidos de suporte/],["docsong",/^documento/],["atend",/^atendimento|^ficha/],["cadastro",/^cadastro|^membros/],["programas",/^programa/],
+  ["saude",/^saude/],["editais",/^edita/],["visitas",/^visita/],["playlist",/^playlist|^podcast/],["galeria",/^galeria|^fotos/],["freq",/^frequencia/]];
+function vozAba(v){ var bt = document.querySelector('.tabs button[data-v="' + v + '"]'); if (bt) bt.click(); window.scrollTo({top:0}); }
+function vozWa(tel, txt, rot){ return '<a class="vozAcao" href="' + CMDVOZ.esc(waHref(tel || "", txt)) + '" target="_blank" rel="noopener">' + WA_ICON + CMDVOZ.esc(rot) + '</a>'; }
+function vozPessoa(nome){ return CMDVOZ.achar(((S.data && S.data.equipe) || []).filter(function(p){ return p.id !== "teste"; }), function(p){ return p.nome + " " + p.id; }, nome); }
+function vozCap(t){ t = String(t || "").trim(); return t ? t.charAt(0).toUpperCase() + t.slice(1) : t; }
+function vozGarante(lista, carregar){ return lista() ? Promise.resolve() : carregar(); }
+CMDVOZ.config({
+  som: function(k){ try { SOM.play(k === "erro" ? "nao" : k === "ouvir" ? "tap" : "ok"); } catch(x){} },
+  ajuda: ["Abrir ponto / abrir gestão / abrir documentos", "Atualizar", "Alerta para a equipe", "Atenção aos pontos", "Cobrar Patrícia",
+    "Mensagem para Lucas: reunião às 15h", "Novo atendimento Maria José", "Abrir cadastro de Maria", "Novo cadastro João da Silva", "Abrir documento estatuto", "Fechar"],
+  cmds: [
+    {re:/^(fechar|cancelar|parar|sair do comando)$/, fn:function(){ CMDVOZ.fechar(); }},
+    {re:/^(atualizar|atualiza|recarregar)( o app| tudo| a pagina)?$/, fn:function(){ setTimeout(function(){ $("atuBtn").click(); }, 500); return {msg:"Atualizando o app…", fechar:true}; }},
+    {re:/^((mandar|manda|enviar|envia|dar|da) )?(o |um )?alerta/, fn:function(){ run("alertaEquipe", S.me, S.pin, MSG_ALERTA).catch(function(){}); CMDVOZ.fechar(); abrirEnvio(MSG_ALERTA, false); }},
+    {re:/atencao aos pontos|pontos da semana/, fn:function(){ CMDVOZ.fechar(); abrirEnvio(MSG_GRUPO.pontos(), false); }},
+    {re:/^(cobra|cobrar|cobre)( o| a)? (.+)$/, fn:function(m){
+      var p = vozPessoa(m[3]); if (!p) return {erro:true, msg:"Não achei \"" + m[3] + "\" na equipe."};
+      var tel = S.data.telefones && S.data.telefones[p.id], pr = S.data.ponto && S.data.ponto[p.id], txt;
+      if (pr && PONTO_RUIM[pr.estado]){ txt = msgPonto(p.id, pr.estado); run("cobrarPonto", S.me, S.pin, p.id, pr.estado).catch(function(){}); }
+      else { var bl = (S.data.tarefas || []).filter(function(b){ var st = (S.data.status[b.id] || {}).estado; return b.pessoas.indexOf(p.id) >= 0 && st !== "concluida" && (b.vencida || S.data.dia < S.data.hoje); })[0];
+        if (bl){ txt = msgCobrar(bl, p.id, "nao"); run("cobrarColaborador", S.me, S.pin, S.data.dia, bl.id, "nao", p.id).catch(function(){}); }
+        else txt = "Oi, " + primeiroNome(p.nome) + "! Aqui é da coordenação da ONG Amigos de Maribondo. 💙 Passando para lembrar: confira suas atividades de hoje no app, inicie e conclua com foto. Obrigado!"; }
+      return {msg:"Cobrança de " + p.nome + " pronta" + (tel ? "" : " (sem WhatsApp cadastrado: escolha o contato)") + ". Aviso enviado no app.", html: vozWa(tel, txt, "Enviar para " + primeiroNome(p.nome))};
+    }},
+    {re:/^(mensagem|mandar|manda|mande|enviar|envia|escrever|escreve|zap|whatsapp)( mensagem)? (para|pra|pro|ao|a)( o| a)? (\S+)(.*)$/, fn:function(m, orig){
+      var p = vozPessoa(m[5]); if (!p) return {erro:true, msg:"Não achei \"" + m[5] + "\" na equipe."};
+      var corpo = orig.replace(/^.*?\b(para|pra|pro|ao|a)\s+((o|a)\s+)?\S+[\s,:-]*/i, "").trim(), tel = S.data.telefones && S.data.telefones[p.id];
+      var txt = corpo ? "Oi, " + primeiroNome(p.nome) + "! " + vozCap(corpo) : "Oi, " + primeiroNome(p.nome) + "! Aqui é o Victor. ";
+      return {msg:"Mensagem para " + p.nome + " pronta.", html: vozWa(tel, txt, "Enviar para " + primeiroNome(p.nome))};
+    }},
+    {re:/^(novo atendimento|atender|atendimento|iniciar atendimento)( de| da| do| para| pra)? ?(.*)$/, fn:function(m, orig){
+      var nome = m[3].trim() ? CMDVOZ.orig(orig, m[3]) : ""; S_AT.ficha = null; vozAba("atend");
+      if (!nome) return {msg:"Ficha de atendimento aberta.", fechar:true};
+      return vozGarante(function(){ return S_MB.lista; }, loadMb).then(function(){
+        var mb = CMDVOZ.achar(S_MB.lista || [], function(x){ return x.nome; }, nome);
+        if (mb && CMDVOZ.norm(mb.nome).indexOf(CMDVOZ.norm(nome).split(" ")[0]) >= 0){ S_AT.sel = mb; S_AT.q = ""; render(); return {msg:"Atendimento de " + mb.nome + " (nº " + mb.num + "). Escolha o tema.", fechar:true}; }
+        S_AT.sel = null; S_AT.q = vozCap(nome); render(); return {msg:"Não achei " + nome + " no cadastro. Toque em Cadastro novo.", fechar:true}; });
+    }},
+    {re:/^(novo cadastro|cadastrar|cadastra|novo membro)( de| da| do)? ?(.*)$/, fn:function(m, orig){
+      S_MB.sel = null; S_MB.edit = {nome: m[3] ? CMDVOZ.orig(orig, m[3]).replace(/(^|\s)\S/g, function(c){ return c.toUpperCase(); }) : ""}; vozAba("cadastro"); return {msg:"Cadastro novo aberto.", fechar:true}; }},
+    {re:/^(abrir |abre |mostrar |ver |buscar |procurar )?(o )?(cadastro|ficha|membro) (de |da |do )?(.+)$/, fn:function(m){
+      var nome = m[5]; vozAba("cadastro");
+      return vozGarante(function(){ return S_MB.lista; }, loadMb).then(function(){
+        var mb = CMDVOZ.achar(S_MB.lista || [], function(x){ return x.nome + " " + x.num; }, nome);
+        if (mb){ abrirMembro(mb.num); return {msg:"Abrindo " + mb.nome + ".", fechar:true}; }
+        S_MB.q = nome; S_MB.sel = null; S_MB.edit = null; render(); return {erro:true, msg:"Não achei " + nome + ". Deixei a busca pronta."}; });
+    }},
+    {re:/^(abrir |abre |mostrar |ver )?(o )?(documento|arquivo|formulario) (de |da |do )?(.+)$/, fn:function(m){
+      var nome = m[5]; vozAba("docsong");
+      return vozGarante(function(){ return S_DO.lista; }, loadDo).then(function(){
+        var d = CMDVOZ.achar(S_DO.lista || [], function(x){ return x.nome; }, nome);
+        if (d){ CMDVOZ.fechar(); visPorId("do_" + d.id, function(){ return run("baixarDocOng", S.me, S.pin, d.id); }); return {msg:"Abrindo " + d.nome + "."}; }
+        S_DO.q = nome; render(); return {erro:true, msg:"Nenhum documento com \"" + nome + "\"."}; });
+    }},
+    {re:/^(abrir|abre|ir para|ir pra|vai para|vai pra|va para|mostrar|mostra|ver)( a| o| as| os)?( aba)? (.+)$/, fn:function(m){
+      var alvo = m[4]; for (var i = 0; i < VOZ_ABAS.length; i++) if (VOZ_ABAS[i][1].test(alvo)){ vozAba(VOZ_ABAS[i][0]); return {msg:"Aba aberta.", fechar:true}; }
+      return {erro:true, msg:"Não achei a aba \"" + alvo + "\"."};
+    }},
+    {re:/^(ponto|gestao|avisos|demandas|documentos|suporte|atendimento|cadastro|engajamento|ideias|programas|saude|editais|visitas|galeria|playlist|frequencia)$/, fn:function(m){
+      for (var i = 0; i < VOZ_ABAS.length; i++) if (VOZ_ABAS[i][1].test(m[1])){ vozAba(VOZ_ABAS[i][0]); return {msg:"Aba aberta.", fechar:true}; } }}
+  ],
+  fallback: function(txt){ return {erro:true, msg:"Não reconheci \"" + txt + "\". Veja os exemplos abaixo."}; }
+});
+var vozFab = document.createElement("button"); vozFab.type = "button"; vozFab.className = "vozFab"; vozFab.hidden = true; vozFab.setAttribute("aria-label", "Comando de voz"); vozFab.textContent = "🎙️";
+document.body.appendChild(vozFab); vozFab.addEventListener("click", function(){ CMDVOZ.abrir(); });
+function vozFabAtualiza(){ vozFab.hidden = !(logged() && S.me === "victor"); }
+vozFabAtualiza(); setInterval(vozFabAtualiza, 1500);
+
+/* ================= v40 · Visualizador de arquivos dentro do app (PDF, Word, planilha, foto) ================= */
+var VIS_MEM = {}; // id -> {b64, mime, nome}: reabre na hora, sem baixar de novo
+var PDFJS_URL = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/legacy/build/pdf.min.mjs", PDFJS_WORKER = "https://cdn.jsdelivr.net/npm/pdfjs-dist@6.2.108/legacy/build/pdf.worker.min.mjs";
+var PDFJS_P = null;
+function carregaPdfJs(){ if (!PDFJS_P) PDFJS_P = import(PDFJS_URL).then(function(m){ var L = m.GlobalWorkerOptions ? m : (m.default || m); L.GlobalWorkerOptions.workerSrc = PDFJS_WORKER; return L; }).catch(function(e){ PDFJS_P = null; throw e; }); return PDFJS_P; }
+function b64Bytes(b64){ var bin = atob(b64), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u; }
+/* leitor de .zip (docx/xlsx) usando o descompressor do próprio navegador */
+function lerZip(u){
+  var dv = new DataView(u.buffer, u.byteOffset, u.byteLength), eocd = -1;
+  for (var i = u.length - 22; i >= Math.max(0, u.length - 66000); i--) if (dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  if (eocd < 0) throw new Error("zip");
+  var n = dv.getUint16(eocd + 10, true), off = dv.getUint32(eocd + 16, true), ents = {}, td = new TextDecoder();
+  for (var k = 0; k < n; k++){
+    var met = dv.getUint16(off + 10, true), csz = dv.getUint32(off + 20, true), nl = dv.getUint16(off + 28, true), xl = dv.getUint16(off + 30, true), cl = dv.getUint16(off + 32, true), lo = dv.getUint32(off + 42, true);
+    var nome = td.decode(u.subarray(off + 46, off + 46 + nl)); ents[nome] = {met: met, csz: csz, lo: lo}; off += 46 + nl + xl + cl;
+  }
+  return { tem: function(nm){ return !!ents[nm]; }, texto: function(nm){ var e = ents[nm]; if (!e) return Promise.resolve("");
+    var ini = e.lo + 30 + dv.getUint16(e.lo + 26, true) + dv.getUint16(e.lo + 28, true), dados = u.subarray(ini, ini + e.csz);
+    if (e.met === 0) return Promise.resolve(td.decode(dados));
+    if (typeof DecompressionStream === "undefined") return Promise.reject(new Error("sem descompressor"));
+    return new Response(new Blob([dados]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text(); } };
+}
+function xmlDoc(t){ return new DOMParser().parseFromString(t, "application/xml"); }
+function filhos(el, nome){ return Array.prototype.filter.call(el.childNodes, function(c){ return c.nodeType === 1 && c.localName === nome; }); }
+function docxHtml(u){
+  var z = lerZip(u);
+  return z.texto("word/document.xml").then(function(t){
+    var body = xmlDoc(t).getElementsByTagNameNS("*", "body")[0]; if (!body) throw new Error("docx");
+    var par = function(p){
+      var pp = filhos(p, "pPr")[0], st = pp && filhos(pp, "pStyle")[0], estilo = st ? (st.getAttribute("w:val") || "") : "", jc = pp && filhos(pp, "jc")[0], lista = (pp && filhos(pp, "numPr").length) || /list|lista/i.test(estilo);
+      var h = Array.prototype.map.call(p.getElementsByTagNameNS("*", "r"), function(r){
+        var rp = filhos(r, "rPr")[0], txt = "";
+        Array.prototype.forEach.call(r.childNodes, function(c){ if (c.localName === "t") txt += esc(c.textContent); else if (c.localName === "tab") txt += "&emsp;"; else if (c.localName === "br") txt += "<br>"; });
+        if (!txt) return ""; if (rp && filhos(rp, "b").length) txt = "<b>" + txt + "</b>"; if (rp && filhos(rp, "i").length) txt = "<i>" + txt + "</i>"; if (rp && filhos(rp, "u").length) txt = "<u>" + txt + "</u>"; return txt; }).join("");
+      var al = jc ? ' style="text-align:' + ({center:"center", right:"right", both:"justify"}[jc.getAttribute("w:val")] || "left") + '"' : "";
+      var m = estilo.match(/^(Heading|T[ií]tulo|Ttulo)\s*(\d)/i) || (/^Title$/i.test(estilo) ? [0, 0, 1] : null);
+      if (m) return "<h" + Math.min(4, Number(m[2]) + 1) + al + ">" + (h || "&nbsp;") + "</h" + Math.min(4, Number(m[2]) + 1) + ">";
+      return lista ? "<li" + al + ">" + h + "</li>" : "<p" + al + ">" + (h || "&nbsp;") + "</p>";
+    };
+    var bloco = function(el){
+      if (el.localName === "p") return par(el);
+      if (el.localName === "tbl") return '<table class="visTab">' + filhos(el, "tr").map(function(tr){ return "<tr>" + filhos(tr, "tc").map(function(tc){ return "<td>" + Array.prototype.map.call(tc.childNodes, function(c){ return c.nodeType === 1 ? bloco(c) : ""; }).join("") + "</td>"; }).join("") + "</tr>"; }).join("") + "</table>";
+      return "";
+    };
+    return '<div class="visDocx">' + Array.prototype.map.call(body.childNodes, function(c){ return c.nodeType === 1 ? bloco(c) : ""; }).join("").replace(/(<li[\s\S]*?<\/li>)+/g, function(x){ return "<ul>" + x + "</ul>"; }) + "</div>";
+  });
+}
+function xlsxHtml(u){
+  var z = lerZip(u), shared = [];
+  return z.texto("xl/sharedStrings.xml").then(function(t){
+    if (t) Array.prototype.forEach.call(xmlDoc(t).getElementsByTagNameNS("*", "si"), function(si){ shared.push(Array.prototype.map.call(si.getElementsByTagNameNS("*", "t"), function(x){ return x.textContent; }).join("")); });
+    return z.texto("xl/worksheets/sheet1.xml");
+  }).then(function(t){
+    var rows = Array.prototype.slice.call(xmlDoc(t).getElementsByTagNameNS("*", "row"), 0, 500), maxC = 0, grade = [];
+    var col = function(ref){ var s = (ref.match(/^[A-Z]+/) || ["A"])[0], n = 0; for (var i = 0; i < s.length; i++) n = n * 26 + s.charCodeAt(i) - 64; return n - 1; };
+    rows.forEach(function(r){ var linha = []; Array.prototype.forEach.call(r.getElementsByTagNameNS("*", "c"), function(c){
+      var v = c.getElementsByTagNameNS("*", "v")[0], is = c.getElementsByTagNameNS("*", "t")[0], tp = c.getAttribute("t"), x = v ? v.textContent : (is ? is.textContent : "");
+      if (tp === "s") x = shared[Number(x)] || ""; var ci = col(c.getAttribute("r") || "A"); linha[ci] = x; if (ci + 1 > maxC) maxC = ci + 1; }); grade.push(linha); });
+    maxC = Math.min(maxC, 30);
+    return '<div class="visXls"><table class="visTab">' + grade.map(function(l, i){ var h = ""; for (var c = 0; c < maxC; c++) h += (i === 0 ? "<th>" : "<td>") + esc(l[c] == null ? "" : l[c]) + (i === 0 ? "</th>" : "</td>"); return "<tr>" + h + "</tr>"; }).join("") + "</table></div>";
+  });
+}
+function abrirVisualizador(r){
+  var u = b64Bytes(r.b64), blob = new Blob([u], {type: r.mime}), url = URL.createObjectURL(blob), ext = (String(r.nome).match(/\.(\w+)$/) || [, ""])[1].toLowerCase();
+  var ov = document.createElement("div"); ov.className = "visOv";
+  ov.innerHTML = '<div class="visTop"><b>' + esc(r.nome) + '</b><a class="visBx" href="' + url + '" download="' + esc(r.nome) + '" aria-label="Baixar">⬇️</a><button class="visBx visX" aria-label="Fechar">✕</button></div><div class="visCorpo"><p class="visCarr">Abrindo…</p></div>';
+  var corpo = ov.querySelector(".visCorpo"), fechar = function(){ ov.remove(); URL.revokeObjectURL(url); document.body.classList.remove("visAberto"); };
+  ov.querySelector(".visX").addEventListener("click", fechar);
+  document.body.appendChild(ov); document.body.classList.add("visAberto");
+  var falhou = function(){ corpo.innerHTML = '<div class="visFalha"><p>Não deu para mostrar este arquivo aqui dentro.</p><a class="btn primary big" href="' + url + '" download="' + esc(r.nome) + '" target="_blank" rel="noopener">⬇️ Abrir no celular</a></div>'; };
+  if (/^image\//.test(r.mime)){ corpo.innerHTML = '<img class="visImg" alt="' + esc(r.nome) + '" src="' + url + '">'; return; }
+  if (r.mime === "application/pdf" || ext === "pdf"){
+    carregaPdfJs().then(function(L){ return L.getDocument({data: u.slice()}).promise; }).then(function(pdf){
+      corpo.innerHTML = '<p class="visInfo">' + pdf.numPages + ' página' + (pdf.numPages > 1 ? 's' : '') + '</p>';
+      var larg = Math.min(corpo.clientWidth || 360, 900) - 8, dpr = Math.min(window.devicePixelRatio || 1, 2), n = Math.min(pdf.numPages, 60), cadeia = Promise.resolve();
+      for (var i = 1; i <= n; i++) (function(i){ cadeia = cadeia.then(function(){ if (!ov.isConnected) return; return pdf.getPage(i).then(function(pg){
+        var v0 = pg.getViewport({scale: 1}), vp = pg.getViewport({scale: larg / v0.width * dpr}), cv = document.createElement("canvas");
+        cv.width = Math.floor(vp.width); cv.height = Math.floor(vp.height); cv.style.width = Math.floor(vp.width / dpr) + "px"; cv.className = "visPag"; corpo.appendChild(cv);
+        return pg.render({canvasContext: cv.getContext("2d"), canvas: cv, viewport: vp}).promise; }); }); })(i);
+      if (pdf.numPages > n) cadeia.then(function(){ corpo.insertAdjacentHTML("beforeend", '<p class="visInfo">Mostrando ' + n + ' de ' + pdf.numPages + ' páginas. Baixe para ver tudo.</p>'); });
+      return cadeia;
+    }).catch(function(){ corpo.innerHTML = '<iframe class="visFrame" title="' + esc(r.nome) + '" src="' + url + '"></iframe><div class="visFalha"><a class="btn" href="' + url + '" download="' + esc(r.nome) + '" target="_blank" rel="noopener">Não apareceu? ⬇️ Abrir no celular</a></div>'; });
+    return;
+  }
+  if (ext === "docx") return docxHtml(u).then(function(h){ corpo.innerHTML = h; }).catch(falhou);
+  if (ext === "xlsx") return xlsxHtml(u).then(function(h){ corpo.innerHTML = h; }).catch(falhou);
+  falhou();
+}
+function visPorId(chave, buscar){
+  if (VIS_MEM[chave]) return abrirVisualizador(VIS_MEM[chave]);
+  toast("Abrindo…");
+  return buscar().then(function(r){ if (r.b64.length < 6e6) VIS_MEM[chave] = r; abrirVisualizador(r); }).catch(function(e){ toast(errMsg(e)); });
+}
+
+/* ================= v39 · Documentos da ONG ================= */
+var S_DO = {lista:null, q:"", busy:false, erro:"", loading:false, arq:null, ren:""};
+var DO_ICON = {pdf:"📕", doc:"📘", docx:"📘", odt:"📘", xls:"📗", xlsx:"📗", jpg:"🖼️", png:"🖼️"};
+function loadDo(){ S_DO.loading = true; S_DO.erro = "";
+  return run("docsOng", S.me, S.pin).then(function(l){ S_DO.lista = l; }).catch(function(e){ S_DO.erro = errMsg(e); }).finally(function(){ S_DO.loading = false; if (S.view === "docsong") render(); }); }
+function tamTxt(n){ return n > 1048576 ? (n/1048576).toFixed(1).replace(".", ",") + " MB" : Math.max(1, Math.round(n/1024)) + " KB"; }
+function listaDocsHtml(){
+  var q = semAc2(S_DO.q).trim(), L = (S_DO.lista || []).filter(function(d){ return !q || semAc2(d.nome).indexOf(q) >= 0; });
+  if (!L.length) return '<p class="sub">' + (S_DO.lista && S_DO.lista.length ? 'Nenhum documento com esse nome.' : 'Nenhum documento ainda. Anexe o primeiro acima.') + '</p>';
+  return L.map(function(d){
+    if (S_DO.ren === d.id) return '<div class="doRow"><input id="doRen" maxlength="120" value="' + esc(d.nome) + '"><span class="row"><button class="btn primary" data-do="renOk" data-id="' + esc(d.id) + '">Salvar</button><button class="btn" data-do="renX">Cancelar</button></span></div>';
+    return '<div class="doRow"><button class="doAbre" data-do="abrir" data-id="' + esc(d.id) + '"><span class="doIc">' + (DO_ICON[d.ext] || "📄") + '</span><span class="pgnome"><b>' + esc(d.nome) + '</b><small class="when">' + esc(d.ext.toUpperCase()) + ' · ' + tamTxt(d.tamanho) + ' · ' + esc(d.dia.slice(8,10) + "/" + d.dia.slice(5,7) + "/" + d.dia.slice(0,4)) + ' · ' + esc(d.por) + '</small></span></button>'
+      + '<span class="row">' + (S.gestor ? '<button class="pgb" data-do="ren" data-id="' + esc(d.id) + '" aria-label="Renomear">✏️</button>' : '') + (S.data.dono ? '<button class="pgb" data-do="del" data-id="' + esc(d.id) + '" aria-label="Apagar">🗑</button>' : '') + '</span></div>';
+  }).join("");
+}
+function renderDocsOng(){
+  if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
+  if (S_DO.erro) return '<div class="need">' + esc(S_DO.erro) + '</div>';
+  if (!S_DO.lista){ if (!S_DO.loading) loadDo(); return '<div class="empty"><b>Carregando documentos…</b></div>'; }
+  return '<div class="gsec"><h2>📂 Anexar documento da ONG</h2><p class="sub">Formulários, fichas, ofícios, estatuto… em PDF, Word, planilha ou foto (até 8 MB).</p>'
+    + '<label class="sub">Nome do documento *<input id="doNome" maxlength="120" placeholder="Ex.: Ficha de inscrição do Kids"></label>'
+    + '<label class="btn big" for="doArq" style="justify-content:center">📎 ' + (S_DO.arq ? esc(S_DO.arq.name) + ' ✓ (trocar)' : 'Escolher arquivo') + '</label><input type="file" id="doArq" hidden accept=".pdf,.doc,.docx,.odt,.xls,.xlsx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">'
+    + '<button class="btn primary big" data-do="anexar"' + (S_DO.busy ? ' disabled' : '') + '>' + (S_DO.busy ? 'Enviando…' : 'Anexar') + '</button></div>'
+    + '<div class="gsec"><h2>Documentos da ONG · ' + S_DO.lista.length + '</h2><input id="doBusca" type="search" placeholder="Buscar pelo nome" value="' + esc(S_DO.q) + '"><div id="doLista">' + listaDocsHtml() + '</div></div>';
+}
+document.addEventListener("change", function(ev){
+  if (ev.target.id !== "doArq" || !ev.target.files || !ev.target.files[0]) return;
+  var f = ev.target.files[0]; if (f.size > 8e6) { ev.target.value = ""; return toast("Arquivo muito grande (máx. 8 MB)."); }
+  var nomeAtual = $("doNome") ? $("doNome").value : ""; S_DO.arq = f; render();
+  if ($("doNome")) $("doNome").value = nomeAtual || f.name.replace(/\.[^.]+$/, "").replace(/[_-]+/g, " ");
+});
+$("view").addEventListener("input", function(ev){ if (ev.target.id === "doBusca"){ S_DO.q = ev.target.value; $("doLista").innerHTML = listaDocsHtml(); } });
+$("view").addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-do]"); if (!b || S.view !== "docsong" || S_DO.busy) return;
+  var a = b.dataset.do;
+  var call = function(p, msg){ S_DO.busy = true; render(); return p.then(function(l){ S_DO.lista = l; S_DO.ren = ""; if (msg) toast(msg); }).catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_DO.busy = false; render(); }); };
+  if (a === "anexar"){
+    var nome = $("doNome").value.trim(); if (nome.length < 2) return toast("Dê um nome ao documento.");
+    var f = S_DO.arq; if (!f) return toast("Escolha o arquivo.");
+    S_DO.busy = true; render();
+    return new Promise(function(res, rej){ var r = new FileReader(); r.onload = function(){ res(String(r.result).split(",")[1]); }; r.onerror = function(){ rej(new Error("Não consegui ler o arquivo.")); }; r.readAsDataURL(f); })
+      .then(function(b64){ return run("addDocOng", S.me, S.pin, nome, b64, f.type || "", f.name); })
+      .then(function(l){ S_DO.lista = l; S_DO.arq = null; SOM.play("conclui"); toast("📂 \"" + nome + "\" anexado."); })
+      .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_DO.busy = false; render(); });
+  }
+  if (a === "abrir"){ var idA = b.dataset.id; return visPorId("do_" + idA, function(){ return run("baixarDocOng", S.me, S.pin, idA); }); }
+  if (a === "ren"){ S_DO.ren = b.dataset.id; return render(); }
+  if (a === "renX"){ S_DO.ren = ""; return render(); }
+  if (a === "renOk") return call(run("renomearDocOng", S.me, S.pin, b.dataset.id, $("doRen").value.trim()), "Nome atualizado.");
+  if (a === "del"){ if (!confirm("Apagar este documento?")) return; return call(run("delDocOng", S.me, S.pin, b.dataset.id), "Documento apagado."); }
 });
 
 /* ---------------- Saúde (relatório semanal) ---------------- */
@@ -2168,7 +2546,7 @@ $("view").addEventListener("change", function(e){
     S.busy = false;
     if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
     var extra = loc ? {lat:loc.lat, lng:loc.lng, acc:loc.acc, motivo:S_EXTRA.motivo, obs:S_EXTRA.obs} : {motivo:S_EXTRA.motivo, obs:S_EXTRA.obs};
-    return act(run("punch", S.me, S.pin, b64, false, extra)).then(function(d){ S_MOT.aberto = false; S_MOT.tipo = ""; S_EXTRA = {}; toast(d.msg); });
+    return act(run("punch", S.me, S.pin, b64, false, extra)).then(function(d){ S_MOT.aberto = false; S_MOT.tipo = ""; S_EXTRA = {}; toast(d.msg); if (d.turnoOk) parabensTurno(d.turnoOk); });
   }).catch(function(err){ S.busy = false; if (err && /localiza/i.test(err.message||"")) S_LOC = /bloqueada/.test(err.message) ? "bloqueada" : "erro"; render(); if (err && err.message) toast(err.message); });
   e.target.value = "";
 });
@@ -2212,14 +2590,105 @@ $("pinOk").addEventListener("click", function(){
 });
 $("pinIn").addEventListener("keydown", function(e){ if (e.key === "Enter") $("pinOk").click(); });
 $("sair").addEventListener("click", function(){ VOZ_MEM = null; try { localStorage.removeItem("vozHoje"); } catch(e){} $("gateImg").removeAttribute("data-h"); S.me = ""; S.pin = ""; S.gestor = false; S.painel = null; if (S.view==="gestao") S.view="dia"; save(); load(null, true); });
-var ABAS_EXTRA = ["atend","cadastro","playlist","galeria","freq","programas","saude","editais","visitas"], S_MAIS = false;
+var ABAS_EXTRA = ["docsong","atend","cadastro","playlist","galeria","freq","programas","saude","editais","visitas"], S_MAIS = false;
 document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest(".maisBtn"); if (!b) return; e.stopImmediatePropagation(); S_MAIS = !(S_MAIS || ABAS_EXTRA.indexOf(S.view) >= 0); if (!S_MAIS && ABAS_EXTRA.indexOf(S.view) >= 0){ S.view = "dia"; save(); } render(); }, true);
-document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; save(); if (S.view==="programas" && S_PG.d && !S_PG.loading) loadPg(); if (S.view==="saude" && S_SA.d && !S_SA.loading) loadSa(); if ((S.view==="cadastro" || S.view==="atend") && S_MB.lista && !S_MB.loading) loadMb(); if (S.view==="editais" && S_ED.d && !S_ED.loading) loadEd(); if (S.view==="gestao") { $("view").innerHTML = '<div id="gWrap"></div>'; loadPainel(); } render(); });
+document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; save(); if (S.view==="programas" && S_PG.d && !S_PG.loading) loadPg(); if (S.view==="saude" && S_SA.d && !S_SA.loading) loadSa(); if ((S.view==="cadastro" || S.view==="atend") && S_MB.lista && !S_MB.loading) loadMb(); if (S.view==="docsong" && S_DO.lista && !S_DO.loading) loadDo(); if (S.view==="editais" && S_ED.d && !S_ED.loading) loadEd(); if (S.view==="gestao") { $("view").innerHTML = '<div id="gWrap"></div>'; loadPainel(); } render(); });
 $("days").addEventListener("click", function(e){ var b = e.target.closest("[data-d]"); if (b) load(b.dataset.d); });
 
 /* ---------------- Cadastro de colaborador ---------------- */
 var S_CAD = null, S_CADED = null; // lista / pessoa em edição
 var DIAS7 = [["seg","Seg"],["ter","Ter"],["qua","Qua"],["qui","Qui"],["sex","Sex"],["sab","Sáb"]];
+
+/* ================= v39 · Importar WhatsApp da equipe ================= */
+var S_IMP = {res:null, busy:false};
+function parseContatos(txt){
+  var out = [], t = String(txt || "");
+  if (/BEGIN:VCARD/i.test(t)){
+    t.split(/END:VCARD/i).forEach(function(card){
+      var fn = (card.match(/^FN[^:\n]*:(.+)$/mi) || card.match(/^N[^:\n]*:(.+)$/mi) || [])[1], tel = (card.match(/^(?:item\d+\.)?TEL[^:\n]*:(.+)$/mi) || [])[1];
+      if (fn && tel) out.push({nome: fn.replace(/;+/g, " ").trim(), tel: tel.trim()});
+    });
+    return out;
+  }
+  t.split(/\r?\n/).forEach(function(l){
+    l = l.trim(); if (!l) return;
+    var m = l.match(/(\+?\d[\d\s().-]{8,}\d)/); if (!m) return;
+    var nome = l.replace(m[1], " ").replace(/[;,\t|:–-]+/g, " ").replace(/\s+/g, " ").trim();
+    if (nome) out.push({nome: nome, tel: m[1]});
+  });
+  return out;
+}
+function importBox(){
+  var r = S_IMP.res;
+  return '<div class="gsec impBox"><h2>📲 Importar WhatsApp da equipe</h2><p class="sub">Cole um por linha (nome e número) ou envie o arquivo de contatos do celular (.vcf) ou uma planilha .csv. O app acha cada pessoa pelo nome.</p>'
+    + '<textarea id="impTxt" rows="4" placeholder="Patrícia 82 99999-0001&#10;Lucas 82 98888-0002"></textarea>'
+    + '<div class="row" style="gap:6px;flex-wrap:wrap"><label class="btn" for="impArq">📁 Escolher arquivo (.vcf / .csv)</label><input type="file" id="impArq" accept=".vcf,.csv,.txt,text/vcard,text/csv,text/plain" hidden>'
+    + '<button class="btn primary" data-g="impOk"'+(S_IMP.busy?' disabled':'')+'>Importar</button></div>'
+    + (r ? '<div class="impRes">' + (r.atualizados.length ? '<p>✅ <b>' + r.atualizados.length + ' salvo(s):</b> ' + r.atualizados.map(function(x){ return esc(x.nome); }).join(", ") + '</p>' : '')
+        + (r.naoAchados.length ? '<p>❓ <b>Não achei na equipe:</b> ' + r.naoAchados.map(esc).join(", ") + '. Use o nome igual ao do app.</p>' : '')
+        + (r.invalidos.length ? '<p>⚠️ <b>Número inválido:</b> ' + r.invalidos.map(esc).join(", ") + '</p>' : '') + '</div>' : '')
+    + '</div>';
+}
+document.addEventListener("change", function(ev){
+  if (ev.target.id !== "impArq" || !ev.target.files || !ev.target.files[0]) return;
+  var f = ev.target.files[0], rd = new FileReader();
+  rd.onload = function(){ var L = parseContatos(rd.result); ev.target.value = "";
+    if (!L.length) return toast("Não achei nomes com número nesse arquivo.");
+    $("impTxt").value = L.map(function(x){ return x.nome + " " + x.tel; }).join("\n"); toast(L.length + " contato(s) lidos. Confira e toque em Importar."); };
+  rd.readAsText(f);
+});
+
+/* ================= v39 · Escolher para quem enviar a mensagem ================= */
+var S_ENV = null; // {txt, sel:[], fila:[], i, onGrupo}
+function abrirEnvio(txt, grupoX){
+  S_ENV = {txt: txt, sel: [], fila: null, i: 0, grupoX: grupoX};
+  desenhaEnvio();
+}
+function desenhaEnvio(){
+  var old = document.querySelector(".envOv"); if (old) old.remove();
+  if (!S_ENV) return;
+  var tels = (S.data && S.data.telefones) || {}, eq = ((S.data && S.data.equipe) || []).filter(function(p){ return p.id !== S.me; });
+  var com = eq.filter(function(p){ return tels[p.id]; }), sem = eq.filter(function(p){ return !tels[p.id]; });
+  var ov = document.createElement("div"); ov.className = "envOv"; var h = '<div class="envBox"><div class="row" style="justify-content:space-between"><b>📤 Enviar mensagem</b><button class="btn" data-env="fechar">✕</button></div>'
+    + '<p class="envTxt">' + esc(S_ENV.txt).replace(/\n/g, "<br>") + '</p>';
+  if (S_ENV.fila){
+    var f = S_ENV.fila, i = S_ENV.i;
+    if (i >= f.length) h += '<p class="envOk">✅ Enviado para ' + f.length + ' pessoa(s).</p><button class="btn primary big" data-env="fechar">Concluir</button>';
+    else { var p = pessoa(f[i]);
+      h += '<p class="sub">Toque para abrir o WhatsApp de cada pessoa. Depois de enviar, volte aqui para a próxima.</p><div class="envProg">' + f.map(function(id, k){ return '<span class="' + (k < i ? "ok" : k === i ? "at" : "") + '">' + (k < i ? "✓ " : "") + esc(primeiroNome(pessoa(id).nome)) + '</span>'; }).join("") + '</div>'
+        + '<a class="wa big" data-env="prox" href="' + esc(waHref(tels[f[i]], S_ENV.txt)) + '" target="_blank" rel="noopener">' + WA_ICON + 'Enviar para ' + esc(p.nome) + ' (' + (i + 1) + '/' + f.length + ')</a>'
+        + '<button class="btn" data-env="pular">Pular ' + esc(primeiroNome(p.nome)) + '</button>'; }
+  } else {
+    h += '<a class="wa big" data-env="grupo" href="' + esc(waHref("", S_ENV.txt)) + '" target="_blank" rel="noopener">' + WA_ICON + 'Enviar num grupo (escolho no WhatsApp)</a>'
+      + '<div class="row" style="justify-content:space-between;margin-top:6px"><b>Ou escolha colaboradores</b><button class="btn" data-env="todos">' + (S_ENV.sel.length === com.length && com.length ? "Desmarcar todos" : "Marcar todos") + '</button></div>'
+      + '<div class="envLista">' + com.map(function(p){ var on = S_ENV.sel.indexOf(p.id) >= 0; return '<div class="envRow"><button type="button" class="envChk" data-env="sel" data-p="' + esc(p.id) + '" aria-pressed="' + on + '"><span class="box">' + (on ? "✓" : "") + '</span>' + chip(p.id) + '</button><a class="wa" data-env="um" href="' + esc(waHref(tels[p.id], S_ENV.txt)) + '" target="_blank" rel="noopener">' + WA_ICON + 'Só ele(a)</a></div>'; }).join("")
+      + (sem.length ? '<p class="sub">Sem WhatsApp cadastrado: ' + sem.map(function(p){ return esc(primeiroNome(p.nome)); }).join(", ") + '. Cadastre em Gestão → Equipe · cadastro → 📲 Importar.</p>' : '') + '</div>'
+      + '<button class="btn primary big" data-env="varios"' + (S_ENV.sel.length ? '' : ' disabled') + '>Enviar para ' + S_ENV.sel.length + ' selecionado(s)</button>';
+  }
+  ov.innerHTML = h + '</div>';
+  document.body.appendChild(ov);
+}
+document.addEventListener("click", function(ev){
+  var a = ev.target.closest("a.grupoBt, a.alertaEq");
+  if (!a || !S.data || !S.data.verTodos || a.closest(".envOv")) return;
+  ev.preventDefault();
+  var txt = decodeURIComponent((a.getAttribute("href").split("text=")[1] || ""));
+  if (a.classList.contains("alertaEq")) return abrirEnvio(txt, false); // o alerta continua indo também no app (handler do 🔔)
+  ev.stopImmediatePropagation(); abrirEnvio(txt, a.dataset.x === "grupoOk");
+}, true);
+document.addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-env]"); if (!b || !S_ENV) { if (S_ENV && ev.target.classList && ev.target.classList.contains("envOv")){ S_ENV = null; desenhaEnvio(); } return; }
+  var k = b.dataset.env, eq = ((S.data && S.data.equipe) || []).filter(function(p){ return p.id !== S.me && S.data.telefones[p.id]; }).map(function(p){ return p.id; });
+  var fimGrupo = function(){ if (S_ENV && S_ENV.grupoX){ S_GRUPO = null; setTimeout(function(){ render(); if (S.view === "gestao") renderGestao(); }, 600); } };
+  if (k === "fechar"){ S_ENV = null; return desenhaEnvio(); }
+  if (k === "grupo" || k === "um"){ SOM.play("pop"); fimGrupo(); if (k === "grupo") setTimeout(function(){ S_ENV = null; desenhaEnvio(); }, 300); return; }
+  if (k === "sel"){ var i = S_ENV.sel.indexOf(b.dataset.p); if (i >= 0) S_ENV.sel.splice(i, 1); else S_ENV.sel.push(b.dataset.p); return desenhaEnvio(); }
+  if (k === "todos"){ S_ENV.sel = S_ENV.sel.length === eq.length ? [] : eq.slice(); return desenhaEnvio(); }
+  if (k === "varios"){ S_ENV.fila = S_ENV.sel.slice(); S_ENV.i = 0; fimGrupo(); return desenhaEnvio(); }
+  if (k === "prox"){ SOM.play("pop"); setTimeout(function(){ if (S_ENV){ S_ENV.i++; desenhaEnvio(); } }, 400); return; }
+  if (k === "pular"){ S_ENV.i++; return desenhaEnvio(); }
+});
+
 function loadCadastro(){ return run("equipeCadastro", S.me, S.pin).then(function(l){ S_CAD = l; renderGestao(); }).catch(function(e){ toast(errMsg(e)); }); }
 function renderCadastro(){
   var h = '<div class="gsec"><div class="row" style="justify-content:space-between"><h2>Equipe · cadastro</h2><button class="btn primary" data-g="cadNovo">+ Novo colaborador</button></div>'
@@ -2228,7 +2697,7 @@ function renderCadastro(){
   if (S_CADED) return h + cadForm(S_CADED) + '</div>';
   h += '<div class="cad">' + S_CAD.map(function(x){
     return '<div class="p">'+chip(x.id)+'<span class="when">'+(x.livre?'horário livre':horas(x.cargaMin)+' por semana')+' · '+(x.telefone?'📱 '+esc(x.telefone):'<span style="color:var(--warn)">sem WhatsApp</span>')+(S.data && S.data.dono ? ' · PIN '+esc(x.pin) : '')+'</span><span class="row" style="gap:6px"><button class="btn" data-g="cadEd" data-p="'+esc(x.id)+'">Editar</button>'+(S.data && S.data.dono ? '<button class="btn" data-g="novoPin" data-p="'+esc(x.id)+'">🔑 Novo PIN</button>' : '')+'</span></div>';
-  }).join("") + '</div></div>';
+  }).join("") + '</div></div>' + importBox();
   return h;
 }
 function cadForm(c){
@@ -2424,6 +2893,8 @@ $("view").addEventListener("click", function(e){
     var vg = lerEditar(); if (!vg) return;
     return gAct(run("editarTarefa", S.me, S.pin, gd, S_EDT.id, vg), function(d){ S.data = d; S_EDT = null; toast("✏️ Atividade atualizada."); });
   }
+  if (g==="impOk"){ var Li = parseContatos($("impTxt").value); if (!Li.length) return toast("Cole nome e número, um por linha.");
+    S_IMP.busy = true; return gAct(run("importarTelefones", S.me, S.pin, Li), function(r){ S_IMP.res = r; S_IMP.busy = false; S_CAD = null; toast("📲 " + r.atualizados.length + " WhatsApp salvo(s)."); load(null, true); }).finally(function(){ S_IMP.busy = false; }); }
   if (g==="cadNovo"){ S_CADED = {nome:"", telefone:"", livre:false, horarios:[]}; return renderGestao(); }
   if (g==="cadEd"){ S_CADED = JSON.parse(JSON.stringify(S_CAD.filter(function(x){ return x.id === b.dataset.p; })[0])); return renderGestao(); }
   if (g==="cadCancel"){ S_CADED = null; return renderGestao(); }
@@ -2544,6 +3015,23 @@ document.addEventListener("click", function(e){
 }, true);
 $("view").addEventListener("click", function(e){ var p = e.target.closest('[data-pg="pres"]'); if (p) SOM.play(p.dataset.v === "sim" ? "ok" : "nao"); }, true);
 $("iniciarDia").addEventListener("click", function(){ SOM.play("ponto"); $("capa").hidden = true; if (logged()) checarLocal(); });
+/* botão 🔄 Atualizar: puxa a versão mais nova do app e todos os dados, sem passar pela capa */
+try { if (sessionStorage.getItem("pulaCapa")){ sessionStorage.removeItem("pulaCapa"); $("capa").hidden = true; } } catch(e){}
+$("atuBtn").addEventListener("click", function(){
+  var b = $("atuBtn"); if (b.classList.contains("gira")) return; b.classList.add("gira"); SOM.play("tap");
+  try { sessionStorage.setItem("pulaCapa", "1"); localStorage.removeItem("cache"); } catch(e){}
+  var vai = function(){ location.replace(location.pathname + "?r=" + Date.now() + (location.hash || "")); };
+  if (window.caches && caches.keys) caches.keys().then(function(ks){ return Promise.all(ks.map(function(k){ return caches.delete(k); })); }).then(vai, vai); else vai();
+});
+/* tela de parabéns quando o turno termina no ponto */
+function parabensTurno(tipo){
+  var ov = document.createElement("div"); ov.className = "turnoOk"; ov.setAttribute("role", "alertdialog");
+  ov.innerHTML = '<div><div class="em">✅👏</div><h3>Parabéns, turno concluído!</h3><p>' + (tipo === "dia" ? "Obrigado pelo seu dia na ONG. Reescrevendo histórias. 💙 Bom descanso!" : "Manhã fechada com sucesso. Bom intervalo e até a tarde! 💙") + '</p><button type="button">Valeu! 👍</button></div>';
+  ov.addEventListener("click", function(e){ if (e.target === ov || e.target.tagName === "BUTTON") ov.remove(); });
+  document.body.appendChild(ov); SOM.play("conclui");
+  try { var r = ov.querySelector(".em").getBoundingClientRect(); burst(r.left + r.width/2, r.top + r.height/2, ["🎉","👏","✅","⭐"]); } catch(e){}
+  setTimeout(function(){ if (ov.parentNode) ov.remove(); }, 9000);
+}
 (function(){ var c = lerCache(), hj = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,10); if (c && logged() && c.hoje === hj){ S.data = c; try { render(); } catch(e){ S.data = null; } } })();
 load("");
 if (logged() && S.gestor && S.view==="gestao") setTimeout(loadPainel, 0);
@@ -2733,6 +3221,10 @@ function renderEngaja(){
     + Object.keys(T).map(function(k){ return '<button class="tog" data-x="engTipo" data-k="' + k + '" aria-pressed="' + (S_ENG.tipo === k) + '">' + esc(T[k].t) + ' · +' + T[k].p + '</button>'; }).join("") + '</div>'
     + '<label class="btn big" for="engFoto" style="justify-content:center">📷 ' + (S_ENG.foto ? "Print escolhido ✓ (trocar)" : "Subir o print") + '</label><input type="file" id="engFoto" accept="image/*" hidden>'
     + '<button class="btn fin big" data-x="engOk"' + (S_ENG.tipo && S_ENG.foto ? "" : " disabled") + '>Concluído 👍</button></div>';
+  var pub = (S.data && S.data.engPublico) || [];
+  h += '<div class="gsec"><h2>🏆 Quem já engajou nesta semana · ' + pub.length + '</h2><p class="sub">Lista de toda a equipe. Só entra registro feito com foto (print).</p>'
+    + (pub.length ? '<div class="engPub">' + pub.map(function(x){ return '<figure>' + (x.foto ? '<img loading="lazy" decoding="async" alt="Print de ' + esc(pessoa(x.pessoa).nome) + '" src="' + esc(x.foto) + '" data-x="engZoom" data-src="' + esc(x.foto.replace("sz=w600", "sz=w1200")) + '" onerror="this.style.display=\'none\'">' : '') + '<figcaption><b>✅ ' + esc(primeiroNome(pessoa(x.pessoa).nome)) + '</b><span>' + esc(x.tipo) + '</span><small class="when">' + fd(x.dia) + ' às ' + esc(x.hora) + '</small></figcaption></figure>'; }).join("") + '</div>'
+      : '<p class="sub">Ninguém registrou ainda nesta semana. Seja o primeiro! 💪</p>') + '</div>';
   h += '<div class="gsec"><h2>Meus registros da semana · <span class="tnum">+' + tot + ' pts</span></h2>'
     + (meus.length ? '<div class="dlist">' + meus.map(function(x){ return '<div class="it' + (x.estado === "invalido" ? " ok" : "") + '"><span class="pill ' + (x.estado === "invalido" ? "bad" : "ok") + '">' + (x.estado === "invalido" ? "não valeu" : "+" + x.pontos) + '</span><b>' + esc((T[x.tipo] || {}).t || x.tipo) + '</b><span class="when">' + fmtDate(x.dia) + ' ' + esc(x.hora) + '</span>' + (x.print ? '<a class="when" href="' + esc(x.print) + '" target="_blank" rel="noopener">ver print</a>' : '') + '</div>'; }).join("") + '</div>' : '<p class="sub">Nenhum registro ainda nesta semana.</p>')
     + '</div>';
@@ -2972,6 +3464,8 @@ document.addEventListener("click", function(ev){
     var ms = (cfg().msgs || []).map(function(m){ return m.k === S_MSG.k ? {k: m.k, t: m.t, m: $("msgTxt").value.trim()} : m; });
     return run("salvarConfig", S.me, S.pin, "msgs", ms).then(function(c){ S.data.config = c; S_MSG.txt = null; toast("💾 Modelo salvo para todos."); render(); }).catch(function(e){ toast(errMsg(e)); });
   }
+  if (x === "engZoom"){ var ov = document.createElement("div"); ov.className = "docOv"; ov.innerHTML = '<img alt="Print" src="' + esc(b.dataset.src) + '"><button class="btn docX">Fechar</button>';
+    ov.addEventListener("click", function(e2){ if (e2.target === ov || e2.target.classList.contains("docX")) ov.remove(); }); document.body.appendChild(ov); return; }
   if (x === "cobPonto"){ if (b.tagName !== "A") ev.preventDefault(); SOM.play("envio");
     run("cobrarPonto", S.me, S.pin, b.dataset.p, b.dataset.e).then(function(){ toast((b.tagName === "A" ? "WhatsApp aberto · " : "") + "Cobrança de ponto enviada no app para " + pessoa(b.dataset.p).nome + "."); }).catch(function(e){ toast(errMsg(e)); });
     return; }
@@ -3002,7 +3496,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611102042";
+var APP_VERSAO = "202611102139";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
