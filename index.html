@@ -381,6 +381,37 @@ body.bloq .wrap,body.bloq #podBar{display:none!important}
 .moverBox label{display:flex;flex-direction:column;gap:3px;font-size:12.5px;font-weight:700;color:var(--muted)}
 .moverBox input{font:inherit;font-size:16px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:8px}
 .btn.alertaEq{display:flex;justify-content:center;background:#FFD23F;color:#1A2A55;border-color:#FFD23F;font-weight:800}
+.alert.grupoBox{display:flex;flex-direction:column;gap:6px;background:rgba(37,211,102,.14);border:1.5px solid #25D366;color:var(--ink);margin-bottom:10px}
+.wa.grupoBt{font-size:13px}
+.avConf{display:flex;flex-direction:column;gap:4px;background:var(--bg);border-radius:10px;padding:8px;margin-top:6px;font-size:13px}
+.cobPonto{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.av .it.t-alteracao{border-left-color:var(--warn)}
+.alert.avPend{display:flex;flex-direction:column;gap:4px;width:100%;text-align:left;font:inherit;background:var(--warn-bg);color:var(--ink);border:2px solid var(--warn);margin-bottom:10px;cursor:pointer}
+.supItem{border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.supItem.ok{border-left-color:var(--ok);opacity:.85}
+.supItem p{margin:0}
+.supResp{color:var(--ok);font-weight:700}
+.mbRow{width:100%;background:none;border:0;border-bottom:1px solid var(--line);text-align:left;font:inherit;color:inherit;cursor:pointer}
+.mbDados{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mbDados div{display:flex;flex-direction:column;background:var(--bg);border-radius:10px;padding:8px;min-width:0}
+.mbDados span{font-size:12px;color:var(--muted)}
+.mbDados b{overflow-wrap:anywhere}
+.morRow{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:6px}
+.morRow input{min-width:0}
+.docSec{border-top:1px solid var(--line);padding-top:8px}
+.docList{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.docIt{display:inline-flex;align-items:center;gap:4px;background:var(--bg);border-radius:999px;padding:3px 10px}
+.docOv{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px}
+.docOv img{max-width:100%;max-height:80vh;border-radius:10px}
+.docPdf{background:var(--surface);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;align-items:center;color:var(--ink)}
+.atSel{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--bg);border-radius:12px;padding:10px}
+.atSel span{display:flex;flex-direction:column}
+.atTemas button{font-size:13px}
+.fichaOk{align-items:center;text-align:center;border:2px solid var(--ok)}
+.fichaNum{font-size:34px;letter-spacing:.04em;color:var(--ok)}
+.atTotal{display:flex;align-items:baseline;gap:8px}
+.atTotal b{font-size:32px}
+@media (max-width:420px){.morRow{grid-template-columns:1fr 1fr}.morRow input:first-child{grid-column:1/-1}.mbDados{grid-template-columns:1fr}}
 .gsec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .gsec h2{margin:0;font-family:var(--f-display);font-size:19px;font-weight:800}
 .gsec .sub{margin:0;font-size:13px;color:var(--muted)}
@@ -570,8 +601,11 @@ a.lnk,.lnk{color:#FFE27A}
     <button role="tab" aria-selected="false" data-v="demandas"><i aria-hidden="true">📦</i>Demandas</button>
     <button role="tab" aria-selected="false" data-v="engaja"><i aria-hidden="true">📣</i>Engaja</button>
     <button role="tab" aria-selected="false" data-v="ideias"><i aria-hidden="true">💡</i>Ideias</button>
+    <button role="tab" aria-selected="false" data-v="suporte"><i aria-hidden="true">🆘</i>Suporte<span class="badge" id="supBadge" hidden></span></button>
     <button role="tab" aria-selected="false" data-v="gestao" id="tabG" hidden><i aria-hidden="true">⚙️</i>Gestão</button>
     <button type="button" class="maisBtn" data-v="__mais" aria-expanded="false"><i aria-hidden="true">☰</i>Mais</button>
+    <button role="tab" aria-selected="false" data-v="atend"><i aria-hidden="true">📋</i>Atendimento</button>
+    <button role="tab" aria-selected="false" data-v="cadastro"><i aria-hidden="true">🪪</i>Cadastro ONG</button>
     <button role="tab" aria-selected="false" data-v="playlist"><i aria-hidden="true">🎧</i>Playlist</button>
     <button role="tab" aria-selected="false" data-v="galeria"><i aria-hidden="true">🖼️</i>Galeria</button>
     <button role="tab" aria-selected="false" data-v="freq"><i aria-hidden="true">📝</i>Frequência</button>
@@ -690,7 +724,7 @@ function render(){
   var vw = $("view"); if (S_VIEWANT !== S.view){ S_VIEWANT = S.view; vw.classList.remove("troca"); void vw.offsetWidth; vw.classList.add("troca"); clearTimeout(vw._t); vw._t = setTimeout(function(){ vw.classList.remove("troca"); }, 700); }
   renderGalBox();
   $("view").innerHTML = S.view==="playlist" ? renderPlaylist() : S.view==="engaja" ? renderEngaja() : S.view==="ideias" ? renderIdeias() : S.view==="galeria" ? renderGaleria() : S.view==="ponto" ? renderPonto() : S.view==="avisos" ? renderAvisos() : S.view==="demandas" ? renderDemandas()
-    : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
+    : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="suporte" ? renderSuporte() : S.view==="cadastro" ? renderMembrosONG() : S.view==="atend" ? renderAtend() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
 }
 
 var S_DIATAB = "agora";
@@ -708,7 +742,9 @@ function renderDia(mine){
   var nao = bl.filter(function(b){ return estDe(b) !== "concluida" && (b.vencida || d.dia < d.hoje); });
   var agora = bl.filter(function(b){ return conc.indexOf(b) < 0 && nao.indexOf(b) < 0; });
   var tab = S_DIATAB, lista = tab === "concluidas" ? conc : tab === "nao" ? nao : agora;
-  var topoG = (d.verTodos && !mine) ? '<div style="margin-bottom:10px">' + botaoAlerta() + '</div>' : '';
+  var topoG = (d.verTodos && !mine) ? avisoGrupoBox() + '<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap">' + botaoAlerta() + botaoGrupo(MSG_GRUPO.pontos(), "🎯 Atenção aos pontos") + '</div>' : '';
+  var pendAv = avisosPendentes();
+  if (pendAv.length) topoG = '<button class="alert avPend" data-act="irAvisos"><b>🔔 '+pendAv.length+' aviso'+(pendAv.length>1?'s':'')+' para confirmar</b><span>'+esc(pendAv[0].texto)+'</span><span>Toque aqui e confirme que viu. 👍</span></button>' + topoG;
   var semFoto = conc.filter(semFotoTar).filter(function(b){ return !mine || b.pessoas.indexOf(S.me) >= 0; });
   var out = topoG + '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
     + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>No horário</button>'
@@ -737,6 +773,24 @@ function formMover(dia, b, prefixo, acaoOk, acaoX){
     + '<label>Início<input type="time" id="'+prefixo+'H" value="'+esc(hhmmDe(b.hora))+'"></label>'
     + '<label>Fim (prazo)<input type="time" id="'+prefixo+'F" value="'+esc(hhmmDe(b.fim))+'"></label></div>'
     + '<div class="row" style="gap:6px;flex-wrap:wrap">'+acaoOk+acaoX+'</div></div>';
+}
+/* ---------- mensagens padrão para o grupo do WhatsApp ---------- */
+var S_GRUPO = null; // aviso pronto depois de mudar data ou remanejar
+function dataBr(iso){ return iso ? iso.slice(8) + "/" + iso.slice(5, 7) : ""; }
+function nomesDe(ps){ return (ps || []).map(function(p){ return primeiroNome(pessoa(p).nome); }).join(", "); }
+var MSG_GRUPO = {
+  atraso: function(b){ return "⏰ *Atividade em atraso*\n📌 " + b.titulo + "\n👤 " + nomesDe(b.pessoas) + "\n🕒 Prazo: " + dataBr(S.data.dia) + ", " + (b.hora || "") + (b.fim ? "–" + b.fim : "") + "\n\nPor favor, concluam pelo app (com foto) ou deem um retorno aqui no grupo. 🙏"; },
+  concluida: function(b, st){ return "✅ *Atividade concluída!*\n📌 " + b.titulo + "\n👤 " + nomesDe(b.pessoas) + "\n🕒 " + dataBr(S.data.dia) + (st && st.fim ? ", concluída às " + st.fim : "") + "\n\nParabéns, equipe! Reescrevendo histórias. 💙"; },
+  modificada: function(g){ return "📅 *Atividade modificada*\n📌 " + g.titulo + "\n👤 " + g.nomes + "\n🗓 Nova data: " + g.quando + "\n\nConfiram no app e toquem em *👍 Confirmar que vi* na aba 🔔 Avisos. 👍"; },
+  remanejada: function(g){ return "🔁 *Atividades remanejadas*\nAs atividades de " + g.de + " passaram para " + g.para + " a partir de hoje" + (g.tarde ? ", no horário da tarde (14h–18h)" : "") + ".\n👤 " + g.para + ", confira no app as suas atividades. 👍"; },
+  reforco: function(b){ return "🔁 *Reforço de atividade*\n📌 " + b.titulo + "\n👤 " + nomesDe(b.pessoas) + "\n🕒 " + dataBr(S.data.dia) + ", " + (b.hora || "") + (b.fim ? "–" + b.fim : "") + ((b.itens||[]).length ? "\n\n📝 " + b.itens.join("\n📝 ") : "") + "\n\nContamos com vocês! Lembrem de iniciar e concluir pelo app, com foto. 💪💙"; },
+  confirme: function(b){ return "✔️ *Confirmem a conclusão*\n📌 " + b.titulo + "\n👤 " + nomesDe(b.pessoas) + "\n\nA atividade já foi feita? Por favor, confirmem a conclusão no app (com foto) ou respondam aqui no grupo. 🙏"; },
+  pontos: function(){ return "🎯 *Atenção aos pontos da semana!*\nCada ação conta para a meta da equipe:\n⏱ Bater o ponto na entrada e na saída de cada turno\n✅ Iniciar e concluir as atividades com foto\n💡 Mandar ideias e 📣 registrar o engajamento com print\n\nBora bater a meta juntos! 💪💙"; }
+};
+function botaoGrupo(txt, rot){ return '<a class="wa grupoBt" data-x="grupoOk" href="'+esc(waHref("", txt))+'" target="_blank" rel="noopener">'+WA_ICON+esc(rot)+'</a>'; }
+function avisoGrupoBox(){
+  if (!S_GRUPO) return "";
+  return '<div class="alert grupoBox"><b>📣 Avisar o grupo</b><span>' + esc(S_GRUPO.resumo) + '</span>' + botaoGrupo(S_GRUPO.texto, "Enviar no grupo do WhatsApp") + '<button class="btn" data-x="grupoX">Agora não</button></div>';
 }
 var MSG_ALERTA = "🔔 Atenção, equipe Amigos de Maribondo! Confiram agora as atividades de hoje no app: iniciar no horário, concluir com foto e bater o ponto na entrada e na saída. Bora fazer acontecer! 💙";
 function botaoAlerta(){ return '<a class="btn alertaEq" data-x="alertaEq" href="'+esc(waHref("", MSG_ALERTA))+'" target="_blank" rel="noopener">🔔 Alerta: atenção às atividades</a>'; }
@@ -779,9 +833,17 @@ function renderBloco(b){
     else if (minha && S_SUP !== b.id) acts += '<button class="btn sos" data-act="abrirsup" data-b="'+esc(b.id)+'"'+dis+'>Preciso de suporte</button>';
   }
   if (est!=="pendente" && (minha || gest)) acts += '<button class="btn" data-act="undo" data-b="'+esc(b.id)+'"'+dis+'>Desfazer</button>';
+  if (S.data.dono && S_EDT && S_EDT.onde === "dia" && S_EDT.id === b.id) acts += formEditar(b, '<button class="btn primary" data-act="edDiaOk" data-b="'+esc(b.id)+'">Salvar alterações</button>', '<button class="btn" data-act="edDiaX">Cancelar</button>');
+  else if (S.data.dono) acts += '<button class="btn" data-act="abrirEd" data-b="'+esc(b.id)+'">✏️ Editar atividade</button>';
   if (S.data.dono){
     if (S_MOVER === b.id) acts += formMover(S.data.dia, b, "mv_", '<button class="btn primary" data-act="moverOk" data-b="'+esc(b.id)+'">Salvar nova data</button>', '<button class="btn" data-act="moverX">Cancelar</button>');
     else acts += '<button class="btn" data-act="abrirMover" data-b="'+esc(b.id)+'">📅 Mudar data/prazo</button><button class="btn" data-act="excluirTar" data-b="'+esc(b.id)+'">🗑 Excluir</button>';
+  }
+  if (gest){
+    if (est === "concluida") acts += botaoGrupo(MSG_GRUPO.concluida(b, st), "📣 Grupo: concluída");
+    else if (vencida || S.data.dia < S.data.hoje) acts += botaoGrupo(MSG_GRUPO.atraso(b), "📣 Grupo: em atraso");
+    if (est !== "concluida" && S.data.dia === S.data.hoje) b.pessoas.forEach(function(p){ var pr = S.data.ponto[p]; if (pr && PONTO_RUIM[pr.estado] && p !== S.me) acts += botoesPonto(p, pr.estado); });
+    if (est !== "concluida") acts += botaoGrupo(MSG_GRUPO.reforco(b), "🔁 Reforço da atividade") + botaoGrupo(MSG_GRUPO.confirme(b), "✔️ Confirme a conclusão");
   }
   var cobra = gest && ((vencida || (est !== "concluida" && S.data.dia < S.data.hoje)) ? "vencida" : (est === "concluida" && st.temFotoConclusao === false) ? "semfoto" : "");
   if (cobra) acts += b.pessoas.map(function(p){ return botaoCobrar(b, p, cobra); }).join("");
@@ -906,7 +968,8 @@ function renderPonto(){
     var r = d.ponto[p.id]; if (!r || !r.estado) return "";
     var prev = r.esperado ? esc(periodosTxt(r.esperado)) : 'livre';
     var at = (r.atraso||0) + (r.atrasoVolta||0);
-    return '<tr><td>'+chip(p.id)+'</td><td class="t">'+prev+'</td><td>'+pillE(r.estado)+(at?'<br><small class="nof">atraso '+at+' min</small>':'')+'</td><td class="reg">'+regsHtml(r.registros, r.raio)+'</td><td class="t">'+horas(r.minutos)+'</td></tr>';
+    var cob = (d.verTodos && d.dia === d.hoje && PONTO_RUIM[r.estado] && p.id !== S.me) ? '<br>' + botoesPonto(p.id, r.estado) : '';
+    return '<tr><td>'+chip(p.id)+'</td><td class="t">'+prev+'</td><td>'+pillE(r.estado)+(at?'<br><small class="nof">atraso '+at+' min</small>':'')+cob+'</td><td class="reg">'+regsHtml(r.registros, r.raio)+'</td><td class="t">'+horas(r.minutos)+'</td></tr>';
   }).join("");
   return head + (d.verTodos || logged() ? '<div class="tbl"><table><thead><tr><th>Equipe</th><th>Previsto</th><th>Situação</th><th>Registros</th><th>Horas</th></tr></thead><tbody>'+rows+'</tbody></table></div>' : '')
     + '<p class="note">'+(d.verTodos ? 'Você vê o ponto de toda a equipe.' : 'Você vê só o seu ponto. A coordenação vê o de todos.')+' O horário previsto vem do horário da semana. O horário do registro vem do servidor, não do celular.</p>';
@@ -1217,6 +1280,305 @@ $("view").addEventListener("input", function(ev){
   if (ev.target.id !== "pgBusca") return;
   var q = semAc(ev.target.value);
   Array.prototype.forEach.call(document.querySelectorAll(".pglist .pgrow"), function(row){ row.hidden = q && row.dataset.nome.indexOf(q) < 0; });
+});
+
+
+/* ================= v38 · Cobrar ponto e confirmar avisos ================= */
+var PONTO_RUIM = {nao_chegou:1, faltou:1, falta_saida:1, sem_saida:1, nao_voltou:1};
+function msgPonto(id, estado){
+  var n = primeiroNome(pessoa(id).nome), oi = "Oi, " + n + "! Aqui é da coordenação da ONG Amigos de Maribondo. ";
+  if (estado === "falta_saida" || estado === "sem_saida") return oi + "⏱ Seu turno terminou e a SAÍDA não foi batida no ponto. Por favor, abra o app e registre agora na aba Ponto. 🙏";
+  if (estado === "nao_voltou") return oi + "⏱ A volta do intervalo ainda não foi registrada no ponto. Por favor, abra o app e registre. 🙏";
+  if (estado === "faltou") return oi + "Não vimos o seu ponto hoje. Aconteceu alguma coisa? Por favor, me dê um retorno. 🙏";
+  return oi + "⏱ Seu ponto de ENTRADA ainda não foi batido hoje. Por favor, abra o app e registre na aba Ponto, ou me avise o que aconteceu. 🙏";
+}
+function botoesPonto(id, estado){
+  var tel = S.data.telefones && S.data.telefones[id], n = esc(primeiroNome(pessoa(id).nome));
+  return '<span class="cobPonto">' + (tel ? '<a class="wa" data-x="cobPonto" data-p="'+esc(id)+'" data-e="'+esc(estado)+'" href="'+esc(waHref(tel, msgPonto(id, estado)))+'" target="_blank" rel="noopener">'+WA_ICON+'Cobrar ponto de '+n+'</a>' : '')
+    + '<button class="btn" data-x="cobPonto" data-p="'+esc(id)+'" data-e="'+esc(estado)+'">🔔 Cobrar '+n+' no app</button></span>';
+}
+function msgConfirmaAviso(id, a){
+  return "Oi, " + primeiroNome(pessoa(id).nome) + "! Aqui é da coordenação da ONG Amigos de Maribondo. 💙\n" + a.texto + "\n\nPor favor, abra o app em 🔔 Avisos e toque em *👍 Confirmar que vi*. Obrigado!";
+}
+function avisosPendentes(){ var d = S.data; if (!d || !logged() || d.verTodos) return [];
+  return (d.avisos || []).filter(function(a){ return (a.esperados || []).indexOf(S.me) >= 0 && (a.vistos || []).indexOf(S.me) < 0; }); }
+
+/* ================= v38 · Editar atividade (só o Victor) ================= */
+function formEditar(t, okHtml, xHtml){
+  var d = S.data;
+  return '<div class="edBox" style="display:flex;flex-direction:column;align-items:stretch;gap:8px;width:100%">'
+    + '<label class="sub">Nome da atividade<input id="eTit" maxlength="120" value="'+esc(t.titulo)+'"></label>'
+    + '<div class="row"><label class="sub">Início <input type="time" id="eIni" value="'+esc(toHHMM(t.hora))+'"></label><label class="sub">Fim <input type="time" id="eFim" value="'+esc(t.fim||"")+'"></label></div>'
+    + '<label class="sub">O que fazer (um item por linha)<textarea id="eItens" rows="3">'+esc((t.itens||[]).join("\n"))+'</textarea></label>'
+    + '<span class="sub">Quem faz</span><div class="pick">'+(d?d.equipe:[]).map(function(x){ return '<button type="button" data-ep="'+esc(x.id)+'" aria-pressed="'+(S_EDT.pessoas.indexOf(x.id)>=0)+'">'+chip(x.id)+'</button>'; }).join("")+'</div>'
+    + '<div class="row">'+okHtml+xHtml+'</div></div>';
+}
+function lerEditar(){
+  var ini = $("eIni").value, fim = $("eFim").value, tit = $("eTit").value.trim();
+  if (tit.length < 2) { toast("Escreva o nome da atividade."); return null; }
+  if (!ini || !fim || fim <= ini) { toast("O fim precisa ser depois do início."); return null; }
+  if (!S_EDT.pessoas.length) { toast("Escolha quem faz a tarefa."); return null; }
+  return {titulo: tit, hora: ini, fim: fim, pessoas: S_EDT.pessoas, itens: $("eItens").value.split("\n").map(function(s){ return s.trim(); }).filter(Boolean)};
+}
+
+/* ================= v38 · Suporte do colaborador ================= */
+var S_SUPG = {aberto:false, cat:"", busy:false, resp:{}, wa:null};
+function renderSuporte(){
+  if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
+  var d = S.data, L = d.suportes || [], cats = d.suporteCats || ["Outro"], gest = d.verTodos, h = "";
+  h += '<div class="gsec"><h2>🆘 Pedir suporte à coordenação</h2><p class="sub">Precisa de algo? Material, uma dúvida, um problema? Escreva aqui, a coordenação recebe na hora.</p>'
+    + '<div class="pick supCats">'+cats.map(function(c){ return '<button type="button" data-sg="cat" data-c="'+esc(c)+'" aria-pressed="'+(S_SUPG.cat===c)+'">'+esc(c)+'</button>'; }).join("")+'</div>'
+    + '<textarea id="sgTxt" rows="3" maxlength="600" placeholder="O que você precisa?"></textarea>'
+    + '<button class="btn primary big" data-sg="enviar"'+(S_SUPG.busy?' disabled':'')+'>Enviar pedido</button>'
+    + (S_SUPG.wa ? '<a class="wa" data-x="supWaOk" href="'+esc(S_SUPG.wa)+'" target="_blank" rel="noopener">'+WA_ICON+'Avisar o Victor no WhatsApp</a>' : '') + '</div>';
+  var ab = L.filter(function(s){ return s.estado !== "resolvido"; }), ok = L.filter(function(s){ return s.estado === "resolvido"; });
+  var item = function(s){
+    var r = '<div class="supItem '+(s.estado==="resolvido"?"ok":"")+'"><div><b>'+(gest?esc(s.nome)+' · ':'')+esc(s.categoria)+'</b><small class="when">'+fd(s.dia)+' às '+esc(s.hora)+'</small></div><p>'+esc(s.texto)+'</p>';
+    if (s.estado === "resolvido") r += '<p class="supResp">✅ Resolvido'+(s.respPor?' por '+esc(s.respPor):'')+(s.resposta?': '+esc(s.resposta):'')+'</p>'
+      + (S_SUPG.resp[s.id] ? '<a class="wa" data-x="supWaOk" href="'+esc(S_SUPG.resp[s.id])+'" target="_blank" rel="noopener">'+WA_ICON+'Avisar '+esc(primeiroNome(s.nome))+' no WhatsApp</a>' : '');
+    else if (gest) r += '<textarea id="sgR_'+esc(s.id)+'" rows="2" placeholder="Resposta (opcional)"></textarea><button class="btn primary" data-sg="resolver" data-id="'+esc(s.id)+'"'+(S_SUPG.busy?' disabled':'')+'>Marcar como resolvido</button>'
+      + (S_SUPG.resp[s.id] ? '<a class="wa" data-x="supWaOk" href="'+esc(S_SUPG.resp[s.id])+'" target="_blank" rel="noopener">'+WA_ICON+'Avisar '+esc(primeiroNome(s.nome))+' no WhatsApp</a>' : '');
+    else r += '<p class="sub">⏳ Aguardando a coordenação.</p>';
+    return r + '</div>';
+  };
+  h += '<div class="gsec"><h2>'+(gest?'Pedidos da equipe':'Meus pedidos')+' · '+ab.length+' em aberto</h2>'+(ab.length?ab.map(item).join(""):'<p class="sub">Nenhum pedido em aberto. 👏</p>')
+    + (ok.length?'<div class="eyebrow">Resolvidos</div>'+ok.map(item).join(""):'')+'</div>';
+  return h;
+}
+$("view").addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-sg]"); if (!b || S.view !== "suporte" || S_SUPG.busy) return;
+  var a = b.dataset.sg;
+  if (a === "cat"){ S_SUPG.cat = b.dataset.c; Array.prototype.forEach.call(document.querySelectorAll(".supCats button"), function(x){ x.setAttribute("aria-pressed", x === b); }); return; }
+  if (a === "enviar"){
+    var t = $("sgTxt").value.trim(); if (t.length < 3) return toast("Escreva o que você precisa.");
+    if (!S_SUPG.cat) return toast("Escolha o tipo do pedido.");
+    S_SUPG.busy = true; render();
+    return run("pedirSuporteGeral", S.me, S.pin, S_SUPG.cat, t).then(function(r){ S.data.suportes = r.suportes; S_SUPG.cat = "";
+      S_SUPG.wa = r.whatsVictor && S.me !== "victor" ? waHref(r.whatsVictor, "Oi, Victor! Aqui é " + primeiroNome(pessoa(S.me).nome) + ". Acabei de pedir suporte no app: " + t) : null;
+      SOM.play("conclui"); toast("🆘 Pedido enviado para a coordenação."); })
+      .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_SUPG.busy = false; render(); });
+  }
+  if (a === "resolver"){
+    var id = b.dataset.id, s = (S.data.suportes || []).filter(function(x){ return x.id === id; })[0] || {}, resp = ($("sgR_" + id) || {}).value || "";
+    S_SUPG.busy = true; render();
+    return run("resolverSuporteGeral", S.me, S.pin, id, resp.trim()).then(function(r){ S.data.suportes = r.suportes;
+      if (r.telefone) S_SUPG.resp[id] = waHref(r.telefone, "Oi, " + primeiroNome(s.nome) + "! Aqui é da coordenação da ONG Amigos de Maribondo. 💙 Seu pedido de suporte (" + s.categoria + ") foi resolvido" + (resp.trim() ? ": " + resp.trim() : ".") + " Qualquer coisa, é só chamar!");
+      toast("✅ Pedido resolvido. A pessoa recebe o aviso no app."); })
+      .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_SUPG.busy = false; render(); });
+  }
+});
+
+/* ================= v38 · Cadastro ONG ================= */
+var S_MB = {lista:null, q:"", sel:null, edit:null, busy:false, erro:"", loading:false, docTipo:"", abre:"", voltarAtend:false};
+var MSG_MEMBRO = [
+  ["💙 Como você está?", function(n){ return "Oi, " + n + "! Tudo bem? Aqui é da ONG Amigos de Maribondo. 💙 Passando para saber como você está. Se precisar de alguma coisa, conte com a gente!"; }],
+  ["🏠 Queremos você aqui", function(n){ return "Oi, " + n + "! Aqui é da ONG Amigos de Maribondo. 💙 A gente quer muito você aqui com a gente! As portas estão sempre abertas. Vem nos fazer uma visita?"; }],
+  ["🌻 Participe das atividades", function(n){ return "Oi, " + n + "! Aqui é da ONG Amigos de Maribondo. 🌻 Temos atividades acontecendo e queremos contar com a sua participação! Quer saber os dias e horários? É só responder aqui."; }],
+  ["🤗 Sentimos sua falta", function(n){ return "Oi, " + n + "! Aqui é da ONG Amigos de Maribondo. 💙 Sentimos a sua falta por aqui! Está tudo bem? Esperamos você nas próximas atividades."; }]
+];
+var DOC_ORD = ["rg","cpf","comprovante","sus","exame","anexo"];
+var DOC_ROT = {rg:"🪪 RG", cpf:"🧾 CPF", comprovante:"🏠 Comprovante de residência", sus:"💳 Cartão SUS", exame:"🩺 Exames", anexo:"📎 Anexos"};
+function loadMb(){
+  S_MB.loading = true; S_MB.erro = "";
+  return run("membros", S.me, S.pin).then(function(r){ S_MB.lista = r.membros; S_AT.temas = r.temas; if (!S_AT.resumo || S_AT.resumo.dia === r.hoje) S_AT.resumo = r.resumoHoje; S_AT.hoje = r.hoje; })
+    .catch(function(e){ S_MB.erro = errMsg(e); }).finally(function(){ S_MB.loading = false; if (S.view==="cadastro" || S.view==="atend") render(); });
+}
+function abrirMembro(num){
+  S_MB.busy = true; render();
+  return run("membro", S.me, S.pin, num).then(function(m){ S_MB.sel = m; S_MB.edit = null; S_MB.abre = ""; window.scrollTo({top:0}); })
+    .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_MB.busy = false; render(); });
+}
+function semAc2(s){ return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase(); }
+function filtraMembros(q){ q = semAc2(q).trim(); var L = S_MB.lista || [];
+  if (!q) return L; return L.filter(function(m){ return semAc2(m.nome).indexOf(q) >= 0 || semAc2(m.num).indexOf(q) >= 0 || String(m.telefone).replace(/\D/g,"").indexOf(q.replace(/\D/g,"") || "##") >= 0; }); }
+function renderMembrosONG(){
+  if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
+  if (S_MB.erro) return '<div class="need">'+esc(S_MB.erro)+'</div>';
+  if (!S_MB.lista){ if (!S_MB.loading) loadMb(); return '<div class="empty"><b>Carregando cadastros…</b></div>'; }
+  var dis = S_MB.busy ? ' disabled' : '';
+  if (S_MB.edit) return formMembro(S_MB.edit, dis);
+  if (S_MB.sel) return fichaMembro(S_MB.sel, dis);
+  var L = filtraMembros(S_MB.q);
+  return '<button class="btn primary big" data-mb="novo" style="width:100%;margin-top:12px">+ Novo cadastro na ONG</button>'
+    + '<div class="gsec"><h2>🪪 Cadastros da ONG · '+S_MB.lista.length+'</h2><input id="mbBusca" type="search" placeholder="Buscar por nome, nº ou telefone" value="'+esc(S_MB.q)+'">'
+    + '<div class="pglist" id="mbLista">'+listaMembrosHtml(L)+'</div></div>';
+}
+function listaMembrosHtml(L){
+  if (!L.length) return '<p class="sub">Nenhum cadastro encontrado.</p>';
+  return L.slice(0, 80).map(function(m){ return '<button class="pgrow mbRow" data-mb="abrir" data-n="'+esc(m.num)+'"><span class="pgnome"><b>'+esc(m.nome)+'</b><small class="when">nº '+esc(m.num)+' · 📞 '+esc(m.telefone)+'</small></span><span>›</span></button>'; }).join("")
+    + (L.length > 80 ? '<p class="sub">Mostrando 80 de '+L.length+'. Refine a busca.</p>' : '');
+}
+function formMembro(e, dis){
+  var mor = (e.moradores || []).slice(); while (mor.length < 5) mor.push({});
+  var inp = function(id, rot, v, extra){ return '<label class="full">'+rot+'<input id="'+id+'" value="'+esc(v||"")+'" '+(extra||"")+'></label>'; };
+  return '<div class="gsec"><h2>'+(e.num?'Editar cadastro nº '+esc(e.num):'Novo cadastro na ONG')+'</h2><p class="sub">'+(e.num?'':'O número de cadastro é gerado sozinho ao salvar. ')+'Campos com * são obrigatórios.</p><div class="f">'
+    + inp("mbNome","Nome completo *",e.nome,'maxlength="90" autocomplete="off"')
+    + inp("mbTel","Telefone (com DDD) *",e.telefone,'inputmode="tel" maxlength="30"')
+    + inp("mbEnd","Endereço *",e.endereco,'maxlength="200" placeholder="Rua, número, bairro"')
+    + '<label>Nº do RG *<input id="mbRg" value="'+esc(e.rg||"")+'" maxlength="30"></label>'
+    + '<label>Nº do CPF<input id="mbCpf" value="'+esc(e.cpf||"")+'" inputmode="numeric" maxlength="20"></label>'
+    + '<label>Nº do Cartão SUS<input id="mbSus" value="'+esc(e.sus||"")+'" inputmode="numeric" maxlength="30"></label>'
+    + '<label>Instagram<input id="mbInsta" value="'+esc(e.instagram||"")+'" maxlength="60" placeholder="@perfil"></label>'
+    + '<label class="full">Data de nascimento<input id="mbNasc" type="date" value="'+esc(e.nascimento||"")+'"></label>'
+    + '<div class="full eyebrow">👨‍👩‍👧 Pessoas que moram na casa (até 5)</div>'
+    + mor.map(function(x, i){ return '<div class="full morRow"><input id="moN'+i+'" placeholder="Nome" value="'+esc(x.nome||"")+'" maxlength="80"><input id="moT'+i+'" placeholder="Telefone" inputmode="tel" value="'+esc(x.telefone||"")+'" maxlength="30"><input id="moP'+i+'" placeholder="Parentesco" list="parL" value="'+esc(x.parentesco||"")+'" maxlength="40"></div>'; }).join("")
+    + '<datalist id="parL"><option value="Mãe"><option value="Pai"><option value="Filho(a)"><option value="Cônjuge"><option value="Irmão(ã)"><option value="Avó/Avô"><option value="Neto(a)"><option value="Tio(a)"><option value="Outro"></datalist>'
+    + '<label class="full">Observação<textarea id="mbObs" rows="2" maxlength="400">'+esc(e.obs||"")+'</textarea></label>'
+    + '<p class="sub full">As fotos do RG, CPF, comprovante e SUS você adiciona logo depois de salvar.</p>'
+    + '<button class="btn primary big" data-mb="salvar"'+dis+'>Salvar cadastro</button><button class="btn" data-mb="cancelar">Cancelar</button></div></div>';
+}
+function fichaMembro(m, dis){
+  var n = primeiroNome(m.nome), h = '';
+  h += '<button class="btn" data-mb="voltar" style="margin-top:12px">‹ Todos os cadastros</button>';
+  h += '<div class="gsec mbHead"><div class="row" style="justify-content:space-between;align-items:flex-start"><div><h2>'+esc(m.nome)+'</h2><p class="sub">Cadastro nº <b>'+esc(m.num)+'</b> · desde '+esc(String(m.criado).slice(8,10)+"/"+String(m.criado).slice(5,7)+"/"+String(m.criado).slice(0,4))+(m.criadoPor?' por '+esc(m.criadoPor):'')+'</p></div><button class="btn" data-mb="editar">✏️ Editar</button></div>'
+    + '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn primary" data-mb="entrada"'+dis+'>📍 Registrar entrada na ONG</button><button class="btn" data-mb="atender">📋 Novo atendimento</button></div>'
+    + '<div class="eyebrow">💬 Falar com o membro</div>'
+    + (m.whats ? '<div class="row" style="gap:6px;flex-wrap:wrap">'+MSG_MEMBRO.map(function(x){ return '<a class="wa" data-x="respWaOk" href="'+esc(waHref(m.whats, x[1](n)))+'" target="_blank" rel="noopener">'+WA_ICON+esc(x[0])+'</a>'; }).join("")+'</div>' : '<p class="sub">Telefone inválido para o WhatsApp. Corrija em ✏️ Editar.</p>')
+    + '</div>';
+  h += '<div class="gsec"><h2>Dados</h2><div class="mbDados">'
+    + [["📞 Telefone",m.telefone],["🏠 Endereço",m.endereco],["🪪 RG",m.rg],["🧾 CPF",m.cpf],["💳 SUS",m.sus],["📸 Instagram",m.instagram],["🎂 Nascimento",m.nascimento?fd(m.nascimento)+"/"+m.nascimento.slice(0,4):""]].map(function(x){ return '<div><span>'+x[0]+'</span><b>'+esc(x[1]||"—")+'</b></div>'; }).join("")+'</div>'
+    + (m.instagram ? '<a class="lnk" href="https://instagram.com/'+esc(m.instagram.replace(/^@/,""))+'" target="_blank" rel="noopener">Abrir Instagram</a>' : '')
+    + '<div class="eyebrow">👨‍👩‍👧 Moram na casa ('+m.moradores.length+')</div>'
+    + (m.moradores.length ? m.moradores.map(function(x){ return '<div class="pgrow"><span><b>'+esc(x.nome)+'</b> <small class="when">'+esc(x.parentesco||"")+'</small></span>'+(x.telefone?'<small>📞 '+esc(x.telefone)+'</small>':'')+'</div>'; }).join("") : '<p class="sub">Ninguém informado.</p>')
+    + (m.obs ? '<p class="sub">📝 '+esc(m.obs)+'</p>' : '') + '</div>';
+  h += '<div class="gsec"><h2>📁 Documentos</h2><p class="sub">Fotos ou PDF. Ficam guardados de forma privada: só abre aqui no app, com PIN.</p>'
+    + DOC_ORD.map(function(t){ var L = m.docs.filter(function(d){ return d.tipo === t; });
+      return '<div class="docSec"><div class="row" style="justify-content:space-between"><b>'+DOC_ROT[t]+' <small class="when">('+L.length+')</small></b><button class="btn" data-mb="addDoc" data-t="'+t+'"'+dis+'>＋ Adicionar</button></div>'
+        + (L.length ? '<div class="docList">'+L.map(function(d){ return '<span class="docIt"><button class="lnk" data-mb="verDoc" data-id="'+esc(d.id)+'">'+(d.mime==="application/pdf"?"📄":"🖼️")+' '+esc(d.descricao || fd(d.dia.slice(0,10)))+'</button>'+(S.data.dono?'<button class="pgb" data-mb="delDoc" data-id="'+esc(d.id)+'" aria-label="Apagar">🗑</button>':'')+'</span>'; }).join("")+'</div>' : '') + '</div>'; }).join("")
+    + '<label class="sub">Descrição do próximo arquivo (opcional)<input id="docDesc" maxlength="200" placeholder="Ex.: frente, verso, hemograma de outubro"></label></div>';
+  h += '<div class="gsec"><h2>📝 Solicitações</h2><div class="row"><input id="soData" type="date" value="'+esc(S.data.hoje)+'" style="max-width:160px"><input id="soTxt" maxlength="500" placeholder="O que o membro pediu?"></div><button class="btn primary" data-mb="addSol"'+dis+'>Registrar solicitação</button>'
+    + (m.solicitacoes.length ? m.solicitacoes.map(function(s){ return '<div class="pgrow"><span class="pgnome"><b>'+esc(s.texto)+'</b><small class="when">para '+fd(s.data)+' · registrado '+esc(s.dia.slice(8,10)+"/"+s.dia.slice(5,7))+' por '+esc(s.por)+'</small></span><button class="btn '+(s.estado==="atendida"?'':'primary')+'" data-mb="solEst" data-id="'+esc(s.id)+'" data-e="'+(s.estado==="atendida"?"aberta":"atendida")+'"'+dis+'>'+(s.estado==="atendida"?"✅ Atendida":"Marcar atendida")+'</button></div>'; }).join("") : '<p class="sub">Nenhuma solicitação.</p>') + '</div>';
+  h += '<div class="gsec"><h2>✅ Presença</h2><div class="row"><input id="prAtiv" list="prAtivL" maxlength="80" placeholder="Atividade (ex.: Dança)"><datalist id="prAtivL"><option value="Flor da Idade"><option value="Dança e Funcional"><option value="Kids"><option value="Sopa"><option value="Geração Futuro"><option value="Palestra"></datalist><button class="btn primary" data-mb="presAtiv"'+dis+'>Registrar presença</button></div>'
+    + (m.presencas.length ? m.presencas.map(function(p){ return '<div class="pgrow"><span>'+(p.tipo==="entrada"?"📍 Entrada na ONG":"✅ "+esc(p.atividade))+'</span><small class="when">'+fd(p.dia)+' às '+esc(p.hora)+' · '+esc(p.por)+'</small></div>'; }).join("") : '<p class="sub">Nenhuma presença registrada.</p>') + '</div>';
+  h += '<div class="gsec"><h2>📋 Atendimentos</h2>'
+    + (m.atendimentos.length ? m.atendimentos.map(function(a){ return '<div class="pgrow"><span class="pgnome"><b>'+esc(a.tema)+'</b><small class="when">Ficha '+esc(a.ficha)+' · '+fd(a.dia)+' às '+esc(a.inicio)+' · data: '+fd(a.data)+' · '+esc(a.por)+'</small><small>'+esc(a.descricao)+'</small></span></div>'; }).join("") : '<p class="sub">Nenhum atendimento ainda.</p>') + '</div>';
+  return h;
+}
+function lerMembro(){
+  var g = function(id){ return $(id) ? $(id).value.trim() : ""; };
+  var m = {num: (S_MB.edit||{}).num || "", nome: g("mbNome"), telefone: g("mbTel"), endereco: g("mbEnd"), rg: g("mbRg"), cpf: g("mbCpf"), sus: g("mbSus"), instagram: g("mbInsta"), nascimento: g("mbNasc"), obs: g("mbObs"), moradores: []};
+  for (var i = 0; i < 5; i++) if (g("moN"+i)) m.moradores.push({nome: g("moN"+i), telefone: g("moT"+i), parentesco: g("moP"+i)});
+  return m;
+}
+var docInput = document.createElement("input"); docInput.type = "file"; docInput.accept = "image/*,application/pdf"; docInput.hidden = true; document.body.appendChild(docInput);
+docInput.addEventListener("change", function(){
+  var f = docInput.files && docInput.files[0]; docInput.value = ""; if (!f || !S_MB.sel) return;
+  var desc = $("docDesc") ? $("docDesc").value.trim() : "", tipo = S_MB.docTipo, num = S_MB.sel.num;
+  var pdf = f.type === "application/pdf";
+  if (pdf && f.size > 8e6) return toast("PDF muito grande (máx. 8 MB).");
+  S_MB.busy = true; render(); toast("Enviando o arquivo…");
+  var ler = pdf ? new Promise(function(res){ var r = new FileReader(); r.onload = function(){ res(String(r.result).split(",")[1]); }; r.onerror = function(){ res(null); }; r.readAsDataURL(f); }) : shrink(f);
+  ler.then(function(b64){ if (!b64) throw new Error("Não consegui ler o arquivo.");
+      return run("addDocMembro", S.me, S.pin, num, tipo, b64, pdf ? "application/pdf" : "image/jpeg", f.name, desc); })
+    .then(function(m){ S_MB.sel = m; SOM.play("conclui"); toast("📁 " + DOC_ROT[tipo] + " salvo."); })
+    .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_MB.busy = false; render(); });
+});
+function verDoc(id){
+  toast("Abrindo…");
+  run("arquivoMembro", S.me, S.pin, id).then(function(r){
+    var bin = atob(r.b64), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i);
+    var url = URL.createObjectURL(new Blob([u], {type: r.mime}));
+    var ov = document.createElement("div"); ov.className = "docOv";
+    ov.innerHTML = (r.mime === "application/pdf" ? '<div class="docPdf"><b>📄 '+esc(r.nome)+'</b><a class="btn primary big" href="'+url+'" target="_blank" rel="noopener" download="'+esc(r.nome)+'">Abrir o PDF</a></div>' : '<img alt="'+esc(r.nome)+'" src="'+url+'">') + '<button class="btn docX">Fechar</button>';
+    ov.addEventListener("click", function(e){ if (e.target === ov || e.target.classList.contains("docX")){ ov.remove(); URL.revokeObjectURL(url); } });
+    document.body.appendChild(ov);
+  }).catch(function(e){ toast(errMsg(e)); });
+}
+$("view").addEventListener("input", function(ev){
+  if (ev.target.id === "mbBusca"){ S_MB.q = ev.target.value; $("mbLista").innerHTML = listaMembrosHtml(filtraMembros(S_MB.q)); }
+  if (ev.target.id === "atBusca"){ S_AT.q = ev.target.value; $("atLista").innerHTML = listaAtendBusca(); }
+});
+$("view").addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-mb]"); if (!b || S.view !== "cadastro" || (S_MB.busy && b.dataset.mb !== "cancelar")) return;
+  var a = b.dataset.mb, m = S_MB.sel;
+  var call = function(p, msg, depois){ S_MB.busy = true; render(); return p.then(function(r){ S_MB.sel = r; if (msg) toast(msg); if (depois) depois(r); }).catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_MB.busy = false; render(); }); };
+  if (a === "novo"){ S_MB.edit = {}; S_MB.sel = null; return render(); }
+  if (a === "cancelar"){ S_MB.edit = null; if (S_MB.voltarAtend && !S_MB.sel){ S_MB.voltarAtend = false; S.view = "atend"; save(); } return render(); }
+  if (a === "voltar"){ S_MB.sel = null; return render(); }
+  if (a === "abrir") return abrirMembro(b.dataset.n);
+  if (a === "editar"){ S_MB.edit = JSON.parse(JSON.stringify(m)); return render(); }
+  if (a === "salvar"){
+    var x = lerMembro();
+    if (x.nome.length < 3) return toast("O nome é obrigatório.");
+    if (x.telefone.replace(/\D/g,"").length < 10) return toast("O telefone é obrigatório (com DDD).");
+    if (x.endereco.length < 5) return toast("O endereço é obrigatório.");
+    if (x.rg.replace(/\W/g,"").length < 4) return toast("O número do RG é obrigatório.");
+    var novo = !x.num;
+    return call(run("salvarMembro", S.me, S.pin, x), null, function(r){ S_MB.edit = null; SOM.play("conclui");
+      toast(novo ? "🪪 Cadastro criado! Número: " + r.num + ". Agora adicione as fotos dos documentos." : "Cadastro atualizado.");
+      var resumo = {num: r.num, nome: r.nome, telefone: r.telefone, endereco: r.endereco};
+      S_MB.lista = (S_MB.lista || []).filter(function(y){ return y.num !== r.num; }).concat([resumo]).sort(function(p, q){ return p.nome.localeCompare(q.nome); });
+      if (novo && S_MB.voltarAtend){ S_MB.voltarAtend = false; S_AT.sel = resumo; S_AT.q = ""; S.view = "atend"; save(); }
+    });
+  }
+  if (a === "entrada") return call(run("presencaMembro", S.me, S.pin, m.num, "entrada", ""), "📍 Entrada de " + primeiroNome(m.nome) + " registrada.");
+  if (a === "presAtiv"){ var at = $("prAtiv").value.trim(); if (!at) return toast("Diga em qual atividade.");
+    return call(run("presencaMembro", S.me, S.pin, m.num, "atividade", at), "✅ Presença em " + at + " registrada."); }
+  if (a === "atender"){ S_AT.sel = {num: m.num, nome: m.nome}; S_AT.ficha = null; S.view = "atend"; save(); return render(); }
+  if (a === "addDoc"){ S_MB.docTipo = b.dataset.t; docInput.click(); return; }
+  if (a === "verDoc") return verDoc(b.dataset.id);
+  if (a === "delDoc"){ if (!confirm("Apagar este documento?")) return; return call(run("delDocMembro", S.me, S.pin, b.dataset.id), "Documento apagado."); }
+  if (a === "addSol"){ var tx = $("soTxt").value.trim(); if (tx.length < 3) return toast("Descreva a solicitação.");
+    return call(run("addSolicitacaoMembro", S.me, S.pin, m.num, $("soData").value, tx), "📝 Solicitação registrada."); }
+  if (a === "solEst") return call(run("marcarSolicitacaoMembro", S.me, S.pin, b.dataset.id, b.dataset.e), b.dataset.e === "atendida" ? "✅ Solicitação atendida." : "Solicitação reaberta.");
+});
+
+/* ================= v38 · Ficha de atendimento ================= */
+var S_AT = {temas:null, resumo:null, hoje:"", sel:null, q:"", tema:"", busy:false, ficha:null, dia:""};
+function listaAtendBusca(){
+  var q = S_AT.q.trim(); if (q.length < 2) return '';
+  var L = filtraMembros(q).slice(0, 8);
+  return (L.length ? L.map(function(m){ return '<button class="pgrow mbRow" data-at="sel" data-n="'+esc(m.num)+'"><span class="pgnome"><b>'+esc(m.nome)+'</b><small class="when">nº '+esc(m.num)+' · 📞 '+esc(m.telefone)+'</small></span><span>Escolher</span></button>'; }).join("") : '<p class="sub">Ninguém com esse nome ou número.</p>')
+    + '<button class="btn" data-at="novoCad" style="margin-top:6px">🪪 Não achou? Fazer cadastro novo</button>';
+}
+function renderAtend(){
+  if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
+  if (S_MB.erro) return '<div class="need">'+esc(S_MB.erro)+'</div>';
+  if (!S_MB.lista){ if (!S_MB.loading) loadMb(); return '<div class="empty"><b>Carregando atendimentos…</b></div>'; }
+  var h = '', dis = S_AT.busy ? ' disabled' : '';
+  if (S_AT.ficha){ var f = S_AT.ficha;
+    h += '<div class="gsec fichaOk"><span class="sub">Ficha de atendimento</span><b class="fichaNum">'+esc(f.ficha)+'</b><p><b>'+esc(f.nome)+'</b> (nº '+esc(f.num)+')<br>'+esc(f.tema)+' · entrada '+esc(f.entrada)+'</p>'
+      + (f.programa === "ok" ? '<p class="sub">✅ Já entrou na lista do programa.</p>' : f.programa ? '<p class="sub">ℹ️ '+esc(f.programa)+'</p>' : '')
+      + '<button class="btn primary big" data-at="outro">Novo atendimento</button></div>';
+  } else {
+    h += '<div class="gsec"><h2>📋 Ficha de atendimento</h2>';
+    if (S_AT.sel) h += '<div class="atSel"><span><b>'+esc(S_AT.sel.nome)+'</b><small class="when">Cadastro nº '+esc(S_AT.sel.num)+'</small></span><button class="btn" data-at="trocar">Trocar</button></div>';
+    else h += '<label class="sub">Quem está sendo atendido? (nome ou nº de cadastro)<input id="atBusca" type="search" value="'+esc(S_AT.q)+'" placeholder="Digite o nome"></label><div class="pglist" id="atLista">'+listaAtendBusca()+'</div>'
+      + (S_AT.q.trim().length < 2 ? '<button class="btn" data-at="novoCad">🪪 Cadastro novo</button>' : '');
+    h += '<span class="sub">Tema</span><div class="pick atTemas">'+(S_AT.temas||[]).map(function(t){ return '<button type="button" data-at="tema" data-t="'+esc(t)+'" aria-pressed="'+(S_AT.tema===t)+'">'+esc(t)+'</button>'; }).join("")+'</div>'
+      + '<label class="sub">Data (da marcação, matrícula ou do atendimento)<input id="atData" type="date" value="'+esc(S.data.hoje)+'"></label>'
+      + '<label class="sub">Descrição *<textarea id="atDesc" rows="3" maxlength="600" placeholder="O que foi pedido, combinado ou informado"></textarea></label>'
+      + '<button class="btn primary big" data-at="iniciar"'+dis+'>Iniciar atendimento e gerar ficha</button>'
+      + '<p class="sub">Ao iniciar, a entrada do membro na ONG é registrada (se ainda não foi hoje). Matrícula no Flor, Dança, Kids e Cadastro na Sopa já colocam a pessoa na lista do programa.</p></div>';
+  }
+  var r = S_AT.resumo || {total:0, porTema:{}, lista:[], dia:S.data.hoje};
+  h += '<div class="gsec"><div class="row" style="justify-content:space-between"><h2>Fechamento do dia</h2><input id="atDia" type="date" value="'+esc(r.dia)+'" style="max-width:160px"></div>'
+    + '<div class="atTotal"><b>'+r.total+'</b><span>atendimento'+(r.total===1?'':'s')+' em '+fd(r.dia)+'</span></div>'
+    + (Object.keys(r.porTema).length ? '<div class="satab">'+Object.keys(r.porTema).sort(function(a,b){ return r.porTema[b]-r.porTema[a]; }).map(function(k){ return '<div><b>'+esc(k)+'</b><span>'+r.porTema[k]+'</span></div>'; }).join("")+'</div>' : '')
+    + (r.lista.length ? '<div class="eyebrow">Fichas</div>'+r.lista.map(function(a){ return '<div class="pgrow"><span class="pgnome"><b>'+esc(a.ficha)+' · '+esc(a.nome)+'</b><small class="when">'+esc(a.inicio)+' · '+esc(a.tema)+' · '+esc(a.por)+'</small><small>'+esc(a.descricao)+'</small></span></div>'; }).join("") : '<p class="sub">Nenhum atendimento neste dia.</p>') + '</div>';
+  return h;
+}
+$("view").addEventListener("change", function(ev){
+  if (ev.target.id === "atDia" && S.view === "atend"){ run("atendimentos", S.me, S.pin, ev.target.value).then(function(r){ S_AT.resumo = r; render(); }).catch(function(e){ toast(errMsg(e)); }); }
+});
+$("view").addEventListener("click", function(ev){
+  var b = ev.target.closest("[data-at]"); if (!b || S.view !== "atend" || S_AT.busy) return;
+  var a = b.dataset.at;
+  if (a === "sel"){ var m = (S_MB.lista||[]).filter(function(x){ return x.num === b.dataset.n; })[0]; S_AT.sel = m; S_AT.q = ""; return render(); }
+  if (a === "trocar"){ S_AT.sel = null; return render(); }
+  if (a === "novoCad"){ S_MB.edit = {nome: /\d/.test(S_AT.q) ? "" : S_AT.q.trim()}; S_MB.sel = null; S_MB.voltarAtend = true; S.view = "cadastro"; save(); return render(); }
+  if (a === "tema"){ S_AT.tema = b.dataset.t; Array.prototype.forEach.call(document.querySelectorAll(".atTemas button"), function(x){ x.setAttribute("aria-pressed", x === b); }); return; }
+  if (a === "outro"){ S_AT.ficha = null; S_AT.sel = null; S_AT.tema = ""; return render(); }
+  if (a === "iniciar"){
+    if (!S_AT.sel) return toast("Escolha o membro (ou faça o cadastro novo).");
+    if (!S_AT.tema) return toast("Escolha o tema do atendimento.");
+    var data = $("atData").value, desc = $("atDesc").value.trim();
+    if (!data) return toast("Informe a data.");
+    if (desc.length < 3) return toast("Escreva a descrição do atendimento.");
+    S_AT.busy = true; render();
+    return run("novoAtendimento", S.me, S.pin, {num: S_AT.sel.num, tema: S_AT.tema, data: data, descricao: desc}).then(function(r){ S_AT.ficha = r; S_AT.resumo = r.resumo; S_AT.tema = ""; SOM.play("conclui"); toast("📋 Ficha " + r.ficha + " gerada."); window.scrollTo({top:0}); })
+      .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_AT.busy = false; render(); });
+  }
 });
 
 /* ---------------- Saúde (relatório semanal) ---------------- */
@@ -1550,7 +1912,7 @@ function renderAvisos(){
   var f = S_AVF;
   lista = lista.filter(function(a){
     if (f === "meus") return a.alvo === S.me || String(a.pessoa).split(",").indexOf(S.me) >= 0;
-    if (f === "tarefas") return /tarefa|atraso|vencida/.test(a.tipo);
+    if (f === "tarefas") return /tarefa|atraso|vencida|alteracao/.test(a.tipo);
     if (f === "pedidos") return /suporte|prazo|resposta|cobranca/.test(a.tipo);
     if (f === "ponto") return /ponto|saida_final|alerta/.test(a.tipo);
     return true;
@@ -1564,12 +1926,19 @@ function renderAvisos(){
     var cls = "it t-"+a.tipo+(me?" me":"")+(a.publico==="gestao"?" g":"");
     var novo = a.ms > v && a.pessoa !== S.me ? ' <span class="pill bad">novo</span>' : '';
     var vis = d.verTodos ? (a.publico==="gestao" ? '<span class="pill muted">só coordenação</span>' : a.publico==="pessoa" ? '<span class="pill muted">só '+esc(pessoa(a.alvo).nome)+'</span>' : '') : (me ? '<span class="pill bad">para você</span>' : '');
-    var zap = "";
-    if (d.verTodos){
+    var zap = "", conf = "", esp = a.esperados || [], vis2 = a.vistos || [];
+    if (esp.length && !d.verTodos && esp.indexOf(S.me) >= 0) conf = vis2.indexOf(S.me) >= 0 ? '<span class="pill ok">✅ Você confirmou</span>' : '<button class="btn primary" data-act="avConf" data-ms="'+a.ms+'">👍 Confirmar que vi</button>';
+    if (esp.length && d.verTodos){
+      var falta = esp.filter(function(id){ return vis2.indexOf(id) < 0; });
+      conf = '<div class="avConf"><b>👁 Viram: '+(esp.length - falta.length)+'/'+esp.length+'</b>'+(vis2.length ? '<span>✅ '+vis2.map(function(id){ return esc(primeiroNome(pessoa(id).nome)); }).join(", ")+'</span>' : '')
+        + (falta.length ? '<span>⏳ Falta: '+falta.map(function(id){ return esc(primeiroNome(pessoa(id).nome)); }).join(", ")+'</span><div class="row" style="flex-wrap:wrap;gap:6px">'+falta.map(function(id){ var t = S.data.telefones && S.data.telefones[id]; return t ? '<a class="wa" href="'+esc(waHref(t, msgConfirmaAviso(id, a)))+'" target="_blank" rel="noopener">'+WA_ICON+'Pedir confirmação a '+esc(primeiroNome(pessoa(id).nome))+'</a>' : ''; }).join("")+'</div>' : '') + '</div>';
+    }
+    if (d.verTodos && !esp.length){
       var ids = (a.alvo ? [a.alvo] : String(a.pessoa||"").split(",")).filter(Boolean);
       zap = ids.map(function(id){ return waLink(id, a.texto.replace(/^[^\wÀ-ú]+/, "")); }).filter(Boolean).join(" ");
     }
-    return '<div class="'+cls+'"><div class="top2"><b>'+esc(a.hora)+'</b><span>'+vis+novo+'</span></div><div class="tx">'+esc(a.texto)+'</div>'+(zap?'<div class="row">'+zap+'</div>':'')+'</div>';
+    var pz = (d.verTodos && /ponto|saida_final/.test(a.tipo) && a.pessoa && d.ponto[a.pessoa] && PONTO_RUIM[d.ponto[a.pessoa].estado]) ? botoesPonto(a.pessoa, d.ponto[a.pessoa].estado) : "";
+    return '<div class="'+cls+'"><div class="top2"><b>'+esc(a.hora)+'</b><span>'+vis+novo+'</span></div><div class="tx">'+esc(a.texto)+'</div>'+conf+pz+(zap?'<div class="row">'+zap+'</div>':'')+'</div>';
   }).join("") + '</div>';
   setTimeout(function(){ marcarVistos(); atualizaBadge(); }, 1500);
   return h;
@@ -1693,6 +2062,10 @@ $("view").addEventListener("click", function(ev){
     return act(run("salvarMeuWhats", S.me, S.pin, tel)).then(function(){ SOM.play("pop"); toast("💬 WhatsApp ativado. A coordenação já consegue te mandar os avisos por ele."); }).catch(function(){}); }
   if (a === "loc"){ SOM.play("radar"); if (S_LOC === "ok") toast("📍 Localização ativa. Tudo certo."); return checarLocal(); }
   if (a === "avf"){ S_AVF = btn.dataset.f; return render(); }
+  if (a === "avConf"){ var msA = btn.dataset.ms; btn.disabled = true;
+    return run("confirmarAviso", S.me, S.pin, msA).then(function(){ (S.data.avisos || []).forEach(function(x){ if (String(x.ms) === msA){ x.vistos = (x.vistos || []).concat([S.me]); } }); SOM.play("ok"); toast("👍 Confirmado. A coordenação já vê que você viu."); render(); })
+      .catch(function(e){ btn.disabled = false; toast(errMsg(e)); }); }
+  if (a === "irAvisos"){ S.view = "avisos"; save(); return render(); }
   if (a === "dem"){
     var k = btn.dataset.k, inp = $("dem_"+k), det = inp ? inp.value.trim() : "";
     if (inp && det.length < 2) return toast("Escreva o que precisa.");
@@ -1704,9 +2077,15 @@ $("view").addEventListener("click", function(ev){
   }
   if (a === "validarIdeia") return run("validarIdeia", S.me, S.pin, btn.dataset.id).then(function(r){ S_PTS = r; renderMeta(); toast("⭐ Ideia validada (+27 pts)."); return load(null, true); }).catch(function(e){ toast(errMsg(e)); });
   if (a === "abrirMover"){ S_MOVER = btn.dataset.b; return render(); }
+  if (a === "abrirEd"){ var te = S.data.tarefas.filter(function(t){ return t.id === btn.dataset.b; })[0]; S_EDT = {id: te.id, pessoas: te.pessoas.slice(), onde: "dia"}; return render(); }
+  if (a === "edDiaX"){ S_EDT = null; return render(); }
+  if (a === "edDiaOk"){ var ve = lerEditar(); if (!ve) return; var idE = btn.dataset.b;
+    return act(run("editarTarefa", S.me, S.pin, S.data.dia, idE, ve)).then(function(){ S_EDT = null; render(); SOM.play("conclui"); toast("✏️ Atividade atualizada. A equipe vê na hora."); }).catch(function(){}); }
   if (a === "moverX"){ S_MOVER = ""; return render(); }
   if (a === "moverOk"){ var nd = $("mv_D").value, nh = $("mv_H").value, nf = $("mv_F").value;
-    return run("moverTarefa", S.me, S.pin, S.data.dia, btn.dataset.b, nd, nh, nf).then(function(r){ S_MOVER = ""; SOM.play("conclui"); toast("📅 Atividade movida para " + r.quando + "." + (r.aprovado ? " Pedido de prazo aprovado." : "")); return load(null, true); }).catch(function(e){ toast(errMsg(e)); }); }
+    var tMv = S.data.tarefas.filter(function(t){ return t.id === btn.dataset.b; })[0] || {};
+    return run("moverTarefa", S.me, S.pin, S.data.dia, btn.dataset.b, nd, nh, nf).then(function(r){ S_MOVER = "";
+      S_GRUPO = {resumo: '"' + tMv.titulo + '" foi para ' + r.quando + '.', texto: MSG_GRUPO.modificada({titulo: tMv.titulo, nomes: nomesDe(tMv.pessoas), quando: r.quando})}; SOM.play("conclui"); toast("📅 Atividade movida para " + r.quando + "." + (r.aprovado ? " Pedido de prazo aprovado." : "")); return load(null, true); }).catch(function(e){ toast(errMsg(e)); }); }
   if (a === "excluirTar"){ var tt = (S.data.tarefas.filter(function(t){ return t.id === btn.dataset.b; })[0] || {}).titulo || "esta atividade";
     if (!window.confirm("Excluir \"" + tt + "\"? Isso não pode ser desfeito.")) return;
     return act(run("delTarefa", S.me, S.pin, S.data.dia, btn.dataset.b)).then(function(){ toast("🗑 Atividade excluída."); }).catch(function(){}); }
@@ -1833,9 +2212,9 @@ $("pinOk").addEventListener("click", function(){
 });
 $("pinIn").addEventListener("keydown", function(e){ if (e.key === "Enter") $("pinOk").click(); });
 $("sair").addEventListener("click", function(){ VOZ_MEM = null; try { localStorage.removeItem("vozHoje"); } catch(e){} $("gateImg").removeAttribute("data-h"); S.me = ""; S.pin = ""; S.gestor = false; S.painel = null; if (S.view==="gestao") S.view="dia"; save(); load(null, true); });
-var ABAS_EXTRA = ["playlist","galeria","freq","programas","saude","editais","visitas"], S_MAIS = false;
+var ABAS_EXTRA = ["atend","cadastro","playlist","galeria","freq","programas","saude","editais","visitas"], S_MAIS = false;
 document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest(".maisBtn"); if (!b) return; e.stopImmediatePropagation(); S_MAIS = !(S_MAIS || ABAS_EXTRA.indexOf(S.view) >= 0); if (!S_MAIS && ABAS_EXTRA.indexOf(S.view) >= 0){ S.view = "dia"; save(); } render(); }, true);
-document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; save(); if (S.view==="programas" && S_PG.d && !S_PG.loading) loadPg(); if (S.view==="saude" && S_SA.d && !S_SA.loading) loadSa(); if (S.view==="editais" && S_ED.d && !S_ED.loading) loadEd(); if (S.view==="gestao") { $("view").innerHTML = '<div id="gWrap"></div>'; loadPainel(); } render(); });
+document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; save(); if (S.view==="programas" && S_PG.d && !S_PG.loading) loadPg(); if (S.view==="saude" && S_SA.d && !S_SA.loading) loadSa(); if ((S.view==="cadastro" || S.view==="atend") && S_MB.lista && !S_MB.loading) loadMb(); if (S.view==="editais" && S_ED.d && !S_ED.loading) loadEd(); if (S.view==="gestao") { $("view").innerHTML = '<div id="gWrap"></div>'; loadPainel(); } render(); });
 $("days").addEventListener("click", function(e){ var b = e.target.closest("[data-d]"); if (b) load(b.dataset.d); });
 
 /* ---------------- Cadastro de colaborador ---------------- */
@@ -1890,7 +2269,7 @@ function renderGestao(){
   var w = $("gWrap"); if (!w) return;
   var p = S.painel, d = S.data;
   if (!p){ w.innerHTML = '<div class="empty"><b>Carregando o painel…</b>Frequência da semana, atrasos e quem falta bater ponto.</div>'; return; }
-  var h = '<div class="gsec"><h2>🔔 Alerta para a equipe</h2><p class="sub">Abre o WhatsApp com a mensagem pronta (escolha o grupo) e avisa todo mundo no app.</p>' + botaoAlerta() + '</div>' + gestaoDiagnostico() + gestaoPontos();
+  var h = avisoGrupoBox() + '<div class="gsec"><h2>🔔 Alerta para a equipe</h2><p class="sub">Abre o WhatsApp com a mensagem pronta (escolha o grupo). O 🔔 também avisa todo mundo no app.</p><div class="row" style="gap:6px;flex-wrap:wrap">' + botaoAlerta() + botaoGrupo(MSG_GRUPO.pontos(), "🎯 Atenção aos pontos") + '</div></div>' + gestaoDiagnostico() + gestaoPontos();
   // relatório final do dia
   var OPD = p.opcoesDia || {seguir:"Dia de atividades executadas · seguir", ajustes:"Dia de necessidade de ajustes", urgencias:"Dia de reavaliação de urgências"};
   var fe = p.fechamento;
@@ -1963,11 +2342,8 @@ function renderGestao(){
   else if (!lista.length) h += '<p class="sub">Nenhuma tarefa neste dia ainda.</p>';
   if (lista && lista.length) h += ativPorPessoa(lista, d);
   if (lista && lista.length) h += '<div class="tl">'+lista.map(function(t){
-    if (S_EDT && S_EDT.id === t.id) return '<div style="flex-direction:column;align-items:stretch;gap:8px"><b>'+esc(t.titulo)+'</b>'
-      + '<div class="row"><label class="sub">Início <input type="time" id="eIni" value="'+esc(toHHMM(t.hora))+'"></label><label class="sub">Fim <input type="time" id="eFim" value="'+esc(t.fim||"")+'"></label></div>'
-      + '<div class="pick">'+(d?d.equipe:[]).map(function(x){ return '<button type="button" data-ep="'+esc(x.id)+'" aria-pressed="'+(S_EDT.pessoas.indexOf(x.id)>=0)+'">'+chip(x.id)+'</button>'; }).join("")+'</div>'
-      + '<div class="row"><button class="btn primary" data-g="edSalvar">Salvar</button><button class="btn" data-g="edCancel">Cancelar</button></div></div>';
-    return '<div><span><b>'+esc(t.hora)+'–'+esc(t.fim||"")+'</b> '+esc(t.titulo)+'</span><span class="row"><button class="btn" data-g="ed" data-id="'+esc(t.id)+'">Editar</button>'+(S.data.dono?'<button class="btn" data-g="del" data-id="'+esc(t.id)+'">Remover</button>':'')+'</span></div>';
+    if (S_EDT && S_EDT.onde === "g" && S_EDT.id === t.id) return '<div style="flex-direction:column;align-items:stretch;gap:8px">' + formEditar(t, '<button class="btn primary" data-g="edSalvar">Salvar</button>', '<button class="btn" data-g="edCancel">Cancelar</button>') + '</div>';
+    return '<div><span><b>'+esc(t.hora)+'–'+esc(t.fim||"")+'</b> '+esc(t.titulo)+'</span><span class="row">'+(S.data.dono?'<button class="btn" data-g="ed" data-id="'+esc(t.id)+'">✏️ Editar</button><button class="btn" data-g="del" data-id="'+esc(t.id)+'">Remover</button>':'')+'</span></div>';
   }).join("")+'</div>';
   h += '<div class="f">'
     + '<label>Início<input id="gHora" type="time"></label>'
@@ -2042,13 +2418,11 @@ $("view").addEventListener("click", function(e){
     return pegarLocal(true).then(function(loc){ return run("definirSede", S.me, S.pin, loc.lat, loc.lng).then(function(){ toast("Localização da sede gravada (precisão de "+Math.round(loc.acc)+" m)."); return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; }); }); })
       .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S.busy = false; renderGestao(); });
   }
-  if (g==="ed"){ var tt = S.data.tarefas.filter(function(x){ return x.id === b.dataset.id; })[0]; S_EDT = {id: tt.id, pessoas: tt.pessoas.slice()}; return renderGestao(); }
+  if (g==="ed"){ var tt = S.data.tarefas.filter(function(x){ return x.id === b.dataset.id; })[0]; S_EDT = {id: tt.id, pessoas: tt.pessoas.slice(), onde: "g"}; return renderGestao(); }
   if (g==="edCancel"){ S_EDT = null; return renderGestao(); }
   if (g==="edSalvar"){
-    var ini = $("eIni").value, fim = $("eFim").value;
-    if (!ini || !fim || fim <= ini) return toast("O fim precisa ser depois do início.");
-    if (!S_EDT.pessoas.length) return toast("Escolha quem faz a tarefa.");
-    return gAct(run("editarTarefa", S.me, S.pin, gd, S_EDT.id, {hora: ini, fim: fim, pessoas: S_EDT.pessoas}), function(d){ S.data = d; S_EDT = null; toast("Tarefa ajustada."); });
+    var vg = lerEditar(); if (!vg) return;
+    return gAct(run("editarTarefa", S.me, S.pin, gd, S_EDT.id, vg), function(d){ S.data = d; S_EDT = null; toast("✏️ Atividade atualizada."); });
   }
   if (g==="cadNovo"){ S_CADED = {nome:"", telefone:"", livre:false, horarios:[]}; return renderGestao(); }
   if (g==="cadEd"){ S_CADED = JSON.parse(JSON.stringify(S_CAD.filter(function(x){ return x.id === b.dataset.p; })[0])); return renderGestao(); }
@@ -2071,7 +2445,9 @@ $("view").addEventListener("click", function(e){
   }
   if (g==="prazoData"){ S_PRZDATA = b.dataset.d + "__" + b.dataset.b; return renderGestao(); }
   if (g==="prazoDataX"){ S_PRZDATA = ""; return renderGestao(); }
-  if (g==="prazoDataOk"){ return gAct(run("moverTarefa", S.me, S.pin, b.dataset.d, b.dataset.b, $("pz_D").value, $("pz_H").value, $("pz_F").value).then(function(r){ S_PRZDATA = ""; return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast("👍 Prazo aprovado: " + r.quando + "."); }); })); }
+  if (g==="prazoDataOk"){ return gAct(run("moverTarefa", S.me, S.pin, b.dataset.d, b.dataset.b, $("pz_D").value, $("pz_H").value, $("pz_F").value).then(function(r){ S_PRZDATA = ""; var pzx = (S.painel.agoraOng.prazos || []).filter(function(p){ return p.bloco === b.dataset.b; })[0] || {};
+      S_GRUPO = {resumo: 'Prazo aprovado: ' + r.quando + '.', texto: MSG_GRUPO.modificada({titulo: pzx.titulo || "Atividade", nomes: nomesDe([pzx.por]), quando: r.quando})};
+      return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast("👍 Prazo aprovado: " + r.quando + "."); }); })); }
   if (g==="prazoOk" || g==="prazoNao"){
     return gAct(run("decidirPrazo", S.me, S.pin, b.dataset.d, b.dataset.b, g==="prazoOk").then(function(r){ return run("painel", S.me, S.pin, S.painel.de).then(function(pp){ S.painel = pp; toast(g==="prazoOk" ? "Prazo aprovado até "+fmtPrazo(r.prazo)+"." : "Pedido recusado."); }); }));
   }
@@ -2547,6 +2923,7 @@ function folhaHtml(){
 document.addEventListener("click", function(ev){
   var b = ev.target.closest("[data-x]"); if (!b) return;
   var x = b.dataset.x;
+  if (x === "grupoOk"){ SOM.play("pop"); setTimeout(function(){ S_GRUPO = null; render(); if (S.view === "gestao") renderGestao(); }, 700); return; }
   if (x === "alertaEq"){ SOM.play("sino"); run("alertaEquipe", S.me, S.pin, MSG_ALERTA).then(function(){ toast("🔔 Alerta enviado no app para todos. Escolha o grupo no WhatsApp."); }).catch(function(e){ toast(errMsg(e)); }); return; }
   if (x === "cobrar"){ if (b.tagName !== "A") ev.preventDefault(); SOM.play("envio");
     run("cobrarColaborador", S.me, S.pin, S.data.dia, b.dataset.b, b.dataset.t, b.dataset.p).then(function(){ toast((b.tagName === "A" ? "WhatsApp aberto · " : "") + "Pedido de resposta enviado no app para " + pessoa(b.dataset.p).nome + "."); }).catch(function(e){ toast(errMsg(e)); });
@@ -2564,6 +2941,7 @@ document.addEventListener("click", function(ev){
   if (x === "remanejar"){ var de = $("rmDe").value, para = $("rmPara").value;
     if (!de || !para || de === para) return toast("Escolha De e Para (pessoas diferentes).");
     return run("remanejarPessoa", S.me, S.pin, de, para, {horarioTarde: $("rmHor").checked, atividadesTarde: $("rmAtv").checked}).then(function(r){
+      S_GRUPO = {resumo: r.movidas + " atividade(s) de " + pessoa(de).nome + " passaram para " + pessoa(para).nome + ".", texto: MSG_GRUPO.remanejada({de: primeiroNome(pessoa(de).nome), para: primeiroNome(pessoa(para).nome), tarde: r.horario})};
       SOM.play("conclui"); toast("🔁 " + r.movidas + " atividade(s) passadas para " + pessoa(para).nome + (r.tarde ? " · " + r.tarde + " foram para a tarde" : "") + (r.horario ? " · horário 14h–18h" : "") + "." + (r.manhaJunto && r.manhaJunto.length ? " ⚠️ Ficaram de manhã por serem com outras pessoas: " + r.manhaJunto.join(", ") + ". Ajuste em Montar o dia." : ""));
       S_CAD = null; return load(null, true); }).catch(function(e){ toast(errMsg(e)); }); }
   if (x === "vozTeste"){ destravaVoz(); toast("Buscando a narração…");
@@ -2594,6 +2972,11 @@ document.addEventListener("click", function(ev){
     var ms = (cfg().msgs || []).map(function(m){ return m.k === S_MSG.k ? {k: m.k, t: m.t, m: $("msgTxt").value.trim()} : m; });
     return run("salvarConfig", S.me, S.pin, "msgs", ms).then(function(c){ S.data.config = c; S_MSG.txt = null; toast("💾 Modelo salvo para todos."); render(); }).catch(function(e){ toast(errMsg(e)); });
   }
+  if (x === "cobPonto"){ if (b.tagName !== "A") ev.preventDefault(); SOM.play("envio");
+    run("cobrarPonto", S.me, S.pin, b.dataset.p, b.dataset.e).then(function(){ toast((b.tagName === "A" ? "WhatsApp aberto · " : "") + "Cobrança de ponto enviada no app para " + pessoa(b.dataset.p).nome + "."); }).catch(function(e){ toast(errMsg(e)); });
+    return; }
+  if (x === "supWaOk"){ SOM.play("pop"); setTimeout(function(){ S_SUPG.wa = null; S_SUPG.resp = {}; render(); }, 700); return; }
+  if (x === "grupoX"){ S_GRUPO = null; render(); if (S.view === "gestao") renderGestao(); return; }
   if (x === "fornFecha"){ S_FORN = null; return render(); }
   if (x === "engInval") return run("invalidarEngajamento", S.me, S.pin, b.dataset.id).then(function(r){ S_PTS = r; renderMeta(); renderGestao(); toast("Registro invalidado."); }).catch(function(e){ toast(errMsg(e)); });
   var salva = function(ch, v, msg){ return run("salvarConfig", S.me, S.pin, ch, v).then(function(c){ S.data.config = c; toast(msg || "Salvo."); renderGestao(); }).catch(function(e){ toast(errMsg(e)); }); };
@@ -2619,7 +3002,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611101743";
+var APP_VERSAO = "202611102042";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
