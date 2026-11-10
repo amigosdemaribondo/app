@@ -314,6 +314,27 @@ ul.lista{margin:0;padding-left:18px}
 .mk2{position:absolute;top:-6px;transform:translateX(-50%);font-size:14px}
 .dinfo{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
 .dinfo b{color:var(--ink)}
+.mtx{position:fixed;inset:0;z-index:120;background:#000;display:grid;place-items:center;transition:opacity .5s ease}
+.mtx.sai{opacity:0}
+.mtx canvas{position:absolute;inset:0}
+.mtxmsg{position:relative;z-index:1;text-align:center;padding:22px 26px;border-radius:16px;background:rgba(0,0,0,.72);border:1.5px solid #22FF66;box-shadow:0 0 28px rgba(34,255,102,.35);opacity:0;transform:scale(.9);transition:all .35s ease;max-width:90vw}
+.mtxmsg.on{opacity:1;transform:none}
+.mtxmsg p{margin:0;font-family:ui-monospace, Menlo, Consolas, monospace;font-weight:800;color:#22FF66;text-shadow:0 0 12px rgba(34,255,102,.8);letter-spacing:.08em;min-height:1.2em}
+.mtxmsg .l1{font-size:clamp(16px,4.6vw,22px)}
+.mtxmsg .l2{font-size:clamp(28px,9vw,44px);margin-top:8px}
+.mtxmsg.venceu{border-color:var(--gold);box-shadow:0 0 36px rgba(245,197,24,.45)}
+.mtxmsg.venceu .l2{color:var(--gold);text-shadow:0 0 16px rgba(245,197,24,.9)}
+.mtxmsg small{display:block;margin-top:12px;color:#8BFFB0;font-size:11px;letter-spacing:.14em;text-transform:uppercase;opacity:.75}
+.imp .impop{display:flex;gap:12px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--navy2);border-radius:14px;padding:12px}
+.impop i{font-style:normal;font-size:26px;border-bottom:2px solid var(--gold);padding-bottom:2px}
+.impop b{display:block}.impop small{color:var(--muted);font-size:12px}
+.ajuda{background:var(--navy2);border-radius:12px;padding:10px 12px;font-size:13.5px}
+.ajuda summary{cursor:pointer;font-weight:700;color:var(--gold)}.ajuda p{margin:8px 0 0}
+.implist{display:flex;flex-direction:column;max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:12px}
+.impit{display:flex;gap:10px;align-items:center;padding:9px 10px;border-bottom:1px solid var(--line)}
+.impit input{width:22px;height:22px;flex:none;accent-color:var(--gold)}
+.impit span{min-width:0;display:flex;flex-direction:column}.impit small{color:var(--muted);font-size:12px}
+.impit.dup{opacity:.55}
 .pinbox{position:fixed;inset:0;z-index:90;background:rgba(4,6,11,.88);display:grid;place-items:center;padding:20px}
 .pinc{background:var(--navy);border:1.5px solid var(--gold);border-radius:20px;padding:22px;width:min(340px,100%);display:flex;flex-direction:column;gap:12px;text-align:center}
 .pinc input{text-align:center;font-size:24px;letter-spacing:.4em}
@@ -455,7 +476,7 @@ var SUGESTOES = [
 var EIXOS_PADRAO = ["Corpo e saúde","Fé e mente","ONG e liderança","Comunicação: rádio e lives","Finanças e projetos"];
 
 /* ===== estado e armazenamento ===== */
-var S = {view:"hoje", sub:"", area:"", busca:"", editC:null, semRef:"", metaIco:"🎯", verTudo:false, gravTexto:"", iaRes:null, iaQ:"", iaResp:"", contatos:{}, viagens:{}, notas:{}, semanas:{}, fin:{}, editF:null, dia:hojeISO(), filtro:"", dias:{}, acoes:{}, objs:{}, refs:{}, prazoAberto:null, mes:hojeISO().slice(0,7), seloNovo:"imediato", alertados:{}};
+var S = {view:"hoje", sub:"", area:"", busca:"", editC:null, semRef:"", metaIco:"🎯", verTudo:false, gravTexto:"", iaRes:null, iaQ:"", iaResp:"", contatos:{}, viagens:{}, notas:{}, semanas:{}, fin:{}, editF:null, imp:null, dia:hojeISO(), filtro:"", dias:{}, acoes:{}, objs:{}, refs:{}, prazoAberto:null, mes:hojeISO().slice(0,7), seloNovo:"imediato", alertados:{}};
 try { S.view = localStorage.getItem("ma_view") || "hoje"; } catch(e){}
 if (["hoje","metas","rede","acao","mais"].indexOf(S.view) < 0) S.view = "hoje";
 var DB = null, UID = null, ASSETS = null, DL = null, LOCAL = true;
@@ -490,10 +511,13 @@ var SOM = (function(){
     alerta: function(){ for (var i = 0; i < 3; i++){ n(880, i*.22, .12, .12, "square"); n(660, i*.22 + .11, .1, .1, "square"); } },
     meta: function(){ [523,659,784,1047].forEach(function(f,i){ n(f, i*.08, .22, .09); }); },
     erro: function(){ n(220, 0, .2, .1, "sawtooth"); },
-    foto: function(){ n(1500, 0, .03, .07, "square"); n(900, .05, .05, .05, "square"); }
+    foto: function(){ n(1500, 0, .03, .07, "square"); n(900, .05, .05, .05, "square"); },
+    tick: function(){ n(600 + Math.random() * 2200, 0, .018, .018, "square"); },
+    bip: function(){ n(1400 + Math.random() * 900, 0, .03, .04, "square"); },
+    matriz: function(){ for (var i = 0; i < 18; i++) n(300 + Math.random() * 1400, i * .055, .045, .035, "square"); n(110, 0, 1.2, .05, "sawtooth"); }
   };
   return { on:function(){ return on; }, set:function(v){ on = v; try { localStorage.setItem("ma_som", v ? "1" : "0"); } catch(e){} },
-    play:function(k){ try { if (navigator.vibrate) navigator.vibrate(k === "alerta" ? [120,60,120,60,200] : k === "clique" ? 6 : 18); } catch(e){}
+    play:function(k){ try { if (navigator.vibrate && k !== "tick" && k !== "bip") navigator.vibrate(k === "alerta" ? [120,60,120,60,200] : k === "clique" ? 6 : 18); } catch(e){}
       if (!on || !S2[k]) return; try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); S2[k](); } catch(e){} } };
 })();
 var tTimer;
@@ -906,10 +930,11 @@ function renderMetas(){
 function renderRede(){
   var L = Object.keys(S.contatos).map(function(id){ return Object.assign({id:id}, S.contatos[id]); });
   var cont = {}; L.forEach(function(c){ cont[c.area] = (cont[c.area] || 0) + 1; });
-  var h = '<div class="card"><div class="redetop"><h2>🤝 Minha rede</h2><button class="bprim slim" data-b="novoContato">+ Contato</button></div>'
+  var h = '<div class="card"><div class="redetop"><h2>🤝 Minha rede</h2><div class="cta"><button class="lbtn" data-b="impAbrir">📥 Importar</button><button class="bprim slim" data-b="novoContato">+ Contato</button></div></div>'
     + '<input id="busca" placeholder="🔎 Buscar nome, função ou objetivo" value="' + esc(S.busca || "") + '">'
     + '<div class="areas"><button class="area' + (!S.area ? " on" : "") + '" data-b="area" data-k=""><i>👥</i><b>Todos</b><em class="tnum">' + L.length + '</em></button><button class="area' + (S.area === "_prio" ? " on" : "") + '" data-b="area" data-k="_prio"><i>⭐</i><b>Prioritários</b><em class="tnum">' + L.filter(function(c){ return c.prio; }).length + '</em></button>'
     + AREAS.map(function(a){ return '<button class="area' + (S.area === a.k ? " on" : "") + '" data-b="area" data-k="' + a.k + '"><i>' + a.ico + '</i><b>' + esc(a.t) + '</b><small>' + esc(a.s) + '</small><em class="tnum">' + (cont[a.k] || 0) + '</em></button>'; }).join("") + '</div></div>';
+  if (S.imp) h += renderImport();
   if (S.editC) h += formContato();
   var q = semAc(S.busca || ""), F = L.filter(function(c){ if (S.area === "_prio" && !c.prio) return false; if (S.area && S.area !== "_prio" && c.area !== S.area) return false; if (q && semAc([c.nome, c.funcao, c.objetivo, c.nota].join(" ")).indexOf(q) < 0) return false; return true; })
     .sort(function(a,b){ return (b.prio?1:0) - (a.prio?1:0) || String(a.nome).localeCompare(String(b.nome), "pt-BR"); });
@@ -1219,7 +1244,132 @@ $("view").addEventListener("click", function(e){
 
 $("view").addEventListener("click", function(e){ var b = e.target.closest('[data-b="verTudo"]'); if (b){ S.verTudo = !S.verTudo; render(); } });
 $("fab").addEventListener("click", function(){ S.sub = "grav"; irPara("mais"); });
-$("bora").addEventListener("click", function(){ SOM.play("meta"); $("capa").style.transition = "opacity .45s ease"; $("capa").style.opacity = "0"; setTimeout(function(){ $("capa").hidden = true; }, 450); });
+$("bora").addEventListener("click", function(){ SOM.play("meta"); $("capa").style.transition = "opacity .45s ease"; $("capa").style.opacity = "0"; setTimeout(function(){ $("capa").hidden = true; if (!window.__semPin) introMatrix(); }, 450); });
+
+
+
+/* ---------- IMPORTAR CONTATOS (agenda do celular, WhatsApp, lista colada) ---------- */
+function lerVcf(txt){
+  var linhas = String(txt || "").replace(/\r\n[ \t]/g, "").replace(/\n[ \t]/g, "").split(/\r?\n/), out = [], c = null;
+  linhas.forEach(function(l){
+    if (/^BEGIN:VCARD/i.test(l)){ c = {nome:"", zap:"", funcao:""}; return; }
+    if (/^END:VCARD/i.test(l)){ if (c && (c.nome || c.zap)) out.push(c); c = null; return; }
+    if (!c) return;
+    var i = l.indexOf(":"); if (i < 0) return;
+    var k = l.slice(0, i).toUpperCase(), v = l.slice(i + 1).replace(/\\,/g, ",").replace(/\;/g, ";").trim();
+    if (/QUOTED-PRINTABLE/.test(k)){ try { v = decodeURIComponent(v.replace(/=([0-9A-F]{2})/gi, "%$1")); } catch(e){} }
+    if (/^FN\b/.test(k)) c.nome = v;
+    else if (/^N\b/.test(k) && !c.nome){ var p = v.split(";"); c.nome = [p[1], p[2], p[0]].filter(Boolean).join(" ").trim(); }
+    else if (/^(ITEM\d+\.)?TEL\b/.test(k)){ var num = v.replace(/[^\d+]/g, ""); if (num && (!c.zap || /CELL|WHATSAPP|IPHONE|MOBILE/.test(k))) c.zap = num; }
+    else if (/^(TITLE|ORG)\b/.test(k) && !c.funcao) c.funcao = v.replace(/;+$/, "").replace(/;/g, " · ");
+  });
+  return out;
+}
+function lerListaTexto(txt){
+  return String(txt || "").split(/\r?\n/).map(function(l){
+    l = l.trim(); if (!l) return null;
+    var m = l.match(/(\+?\d[\d\s().-]{7,}\d)/), zap = m ? m[1].replace(/[^\d+]/g, "") : "";
+    var nome = (m ? l.replace(m[1], "") : l).replace(/[-–:;,|]+\s*$/,"").replace(/^\s*[-–:;,|]+/,"").replace(/\s{2,}/g, " ").trim();
+    return nome || zap ? {nome:nome || zap, zap:zap, funcao:""} : null;
+  }).filter(Boolean);
+}
+function soDig(z){ var d = String(z || "").replace(/\D/g, ""); return d.length > 11 && d.indexOf("55") === 0 ? d.slice(2) : d; }
+function prepararImport(lista, origem){
+  var existentes = {}; Object.keys(S.contatos).forEach(function(id){ var d = soDig(S.contatos[id].zap); if (d) existentes[d.slice(-8)] = 1; existentes["n:" + semAc(S.contatos[id].nome)] = 1; });
+  var vistos = {};
+  var itens = lista.slice(0, 500).map(function(c){ var d = soDig(c.zap), chave = d ? d.slice(-8) : "n:" + semAc(c.nome);
+    var dup = !!(existentes[chave] || vistos[chave]); vistos[chave] = 1; return {nome:c.nome, zap:c.zap, funcao:c.funcao || "", dup:dup, sel:!dup}; });
+  S.imp = {itens:itens, area:S.area && S.area !== "_prio" ? S.area : "papo", origem:origem};
+  SOM.play(itens.length ? "feito" : "erro"); if (!itens.length) toast("Não encontrei contatos nesse arquivo.");
+  render();
+}
+function renderImport(){
+  var im = S.imp;
+  var h = '<div class="card form imp"><div class="redetop"><h2>📥 Importar contatos</h2><button class="lbtn" data-b="impFechar">✕</button></div>';
+  if (!im.itens){
+    h += '<button class="impop" data-b="impVcf"><i>📇</i><span><b>Arquivo de contatos (.vcf)</b><small>Da agenda do iPhone ou de um contato compartilhado pelo WhatsApp</small></span></button>'
+      + (navigator.contacts && navigator.contacts.select ? '<button class="impop" data-b="impAgenda"><i>📱</i><span><b>Escolher da agenda do celular</b><small>Marque vários de uma vez (Android)</small></span></button>' : '')
+      + '<button class="impop" data-b="impColar"><i>📋</i><span><b>Colar uma lista</b><small>Um por linha: Nome e número. Ex.: Maria Silva 82 99999-0000</small></span></button>'
+      + (im.colar ? '<textarea id="impTx" rows="6" placeholder="João Prefeito 82 98888-1111&#10;Ana Comércio 82 97777-2222"></textarea><button class="bprim" data-b="impLerTx">Conferir lista</button>' : '')
+      + '<details class="ajuda"><summary>Como tirar os contatos do iPhone e do WhatsApp</summary>'
+      + '<p><b>Um contato do iPhone:</b> Contatos → abra a pessoa → Compartilhar Contato → Salvar em Arquivos. Depois toque em "Arquivo de contatos" aqui.</p>'
+      + '<p><b>Vários de uma vez:</b> no computador, entre em icloud.com/contacts → selecione os contatos → engrenagem → Exportar vCard. Mande o arquivo para o celular e importe aqui.</p>'
+      + '<p><b>Do WhatsApp:</b> abra a conversa → toque no nome → Compartilhar contato → Salvar em Arquivos. O WhatsApp não exporta a lista inteira; para grupos, use "Colar uma lista".</p></details>';
+    return h + '</div>';
+  }
+  var sel = im.itens.filter(function(x){ return x.sel; }).length, dups = im.itens.filter(function(x){ return x.dup; }).length;
+  h += '<p class="muted sm" style="margin:0">' + im.itens.length + ' encontrado(s)' + (dups ? ' · ' + dups + ' já estão na sua rede (desmarcados)' : '') + '</p>'
+    + '<div class="grid2"><label class="muted sm">Colocar na área<select id="impArea">' + AREAS.map(function(a){ return '<option value="' + a.k + '"' + (im.area === a.k ? " selected" : "") + '>' + a.ico + ' ' + esc(a.t) + '</option>'; }).join("") + '</select></label>'
+    + '<div class="cta" style="align-items:flex-end"><button class="lbtn" data-b="impTodos">Marcar todos</button><button class="lbtn" data-b="impNenhum">Nenhum</button></div></div>'
+    + '<div class="implist">' + im.itens.map(function(x, i){ return '<label class="impit' + (x.dup ? " dup" : "") + '"><input type="checkbox" data-impsel="' + i + '"' + (x.sel ? " checked" : "") + '><span><b>' + esc(x.nome) + '</b><small>' + esc(x.zap || "sem número") + (x.funcao ? " · " + esc(x.funcao) : "") + (x.dup ? " · já existe" : "") + '</small></span></label>'; }).join("") + '</div>'
+    + '<button class="bprim" data-b="impSalvar"' + (sel ? "" : " disabled") + '>📥 Importar ' + sel + ' contato(s)</button><button class="desfazer" data-b="impVoltar">‹ Escolher outra forma</button>';
+  return h + '</div>';
+}
+var impIn = document.createElement("input"); impIn.type = "file"; impIn.accept = ".vcf,text/vcard,text/x-vcard,text/directory"; impIn.hidden = true; document.body.appendChild(impIn);
+impIn.addEventListener("change", function(){ var f = impIn.files && impIn.files[0]; if (!f) return; var fr = new FileReader(); fr.onload = function(){ prepararImport(lerVcf(fr.result), "vcf"); }; fr.readAsText(f); impIn.value = ""; });
+$("view").addEventListener("change", function(e){
+  if (e.target.dataset && e.target.dataset.impsel != null && S.imp){ S.imp.itens[+e.target.dataset.impsel].sel = e.target.checked; render(); }
+  if (e.target.id === "impArea" && S.imp) S.imp.area = e.target.value;
+});
+$("view").addEventListener("click", function(e){
+  var b = e.target.closest("[data-b]"); if (!b) return;
+  var a = b.dataset.b;
+  if (a === "impAbrir"){ S.imp = {}; render(); window.scrollTo({top:0, behavior:"smooth"}); return; }
+  if (a === "impFechar"){ S.imp = null; render(); return; }
+  if (a === "impVoltar"){ S.imp = {}; render(); return; }
+  if (a === "impVcf"){ impIn.click(); return; }
+  if (a === "impColar"){ S.imp = {colar:true}; render(); setTimeout(function(){ if ($("impTx")) $("impTx").focus(); }, 50); return; }
+  if (a === "impLerTx"){ prepararImport(lerListaTexto($("impTx").value), "lista"); return; }
+  if (a === "impAgenda"){
+    navigator.contacts.select(["name", "tel"], {multiple:true}).then(function(r){ prepararImport((r || []).map(function(c){ return {nome:(c.name || [])[0] || "", zap:(c.tel || [])[0] || ""}; }), "agenda"); }).catch(function(){ toast("Não consegui abrir a agenda."); });
+    return;
+  }
+  if (a === "impTodos" || a === "impNenhum"){ S.imp.itens.forEach(function(x){ x.sel = a === "impTodos"; }); render(); return; }
+  if (a === "impSalvar"){
+    var area = $("impArea") ? $("impArea").value : S.imp.area, L = S.imp.itens.filter(function(x){ return x.sel; }), base0 = Date.now();
+    L.forEach(function(x, i){ var id = "c" + (base0 + i).toString(36); S.contatos[id] = {nome:x.nome, zap:x.zap, funcao:x.funcao, objetivo:"", area:area, status:"potencial", prio:false, criado:agoraStamp()}; gravar("contatos", id, S.contatos[id]); });
+    S.imp = null; S.area = area; SOM.play("meta"); toast("📥 " + L.length + " contato(s) importado(s)"); render(); return;
+  }
+});
+
+/* ===== abertura estilo matriz: códigos descendo + "VOCÊ VENCEU!" ===== */
+function introMatrix(){
+  var reduz = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var wrap = document.createElement("div"); wrap.className = "mtx"; wrap.setAttribute("role", "status");
+  var cv = document.createElement("canvas"); wrap.appendChild(cv);
+  var msg = document.createElement("div"); msg.className = "mtxmsg"; msg.innerHTML = '<p class="l1"></p><p class="l2"></p><small>toque para entrar</small>'; wrap.appendChild(msg);
+  document.body.appendChild(wrap);
+  var ctx = cv.getContext("2d"), dpr = Math.min(window.devicePixelRatio || 1, 2), W, H, fs, cols, gotas;
+  function tam(){ W = window.innerWidth; H = window.innerHeight; cv.width = W * dpr; cv.height = H * dpr; cv.style.width = W + "px"; cv.style.height = H + "px"; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    fs = W < 500 ? 15 : 18; cols = Math.ceil(W / fs); gotas = []; for (var i = 0; i < cols; i++) gotas.push(Math.random() * -H / fs); ctx.fillStyle = "#000"; ctx.fillRect(0, 0, W, H); }
+  tam(); window.addEventListener("resize", tam);
+  var CH = "01VICTORPEDROSA23456789ABCDEFGHJKLMNQRSUWXYZ$#@%&*+=<>{}[]", t0 = performance.now(), fim = false, raf;
+  function quadro(now){
+    var el = now - t0;
+    ctx.fillStyle = "rgba(0,0,0,0.075)"; ctx.fillRect(0, 0, W, H);
+    ctx.font = "700 " + fs + "px ui-monospace, Menlo, Consolas, monospace";
+    for (var i = 0; i < cols; i++){
+      var y = gotas[i] * fs, c = CH.charAt(Math.floor(Math.random() * CH.length));
+      ctx.fillStyle = Math.random() < 0.08 ? "#E9FFE9" : (el > 2200 && Math.random() < 0.25 ? "#F5C518" : "#22FF66");
+      ctx.fillText(c, i * fs, y);
+      if (y > H && Math.random() > 0.975) gotas[i] = 0; else gotas[i] += el > 2200 ? 1.3 : 1;
+    }
+    if (!fim){ if (Math.random() < (el > 2200 ? .55 : .35)) { try { SOM.play("tick"); } catch(e){} } raf = requestAnimationFrame(quadro); }
+  }
+  function decifra(el, alvo, ms, depois){
+    var ini = performance.now(), L = "01ABCDEFGHIJKLMNOPQRSTUVWXYZ#$%&";
+    (function passo(now){ var k = Math.min(1, (now - ini) / ms), n = Math.floor(alvo.length * k), s = alvo.slice(0, n);
+      for (var j = n; j < alvo.length; j++) s += alvo[j] === " " ? " " : L.charAt(Math.floor(Math.random() * L.length));
+      if (n !== el.__n){ el.__n = n; try { SOM.play("bip"); } catch(e){} } el.textContent = s; if (k < 1) requestAnimationFrame(passo); else if (depois) depois(); })(ini);
+  }
+  function sair(){ if (fim) return; fim = true; cancelAnimationFrame(raf); wrap.classList.add("sai"); setTimeout(function(){ wrap.remove(); window.removeEventListener("resize", tam); }, 500); }
+  wrap.addEventListener("click", sair);
+  try { SOM.play("matriz"); } catch(e){}
+  if (reduz){ msg.querySelector(".l1").textContent = "FINALIZADO COM SUCESSO!"; msg.querySelector(".l2").textContent = "VOCÊ VENCEU!"; msg.classList.add("on"); setTimeout(sair, 1800); return; }
+  raf = requestAnimationFrame(quadro);
+  setTimeout(function(){ msg.classList.add("on"); decifra(msg.querySelector(".l1"), "FINALIZADO COM SUCESSO!", 900, function(){ decifra(msg.querySelector(".l2"), "VOCÊ VENCEU!", 700, function(){ try { SOM.play("meta"); } catch(e){} msg.classList.add("venceu"); }); }); }, 1100);
+  setTimeout(sair, 5200);
+}
 
 /* ===== alertas na hora ===== */
 function checarAlertas(){
@@ -1286,10 +1436,11 @@ function pedirPin(msg){
 $("pinOk").addEventListener("click", function(){
   var p = $("pinIn").value.trim(); if (!p) return;
   $("pinMsg").textContent = "Conferindo…";
-  PIN = p; apiRun("maCarregar").then(function(){ try { localStorage.setItem("ma_pin", p); } catch(e){} $("pinBox").hidden = true; SOM.play("meta"); toast("Bem-vindo, Victor!"); carregarNuvem(); })
+  PIN = p; apiRun("maCarregar").then(function(){ try { localStorage.setItem("ma_pin", p); } catch(e){} $("pinBox").hidden = true; window.__semPin = false; introMatrix(); carregarNuvem(); })
     .catch(function(e){ PIN = ""; SOM.play("erro"); $("pinMsg").textContent = /PIN/.test(e.message) ? "Senha incorreta. Tente de novo." : "Sem internet. Tente de novo."; });
 });
 $("pinPular").addEventListener("click", function(){ $("pinBox").hidden = true; $("estado").textContent = "Salvando só neste celular."; });
+window.__semPin = !PIN;
 $("bora").addEventListener("click", function(){ if (!PIN) setTimeout(function(){ pedirPin(); }, 500); });
 carregarNuvem();
 setInterval(function(){ if (!document.hidden && PIN && !Object.keys(gravando).some(function(k){ return gravando[k]; })) carregarNuvem(); }, 120000);
