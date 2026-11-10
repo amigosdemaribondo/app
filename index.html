@@ -360,7 +360,25 @@ body.bloq .wrap,body.bloq #podBar{display:none!important}
 .gload{position:fixed;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(6,16,42,.72);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
 .gload[hidden]{display:none}
 .gload b{font-size:17px}
-.amp{width:72px;height:108px;animation:vira 2.6s ease-in-out infinite}
+.maoBox{position:relative;display:flex;align-items:center;gap:14px}
+.mao{width:110px;height:138px;animation:balanca 3s ease-in-out infinite;transform-origin:50% 90%}
+.mao .dedo{transform-box:fill-box;transform-origin:50% 100%;animation:3s ease-in-out infinite}
+.mao .d2{animation-name:sobe1}.mao .d3{animation-name:sobe2d}.mao .d4{animation-name:sobe3}.mao .d5{animation-name:sobe4}.mao .d1{animation-name:sobe5}
+@keyframes sobe1{0%,4%{transform:scaleY(.35)}12%,92%{transform:scaleY(1)}100%{transform:scaleY(.35)}}
+@keyframes sobe2d{0%,20%{transform:scaleY(.35)}28%,92%{transform:scaleY(1)}100%{transform:scaleY(.35)}}
+@keyframes sobe3{0%,36%{transform:scaleY(.35)}44%,92%{transform:scaleY(1)}100%{transform:scaleY(.35)}}
+@keyframes sobe4{0%,52%{transform:scaleY(.35)}60%,92%{transform:scaleY(1)}100%{transform:scaleY(.35)}}
+@keyframes sobe5{0%,68%{transform:scaleY(.4)}76%,92%{transform:scaleY(1)}100%{transform:scaleY(.4)}}
+@keyframes balanca{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+.conta{position:relative;width:54px;height:64px;font-family:var(--f-display);font-weight:800;font-size:58px;color:#FFD43E;line-height:64px}
+.conta span{position:absolute;inset:0;text-align:center;opacity:0;animation:3s linear infinite}
+.conta span:nth-child(1){animation-name:n1}.conta span:nth-child(2){animation-name:n2}.conta span:nth-child(3){animation-name:n3}.conta span:nth-child(4){animation-name:n4}.conta span:nth-child(5){animation-name:n5}
+@keyframes n1{0%,5%{opacity:0;transform:scale(.6)}8%,20%{opacity:1;transform:scale(1)}23%,100%{opacity:0}}
+@keyframes n2{0%,21%{opacity:0;transform:scale(.6)}24%,36%{opacity:1;transform:scale(1)}39%,100%{opacity:0}}
+@keyframes n3{0%,37%{opacity:0;transform:scale(.6)}40%,52%{opacity:1;transform:scale(1)}55%,100%{opacity:0}}
+@keyframes n4{0%,53%{opacity:0;transform:scale(.6)}56%,68%{opacity:1;transform:scale(1)}71%,100%{opacity:0}}
+@keyframes n5{0%,69%{opacity:0;transform:scale(.6)}72%,94%{opacity:1;transform:scale(1.15)}100%{opacity:0}}
+@media (prefers-reduced-motion:reduce){.mao,.mao .dedo,.conta span{animation:none}.mao .dedo{transform:none}.conta span:nth-child(5){opacity:1}}
 .amp .aT{animation:desce 2.6s linear infinite}
 .amp .aB{animation:sobe2 2.6s linear infinite}
 .amp .fio{animation:cai .5s linear infinite}
@@ -427,6 +445,21 @@ a.lnk,.lnk{color:#FFE27A}
 
 /* pontos e metas */
 .metabox{display:grid;grid-template-columns:1fr;gap:10px}
+.metabox.fechado{display:none}
+.metabox.abrindo{animation:entra .3s ease-out both}
+.topoDia{display:flex;align-items:center;gap:10px}
+.topoDia .days{flex:1 1 auto;min-width:0}
+.miniMeta{flex:0 0 auto;display:flex;align-items:center;gap:8px;border:1.5px solid rgba(255,255,255,.22);background:var(--surface);border-radius:16px;padding:5px 10px 5px 5px;color:var(--ink);text-align:left}
+.miniMeta[hidden]{display:none}
+.miniMeta svg{width:54px;height:54px;flex:0 0 auto}
+.miniMeta .mtx{display:flex;flex-direction:column;line-height:1.1}
+.miniMeta .mtx b{font-family:var(--f-display);font-size:20px}
+.miniMeta .mtx small{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.miniMeta .mtx em{font-style:normal;font-size:11px;color:var(--accent);font-weight:800}
+.miniMeta[aria-expanded="true"]{border-color:var(--accent)}
+.passos2{display:flex;flex-wrap:wrap;gap:6px}
+.passos2 span{display:inline-flex;align-items:center;gap:6px;background:var(--sunk);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:700}
+.passos2 i{font-style:normal}
 .metabox:empty{display:none}
 .mcard{background:var(--surface);border:1.5px solid rgba(255,255,255,.18);border-radius:18px;padding:14px;display:flex;gap:14px;align-items:center;box-shadow:0 4px 14px rgba(8,26,70,.18)}
 .mring{position:relative;width:104px;height:104px;flex:none}
@@ -500,15 +533,21 @@ a.lnk,.lnk{color:#FFE27A}
     <p id="gMsg" role="alert"></p>
   </div>
   <div class="gload" id="gLoad" hidden>
-    <svg class="amp" viewBox="0 0 64 96" aria-hidden="true">
-      <defs><clipPath id="ampT"><path d="M17 10h30c0 17-11 27-15 35-4-8-15-18-15-35z"/></clipPath><clipPath id="ampB"><path d="M32 51c4 8 15 18 15 35H17c0-17 11-27 15-35z"/></clipPath></defs>
-      <rect class="aT" clip-path="url(#ampT)" x="10" y="10" width="44" height="38" fill="#FFD43E"/>
-      <rect class="aB" clip-path="url(#ampB)" x="10" y="50" width="44" height="38" fill="#FFD43E"/>
-      <line class="fio" x1="32" y1="44" x2="32" y2="86" stroke="#FFD43E" stroke-width="2.5" stroke-dasharray="3 5"/>
-      <path d="M13 7c0 22 15 31 15 41S13 67 13 89h38c0-22-15-31-15-41s15-19 15-41z" fill="none" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
-      <path d="M8 5h48M8 91h48" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
-    </svg>
-    <b id="gLoadTx">Preparando o seu dia…</b>
+    <div class="maoBox" aria-hidden="true">
+      <svg class="mao" viewBox="0 0 120 150">
+        <g fill="#F2B98A" stroke="#7A4A2A" stroke-width="2.5" stroke-linejoin="round">
+          <rect class="dedo d1" x="14" y="62" width="20" height="44" rx="10" transform="rotate(-28 24 104)"/>
+          <rect class="dedo d2" x="32" y="18" width="18" height="70" rx="9"/>
+          <rect class="dedo d3" x="52" y="10" width="18" height="78" rx="9"/>
+          <rect class="dedo d4" x="72" y="16" width="18" height="72" rx="9"/>
+          <rect class="dedo d5" x="91" y="32" width="16" height="58" rx="8"/>
+          <path d="M28 80h82v30c0 22-18 36-40 36h-6c-20 0-36-14-36-34z"/>
+        </g>
+        <path d="M58 132q8 5 16 0" stroke="#7A4A2A" stroke-width="2" fill="none" stroke-linecap="round" opacity=".5"/>
+      </svg>
+      <div class="conta"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+    </div>
+    <b id="gLoadTx">Freitas tá contando nos dedos… já já entra! 🖐️</b>
   </div>
 </div>
 <div class="wrap">
@@ -521,20 +560,19 @@ a.lnk,.lnk{color:#FFE27A}
     <input id="pinIn" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN">
     <button class="btn primary" id="pinOk">Entrar</button>
   </div>
-  <div class="days" id="days" role="group" aria-label="Dias"></div>
-  <div class="expd"><div class="expd-h"><b>Todo dia</b><span class="tnum">08h–12h · 14h–18h</span></div>
-    <ol class="passos">
-      <li><i>⏱</i><span><b>Bater o ponto</b> na entrada e na saída de cada turno</span></li>
-      <li><i>✅</i><span><b>Iniciar e concluir</b> as atividades do dia</span></li>
-      <li><i>📲</i><span><b>Usar o app</b> para tudo da ONG</span></li>
-    </ol></div>
+  <div class="topoDia">
+    <div class="days" id="days" role="group" aria-label="Dias"></div>
+    <button type="button" class="miniMeta" id="miniMeta" hidden aria-expanded="false" aria-controls="metaBox"></button>
+  </div>
+  <div id="metaBox" class="metabox fechado"></div>
+  <div id="ativaBox"></div>
   <div class="sum">
     <div class="stat"><div class="n tnum" id="sDone">–</div><div class="l">tarefas concluídas</div><div class="bar"><i id="sBar" style="width:0"></i></div></div>
     <div class="stat"><div class="n tnum" id="sLive">–</div><div class="l">iniciadas agora</div></div>
     <div class="stat"><div class="n tnum" id="sPonto">–</div><div class="l" id="sPontoL">na ONG agora</div></div>
   </div>
-  <div id="ativaBox"></div>
-  <div id="metaBox" class="metabox"></div>
+  <div class="expd"><div class="expd-h"><b>Todo dia</b><span class="tnum">08h–12h · 14h–18h</span></div>
+    <div class="passos2"><span><i>⏱</i>Ponto na entrada e saída</span><span><i>✅</i>Iniciar e concluir atividades</span><span><i>📲</i>Tudo pelo app</span></div></div>
   <div id="galBox"></div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-v="dia"><i aria-hidden="true">📋</i>Dia</button>
@@ -637,6 +675,7 @@ $("gPin").addEventListener("keydown", function(e){ if (e.key === "Enter") entrar
 setTimeout(gateAtualiza, 0);
 function render(){
   gateAtualiza();
+  try { renderMiniMeta(); } catch(e){}
   var d = S.data; if (!d) return;
   renderAtiva();
   if (!$("metaBox").innerHTML && S_PTS) renderMeta();
@@ -1301,7 +1340,22 @@ function anelSelos(pct, selos, rot, tam){
   var chips = SELO_ORD.map(function(k){ var n = selos[k] || 0; return n ? '<span class="sc" style="--c:' + SELO_COR[k] + '"><i>' + SELO[k][0] + '</i>' + SELO[k][1] + ' <b>×' + n + '</b></span>' : ''; }).join("");
   return {html:'<div class="aring' + (pct >= 100 ? " full" : "") + '" id="' + uid + '" style="width:' + tam + 'px;height:' + tam + 'px"><svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="' + R + '" fill="none" stroke="rgba(255,255,255,.13)" stroke-width="11"/>' + segs + '</svg>' + icones + '<div class="ctr"><b class="pc tnum">0%</b><small>' + rot + '</small></div>' + (pct >= 100 ? '<span class="coroa">🏆</span>' : '') + '</div>', chips:chips};
 }
+var S_METAOPEN = false;
+function renderMiniMeta(){
+  var b = $("miniMeta"); if (!b) return; var r = S_PTS;
+  if (!r || !logged()){ b.hidden = true; return; }
+  var meu = r.eu && r.eu.meta, pct = meu ? r.eu.pct : ((r.equipe || {}).pct || 0), C = 2 * Math.PI * 21, ok = pct >= 100;
+  var cor = ok ? "#3BE38A" : "#FFD23F";
+  b.hidden = false; b.setAttribute("aria-expanded", S_METAOPEN);
+  b.setAttribute("aria-label", (meu ? "Minha meta da semana: " : "Meta da equipe: ") + pct + "%. Toque para ver os detalhes.");
+  b.innerHTML = '<svg viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="21" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="7"/>'
+    + '<circle cx="27" cy="27" r="21" fill="none" stroke="' + cor + '" stroke-width="7" stroke-linecap="round" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - Math.min(100, pct) / 100)).toFixed(1) + '" transform="rotate(-90 27 27)" style="transition:stroke-dashoffset 1s ease"/>'
+    + '<text x="27" y="33" text-anchor="middle" font-size="17">' + (ok ? "🏆" : "🎯") + '</text></svg>'
+    + '<span class="mtx"><small>' + (meu ? "Minha meta" : "Equipe") + '</small><b class="tnum">' + pct + '%</b><em>' + (S_METAOPEN ? "fechar ▴" : "ver ▾") + '</em></span>';
+}
+$("miniMeta").addEventListener("click", function(){ S_METAOPEN = !S_METAOPEN; var m = $("metaBox"); m.classList.toggle("fechado", !S_METAOPEN); if (S_METAOPEN){ m.classList.remove("abrindo"); void m.offsetWidth; m.classList.add("abrindo"); renderMeta(); } renderMiniMeta(); });
 function renderMeta(){
+  renderMiniMeta();
   var box = $("metaBox"); if (!box) return;
   var r = S_PTS; if (!r){ box.innerHTML = ""; return; }
   var h = "", eq = r.equipe || {pct:0, checks:0, selos:{}};
@@ -2340,7 +2394,7 @@ setInterval(function(){
 var S_FOLHA = null, S_FOLHA_LOAD = false;
 function gestaoExtras(){
   var c = cfg(), d = S.data, h = "";
-  h += '<div class="gsec"><h2>🔊 Narração do app</h2><p class="sub">Toque para ouvir a voz gravada (Pedro). Se aparecer erro, ele diz o que falta.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn primary" data-x="vozTeste" data-k="g1">▶ Abertura</button><button class="btn" data-x="vozTeste" data-k="b1">▶ Meta batida</button><button class="btn" data-x="vozTeste" data-k="a1">▶ Alerta</button></div>' + (VOZ_ERRO ? '<p class="sub" style="color:var(--bad)">⚠️ ' + esc(VOZ_ERRO) + '</p>' : '') + '</div>';
+  h += '<div class="gsec"><h2>🔊 Narração do app</h2><p class="sub">Toque para ouvir a voz gravada (Pedro). Se aparecer erro, ele diz o que falta.</p><div class="row" style="gap:8px;flex-wrap:wrap"><button class="btn primary" data-x="vozTeste" data-k="g1">▶ Abertura</button><button class="btn" data-x="vozTeste" data-k="b1">▶ Meta batida</button><button class="btn" data-x="vozTeste" data-k="a1">▶ Alerta</button></div>' + (VOZ_ERRO ? '<p class="sub" style="color:' + (/^Formato/.test(VOZ_ERRO) ? 'var(--muted)' : 'var(--bad)') + '">' + (/^Formato/.test(VOZ_ERRO) ? 'ℹ️ ' : '⚠️ ') + esc(VOZ_ERRO) + '</p>' : '') + '</div>';
   // engajamento da semana
   var eng = (S_PTS && S_PTS.engajamento) || [], T = c.engTipos || {};
   h += '<div class="gsec"><h2>📣 Engajamento da semana (' + eng.length + ')</h2>' + (eng.length ? '<div class="dlist">' + eng.map(function(x){
@@ -2401,7 +2455,8 @@ document.addEventListener("click", function(ev){
   if (x === "ir"){ S.view = b.dataset.v; try { localStorage.setItem("view", S.view); } catch(e){} render(); window.scrollTo({top: $("view").offsetTop - 80, behavior: "smooth"}); return; }
   if (x === "pod") return tocarPodcast(+b.dataset.i);
   if (x === "vozTeste"){ destravaVoz(); toast("Buscando a narração…");
-    return run("voz", S.me, S.pin, b.dataset.k).then(function(c){ if (!c) throw new Error("Narração não gravada ainda. No Apps Script, rode gerarNarracoes."); return tocaClip(c).then(function(){ toast("🔊 Tocando a voz gravada."); }); })
+    return run("voz", S.me, S.pin, b.dataset.k).then(function(c){ if (!c) throw new Error("Narração não gravada ainda. No Apps Script, rode gerarNarracoes."); if (!c.versao){ VOZ_ERRO = "O Apps Script publicado ainda é antigo (sem a correção do áudio). Faça Implantar → Gerenciar implantações → ✏️ → Nova versão."; toast("⚠️ " + VOZ_ERRO); renderGestao(); return; }
+      VOZ_ERRO = "Formato recebido: " + (c.fmt || "?") + " · servidor v" + c.versao; return tocaClip(c).then(function(){ toast("🔊 Tocando · " + (c.fmt || "")); renderGestao(); }); })
       .catch(function(e){ var m = errMsg(e); if (/desconhecida/i.test(m)) m = "O Apps Script ainda está na versão antiga: faça Implantar → Gerenciar implantações → ✏️ → Nova versão."; VOZ_ERRO = m; toast("⚠️ " + m); }); }
   if (x === "podFecha"){ S_POD = null; podBar(); return; }
   if (x === "galToggle"){ try { localStorage.setItem("galOff", galOff() ? "0" : "1"); } catch(e){} GAL_K = ""; renderGalBox(); if (S.view === "galeria") render(); return; }
@@ -2452,7 +2507,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611100643";
+var APP_VERSAO = "202611100706";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
