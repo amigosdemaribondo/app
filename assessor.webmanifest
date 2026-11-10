@@ -1,0 +1,17 @@
+{
+ "name": "Meu Assessor",
+ "short_name": "Meu Assessor",
+ "start_url": "./assessor.html",
+ "scope": "./",
+ "display": "standalone",
+ "background_color": "#04060B",
+ "theme_color": "#04060B",
+ "icons": [
+  {
+   "src": "assessor-icone.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any maskable"
+  }
+ ]
+}
