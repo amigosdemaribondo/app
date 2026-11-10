@@ -204,6 +204,7 @@ td.t.none{color:var(--line)}
 .turnoOk p{margin:0 0 16px;color:#334}
 .turnoOk button{border:none;background:#2459B8;color:#fff;font:inherit;font-weight:800;font-size:17px;border-radius:999px;padding:12px 28px}
 @keyframes pulo{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
+.btn.semRef{border-color:#FFD23F;color:#FFD23F}
 .impRes{background:var(--bg);border-radius:10px;padding:8px 10px;font-size:13.5px}
 .impRes p{margin:4px 0}
 .envOv{position:fixed;inset:0;z-index:997;background:rgba(6,15,38,.7);display:flex;align-items:flex-end;justify-content:center}
@@ -445,6 +446,15 @@ body.bloq .wrap,body.bloq #podBar{display:none!important}
 #gTroca{border:0;background:none;color:#C9D6F2;font:inherit;font-size:14px;text-decoration:underline;padding:8px}
 .gstep{display:flex;flex-direction:column;gap:10px}
 .gstep[hidden]{display:none}
+.naongBt{background:#FFD23F!important;color:#1B1400!important;border-color:#FFD23F!important;font-weight:900;animation:pulsaNa 1.6s ease-in-out infinite}
+@keyframes pulsaNa{0%,100%{box-shadow:0 0 0 0 rgb(255 210 63 / .55)}50%{box-shadow:0 0 0 10px rgb(255 210 63 / 0)}}
+.naongLista{display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:rgba(47,208,122,.12);border:1px solid rgba(47,208,122,.45);border-radius:12px;padding:8px 10px;margin-bottom:10px;font-size:13px}
+.naongLista b{width:100%;font-size:13px}
+.naongLista span{background:rgba(255,255,255,.1);border-radius:999px;padding:3px 10px}
+.naongLista i{font-style:normal;opacity:.75;font-size:12px}
+.naongLista .vz{background:none;opacity:.75}
+#gForcar{border:1.5px solid rgba(255,255,255,.45);background:transparent;color:#fff;border-radius:999px;font:inherit;font-weight:700;font-size:14px;padding:10px}
+#gForcar[hidden]{display:none}
 .btn.selfiePt{background:#2FD07A;border-color:#2FD07A;color:#03140A}
 #gOk{margin-top:8px;border:none;border-radius:999px;background:#FFD43E;color:#0A1A3F;font:inherit;font-weight:800;font-size:18px;padding:16px}
 #gMsg{margin:4px 0 0;min-height:1.2em;color:#FFB4B4;font-weight:700;text-align:center}
@@ -653,6 +663,7 @@ a.lnk,.lnk{color:#FFE27A}
     <p class="gsub">Para entrar, tire uma selfie. Ela fica salva e já vale como a foto do seu ponto.</p>
     <label id="gSfBt" for="selfieIn">📸 Tirar selfie e entrar</label>
     <input type="file" id="selfieIn" accept="image/*" capture="user" hidden>
+    <button id="gForcar" type="button" hidden>Entrar mesmo assim (a coordenação vai conferir a foto)</button>
     <button id="gTroca" type="button">Não é você? Trocar de pessoa</button>
     </div>
     <p id="gMsg" role="alert"></p>
@@ -753,7 +764,8 @@ function renderAtiva(){
   if (!logged()){ box.innerHTML = ""; return; }
   var d = S.data, locOk = S_LOC === "ok", waOk = !!d.meuWhats;
   if (document.activeElement && document.activeElement.id === "waIn") return;
-  var h = '<div class="ativa">'
+  var h = (d.naOngLiberado && !S.gestor && S.me !== "teste" ? (naOngConfirmei() ? '<div class="ativa"><button class="ab on naongOk" data-act="estouNaOng"><i>✅</i>Na ONG desde ' + esc(((d.naOngLista || []).filter(function(c){ return c.pessoa === S.me; })[0] || {}).hora || "") + '</button></div>' : '<div class="ativa"><button class="ab naongBt" data-act="estouNaOng"><i>📍</i>Estou na ONG</button></div>') : '')
+    + '<div class="ativa">'
     + (locOk ? '<button class="ab on" data-act="loc"><i>📍</i>Localização ativa ✓</button>'
              : '<button class="ab" data-act="loc"><i>📍</i>' + (S_LOC === "checando" ? "Verificando…" : "Ativar localização") + '</button>')
     + (waOk ? '<button class="ab on" data-act="waEdit"><i>💬</i>WhatsApp ativo ✓<br>…' + esc(String(d.meuWhats).slice(-4)) + '</button>'
@@ -811,12 +823,10 @@ $("gOk").addEventListener("click", entrarGate);
 $("selfieIn").addEventListener("change", function(ev){
   var f = ev.target.files && ev.target.files[0]; ev.target.value = ""; if (!f || !logged()) return;
   $("gMsg").textContent = ""; $("gLoad").hidden = false;
-  shrink(f).then(function(b64){ if (!b64) throw new Error("Não consegui ler a foto. Tente de novo."); return run("selfieLogin", S.me, S.pin, b64); })
-    .then(function(r){ try { localStorage.setItem("selfie_" + S.me, JSON.stringify({id: r.id, ms: Date.now(), dia: r.dia, hora: r.hora, usada: false})); } catch(e){}
-      return Promise.race([load(null, true), new Promise(function(ok){ setTimeout(ok, 6000); })]); })
-    .then(function(){ fecharGate(); toast("📸 Selfie salva. No Ponto, é só tocar em ✅ Bater ponto com a selfie."); })
-    .catch(function(e){ $("gLoad").hidden = true; $("gMsg").textContent = errMsg(e); try { SOM.play("erro"); } catch(x){} });
+  shrink(f).then(function(b64){ if (!b64) throw new Error("Não consegui ler a foto. Tente de novo."); return enviarSelfie(b64, false); })
+    .catch(function(e){ $("gLoad").hidden = true; $("gMsg").textContent = errMsg(e); });
 });
+$("gForcar").addEventListener("click", function(){ if (S_SELF.ultimo) enviarSelfie(S_SELF.ultimo, true); });
 $("gTroca").addEventListener("click", function(){ $("sair").click(); });
 $("gPin").addEventListener("keydown", function(e){ if (e.key === "Enter") entrarGate(); });
 setTimeout(gateAtualiza, 0);
@@ -871,7 +881,7 @@ function renderDia(mine){
   var pendAv = avisosPendentes();
   if (pendAv.length) topoG = '<button class="alert avPend" data-act="irAvisos"><b>🔔 '+pendAv.length+' aviso'+(pendAv.length>1?'s':'')+' para confirmar</b><span>'+esc(pendAv[0].texto)+'</span><span>Toque aqui e confirme que viu. 👍</span></button>' + topoG;
   var semFoto = conc.filter(semFotoTar).filter(function(b){ return !mine || b.pessoas.indexOf(S.me) >= 0; });
-  var out = topoG + '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
+  var out = naOngListaHtml() + topoG + '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
     + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>No horário</button>'
     + '<button class="dcc" data-act="diatab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+conc.length+'</b>Concluídas</button>'
     + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Não respondidas</button></div>';
@@ -1065,17 +1075,19 @@ function renderPonto(){
     h += '<div class="bigt tnum">'+esc(d.agora)+'<small>horário do servidor</small></div>';
     var locOff = S_LOC !== "ok" && !locLivre();
     if (isToday && S_LOC === "") setTimeout(checarLocal, 0);
-    if (isToday) h += locBox() + '<input type="file" id="fotoIn" accept="image/*" capture="user" hidden>';
+    if (isToday) h += naOngListaHtml() + locBox() + '<input type="file" id="fotoIn" accept="image/*" capture="user" hidden>';
     if (!isToday) h += '<span class="when">O ponto só pode ser registrado hoje. Toque em "hoje" no topo.</span>';
     else if (S.busy) h += '<button class="btn primary big" disabled>Enviando…</button>';
     else if (!me.dentro){
       var sfE = selfieInfo();
-      if (sfE && !sfE.usada) h += '<button class="btn big selfiePt'+(locOff?' off':'')+'" data-act="pontoSelfie">✅ Bater ponto com a selfie do login ('+esc(sfE.hora)+')</button>';
+      if (sfE && sfE.usada === undefined) sfE.usada = false;
+      if (sfE && !sfE.usada && !d.naOngLiberado && !sfE.naOng && !S.gestor) h += '<p class="when">📍 Sua selfie do login foi tirada fora da ONG, então não vale para o ponto. Tire a foto aqui na ONG.</p>';
+      if (sfE && !sfE.usada && (d.naOngLiberado || sfE.naOng || S.gestor)) h += '<button class="btn big selfiePt'+(locOff?' off':'')+'" data-act="pontoSelfie">✅ Bater ponto com a selfie do login ('+esc(sfE.hora)+')</button>';
       h += '<label class="btn '+(sfE && !sfE.usada ? '' : 'primary ')+'big'+(locOff?' off':'')+'" for="fotoIn" data-saida="">📷 '+(sfE && !sfE.usada ? 'Tirar outra foto e registrar entrada' : 'Tirar foto e registrar entrada')+'</label>';
     } else {
       if (me.podeSairSemMotivo && !S_MOT.aberto){
         var sfS = selfieInfo();
-        if (sfS && !sfS.usada) h += '<button class="btn big selfiePt'+(locOff?' off':'')+'" data-act="pontoSelfie">✅ Saída com a selfie do login ('+esc(sfS.hora)+')</button>';
+        if (sfS && !sfS.usada && (d.naOngLiberado || sfS.naOng || S.gestor)) h += '<button class="btn big selfiePt'+(locOff?' off':'')+'" data-act="pontoSelfie">✅ Saída com a selfie do login ('+esc(sfS.hora)+')</button>';
         h += '<label class="btn primary big'+(locOff?' off':'')+'" for="fotoIn" data-saida="normal">📷 '+(me.saidaEhIntervalo?"Foto e saída · intervalo (volta às "+esc(me.volta)+")":"Foto e saída · fim do expediente")+'</label>';
         if (me.saidaEhIntervalo) h += '<button class="btn" data-act="motivo">Outra saída (externa ou emergência)</button>';
       } else {
@@ -1433,6 +1445,106 @@ $("view").addEventListener("input", function(ev){
   Array.prototype.forEach.call(document.querySelectorAll(".pglist .pgrow"), function(row){ row.hidden = q && row.dataset.nome.indexOf(q) < 0; });
 });
 
+
+
+/* ================= v44 · "Estou na ONG" (até sexta 08h) e conferência do rosto ================= */
+function naOngConfirmei(){ var d = S.data; return !!(d && (d.naOngLista || []).some(function(c){ return c.pessoa === S.me; })); }
+function precisaConfirmar(){ var d = S.data; return !!(d && d.naOngLiberado && logged() && !S.gestor && S.me !== "teste" && !naOngConfirmei()); }
+function avisoConfirmar(){ toast("📍 Primeiro toque em \"Estou na ONG\" (no topo). Ponto e atividades só valem dentro da ONG."); try { SOM.play("nao"); } catch(e){} }
+function naOngListaHtml(){
+  var d = S.data; if (!d || !d.naOngLiberado || !logged()) return "";
+  var L = d.naOngLista || [];
+  return '<div class="naongLista"><b>📍 Na ONG hoje</b>' + (L.length ? L.map(function(c){ return '<span>' + esc(primeiroNome(pessoa(c.pessoa).nome)) + ' <i>' + esc(c.hora) + '</i></span>'; }).join("") : '<span class="vz">Ninguém confirmou ainda.</span>') + '</div>';
+}
+function estouNaOngAgir(){
+  if (naOngConfirmei()) return toast("✅ Você já confirmou que está na ONG hoje.");
+  S.busy = true; render();
+  return pegarLocal(false).catch(function(){ return null; }).then(function(loc){ return run("estouNaOng", S.me, S.pin, loc ? {lat:loc.lat, lng:loc.lng, acc:loc.acc} : {}); })
+    .then(function(r){ S.data.naOngLista = r.confirmados; SOM.play("ponto"); toast("📍 Confirmado: você está na ONG. A equipe vê na lista."); })
+    .catch(function(e){ toast(errMsg(e)); }).finally(function(){ S.busy = false; render(); });
+}
+/* ---- conferência do rosto: compara a selfie com a foto de referência cadastrada pelo Victor ---- */
+var FACE_BASE = "https://cdn.jsdelivr.net/npm/@vladmandic/face-api@1.7.12/", FACE_P = null;
+function carregaFace(){
+  if (FACE_P) return FACE_P;
+  FACE_P = new Promise(function(ok, no){
+    if (window.faceapi) return ok(window.faceapi);
+    var s = document.createElement("script"); s.src = FACE_BASE + "dist/face-api.js"; s.onload = function(){ window.faceapi ? ok(window.faceapi) : no(new Error("face")); }; s.onerror = function(){ no(new Error("face")); }; document.head.appendChild(s);
+  }).then(function(F){ var M = FACE_BASE + "model/";
+    return Promise.all([F.nets.tinyFaceDetector.loadFromUri(M), F.nets.faceLandmark68TinyNet.loadFromUri(M), F.nets.faceRecognitionNet.loadFromUri(M)]).then(function(){ return F; }); })
+    .catch(function(e){ FACE_P = null; throw e; });
+  return FACE_P;
+}
+function comLimite(p, ms){ return Promise.race([p, new Promise(function(_, no){ setTimeout(function(){ no(new Error("tempo")); }, ms); })]); }
+function imagemDe(src){ return new Promise(function(ok, no){ var i = new Image(); i.onload = function(){ ok(i); }; i.onerror = no; i.src = src; }); }
+function descritorDe(F, src){
+  return imagemDe(src).then(function(im){ return F.detectSingleFace(im, new F.TinyFaceDetectorOptions({inputSize: 416, scoreThreshold: 0.4})).withFaceLandmarks(true).withFaceDescriptor(); })
+    .then(function(r){ return r ? Array.prototype.slice.call(r.descriptor) : null; });
+}
+function refDescritor(F){
+  var v = S.data && S.data.minhaRef; if (!v) return Promise.resolve(null);
+  try { var c = JSON.parse(localStorage.getItem("refDesc_" + S.me) || "null"); if (c && c.v === v && c.d) return Promise.resolve(c.d); } catch(e){}
+  return run("minhaFotoRef", S.me, S.pin).then(function(r){ if (!r.b64) return null; return descritorDe(F, "data:image/jpeg;base64," + r.b64); })
+    .then(function(d){ if (d){ try { localStorage.setItem("refDesc_" + S.me, JSON.stringify({v: v, d: d})); } catch(e){} } return d; });
+}
+/* devolve {st: ok | diferente | sem_rosto | sem_ref | erro, dist} */
+function conferirRosto(b64){
+  if (!(S.data && S.data.minhaRef)) return Promise.resolve({st: "sem_ref"});
+  return comLimite(carregaFace().then(function(F){
+    return refDescritor(F).then(function(ref){
+      if (!ref) return {st: "erro"};
+      return descritorDe(F, "data:image/jpeg;base64," + b64).then(function(d){
+        if (!d) return {st: "sem_rosto"};
+        var s = 0; for (var i = 0; i < d.length; i++) s += (d[i] - ref[i]) * (d[i] - ref[i]); var dist = Math.sqrt(s);
+        return {st: dist < 0.55 ? "ok" : "diferente", dist: dist};
+      });
+    });
+  }), 25000).catch(function(){ return {st: "erro"}; });
+}
+var S_SELF = {tent: 0, ultimo: null};
+function enviarSelfie(b64, forcar){
+  $("gMsg").textContent = ""; $("gLoad").hidden = false; var face, loc;
+  var lt = $("gLoadTx"); if (lt) lt.textContent = S.data && S.data.minhaRef ? "Conferindo seu rosto…" : "Entrando…";
+  return Promise.all([
+    forcar ? Promise.resolve(S_SELF.face || {st: "erro"}) : conferirRosto(b64),
+    comLimite(pegarLocal(false), 9000).catch(function(){ return null; })
+  ]).then(function(rs){
+    face = rs[0]; loc = rs[1]; S_SELF.face = face;
+    if (!forcar && (face.st === "diferente" || face.st === "sem_rosto")){
+      S_SELF.tent++; S_SELF.ultimo = b64;
+      throw new Error((face.st === "sem_rosto" ? "Não encontrei seu rosto na foto." : "O rosto não confere com a sua foto cadastrada.") + " Tire de novo, de frente e com boa luz.");
+    }
+    var info = {face: {st: face.st, dist: face.dist, forcar: !!forcar}}; if (loc){ info.lat = loc.lat; info.lng = loc.lng; info.acc = loc.acc; }
+    return run("selfieLogin", S.me, S.pin, b64, info);
+  }).then(function(r){
+    try { localStorage.setItem("selfie_" + S.me, JSON.stringify({id: r.id, ms: Date.now(), dia: r.dia, hora: r.hora, usada: false, naOng: !!r.naOng, rosto: r.rosto})); } catch(e){}
+    S_SELF = {tent: 0, ultimo: null};
+    return Promise.race([load(null, true), new Promise(function(ok){ setTimeout(ok, 6000); })]).then(function(){
+      fecharGate(); toast(r.rosto === "confere" ? "✅ Rosto confirmado. Bem-vindo(a)!" : "📸 Selfie salva.");
+    });
+  }).catch(function(e){
+    $("gLoad").hidden = true; $("gMsg").textContent = errMsg(e); try { SOM.play("erro"); } catch(x){}
+    var bf = $("gForcar"); if (bf) bf.hidden = !(S_SELF.tent >= 2 && S_SELF.ultimo);
+  });
+}
+/* ---- coordenação: selfies do dia ---- */
+var S_SFH = null;
+function selfiesHojeHtml(){
+  var h = '<div class="gsec"><div class="row" style="justify-content:space-between"><h2>📸 Selfies de hoje</h2><button class="btn" data-g="sfhCarregar">' + (S_SFH ? "Atualizar" : "Ver") + '</button></div><p class="sub">Local (na ONG ou fora) e conferência do rosto com a foto de referência.</p>';
+  if (!S_SFH) return h + '</div>';
+  if (!S_SFH.length) return h + '<p class="sub">Nenhuma selfie hoje.</p></div>';
+  var R = {confere: ["✅ rosto confere", "ok"], nao_confere: ["⚠️ rosto NÃO confere", "bad"], sem_rosto: ["⚠️ sem rosto", "bad"], sem_ref: ["sem foto de referência", "muted"], nao_verificado: ["rosto não verificado", "warn"]};
+  return h + S_SFH.map(function(s){ var r = R[s.rosto] || [s.rosto || "—", "muted"];
+    return '<div class="pgrow"><span class="pgnome"><b>' + esc(s.hora) + ' · ' + esc(s.nome) + '</b><small class="when">' + (s.naOng === "sim" ? "📍 na ONG" : "📍 fora da ONG" + (s.dist ? " (" + esc(s.dist) + " m)" : "")) + (s.usada ? " · ponto: " + esc(s.usada) : "") + '</small></span><span class="row" style="gap:6px"><span class="pill ' + r[1] + '">' + r[0] + '</span><button class="pgb" data-g="sfhVer" data-id="' + esc(s.id) + '" aria-label="Ver selfie">👁</button></span></div>'; }).join("") + '</div>';
+}
+var refIn = document.createElement("input"); refIn.type = "file"; refIn.accept = "image/*"; refIn.hidden = true; document.body.appendChild(refIn); var REF_ALVO = "";
+refIn.addEventListener("change", function(){
+  var f = refIn.files && refIn.files[0]; refIn.value = ""; if (!f || !REF_ALVO) return;
+  toast("Enviando a foto de referência…");
+  shrink(f).then(function(b64){ return run("salvarFotoRef", S.me, S.pin, REF_ALVO, b64); })
+    .then(function(l){ S_CAD = l; renderGestao(); SOM.play("conclui"); toast("📷 Foto de referência de " + pessoa(REF_ALVO).nome + " salva."); })
+    .catch(function(e){ toast(errMsg(e)); });
+});
 
 /* ================= v38 · Cobrar ponto e confirmar avisos ================= */
 var PONTO_RUIM = {nao_chegou:1, faltou:1, falta_saida:1, sem_saida:1, nao_voltou:1};
@@ -2497,10 +2609,12 @@ $("view").addEventListener("click", function(ev){
   var lft = ev.target.closest("label[data-ftar], label[data-ffreq]");
   if (lft){
     if (S.busy || !logged()){ ev.preventDefault(); return; }
+    if (lft.dataset.ftar && !lft.dataset.fc && precisaConfirmar()){ ev.preventDefault(); return avisoConfirmar(); }
     S_FOTOALVO = lft.dataset.ftar ? (lft.dataset.fc ? {tipo:"fotoConc", b:lft.dataset.ftar} : {tipo:"tarefa", b:lft.dataset.ftar}) : {tipo:"freq", b:lft.dataset.ffreq, dia:lft.dataset.dia};
     return;
   }
   var lab = ev.target.closest("label[data-saida]");
+  if (lab && precisaConfirmar()){ ev.preventDefault(); return avisoConfirmar(); }
   if (lab){
     if (S.busy || (S_LOC !== "ok" && !locLivre())){ ev.preventDefault(); if (!S.busy) toast("Ative a localização para registrar o ponto."); return; }
     S_EXTRA = {};
@@ -2515,6 +2629,7 @@ $("view").addEventListener("click", function(ev){
   var btn = ev.target.closest("[data-act]"); if (!btn || btn.disabled || S.busy) return;
   var a = btn.dataset.act;
   if (a === "pontoSelfie"){
+    if (precisaConfirmar()) return avisoConfirmar();
     var sf = selfieInfo(); if (!sf || sf.usada) { render(); return toast("A selfie do login venceu. Tire uma foto."); }
     if (S_LOC !== "ok" && !locLivre()) return toast("Ative a localização para registrar o ponto.");
     S.busy = true; render();
@@ -2589,6 +2704,7 @@ $("view").addEventListener("click", function(ev){
   var texto = "";
   if (a === "suporte"){ texto = ($("supTxt") ? $("supTxt").value : "").trim(); if (texto.length < 3) return toast("Escreva o que você precisa para resolver."); }
   if (a === "prazo") texto = btn.dataset.o;
+  if ((a === "start" || a === "finish" || a === "lista" || a === "foto") && precisaConfirmar()) return avisoConfirmar();
   var precisaLocal = a === "start" || a === "finish" || a === "suporte";
   var pLoc = precisaLocal ? (S.busy = true, render(), pegaLoc()) : Promise.resolve(null);
   pLoc.then(function(loc){
@@ -2791,8 +2907,8 @@ function renderCadastro(){
   if (!S_CAD){ setTimeout(loadCadastro, 0); return h + '<p class="sub">Carregando…</p></div>'; }
   if (S_CADED) return h + cadForm(S_CADED) + '</div>';
   h += '<div class="cad">' + S_CAD.map(function(x){
-    return '<div class="p">'+chip(x.id)+'<span class="when">'+(x.livre?'horário livre':horas(x.cargaMin)+' por semana')+' · '+(x.telefone?'📱 '+esc(x.telefone):'<span style="color:var(--warn)">sem WhatsApp</span>')+(S.data && S.data.dono ? ' · PIN '+esc(x.pin) : '')+'</span><span class="row" style="gap:6px"><button class="btn" data-g="cadEd" data-p="'+esc(x.id)+'">Editar</button>'+(S.data && S.data.dono ? '<button class="btn" data-g="novoPin" data-p="'+esc(x.id)+'">🔑 Novo PIN</button>' : '')+'</span></div>';
-  }).join("") + '</div></div>' + importBox();
+    return '<div class="p">'+chip(x.id)+'<span class="when">'+(x.livre?'horário livre':horas(x.cargaMin)+' por semana')+' · '+(x.telefone?'📱 '+esc(x.telefone):'<span style="color:var(--warn)">sem WhatsApp</span>')+(S.data && S.data.dono ? ' · PIN '+esc(x.pin) : '')+'</span><span class="row" style="gap:6px"><button class="btn" data-g="cadEd" data-p="'+esc(x.id)+'">Editar</button>'+(S.data && S.data.dono ? '<button class="btn" data-g="novoPin" data-p="'+esc(x.id)+'">🔑 Novo PIN</button><button class="btn'+(x.fotoRef?'':' semRef')+'" data-g="fotoRef" data-p="'+esc(x.id)+'">📷 '+(x.fotoRef?'Trocar foto ✓':'Foto do rosto')+'</button>'+(x.fotoRef?'<button class="btn" data-g="verRef" data-p="'+esc(x.id)+'" aria-label="Ver foto de referência">👁</button>':'') : '')+'</span></div>';
+  }).join("") + '</div>' + (S.data && S.data.dono ? '<p class="sub">📷 <b>Foto do rosto:</b> foto de frente de cada colaborador. Na entrada, o app compara a selfie com ela. ' + S_CAD.filter(function(x){ return !x.fotoRef && !x.gestor; }).length + ' sem foto.</p>' : '') + '</div>' + importBox() + selfiesHojeHtml();
   return h;
 }
 function cadForm(c){
@@ -2988,6 +3104,10 @@ $("view").addEventListener("click", function(e){
     var vg = lerEditar(); if (!vg) return;
     return gAct(run("editarTarefa", S.me, S.pin, gd, S_EDT.id, vg), function(d){ S.data = d; S_EDT = null; toast("✏️ Atividade atualizada."); });
   }
+  if (g==="fotoRef"){ REF_ALVO = b.dataset.p; refIn.click(); return; }
+  if (g==="verRef"){ var pr = b.dataset.p; return visPorId("ref_" + pr + "_" + Date.now(), function(){ return run("verFotoRef", S.me, S.pin, pr); }); }
+  if (g==="sfhCarregar"){ return run("selfiesHoje", S.me, S.pin).then(function(l){ S_SFH = l; renderGestao(); }).catch(function(e){ toast(errMsg(e)); }); }
+  if (g==="sfhVer"){ var sid = b.dataset.id; return visPorId("sf_" + sid, function(){ return run("verSelfie", S.me, S.pin, sid); }); }
   if (g==="impOk"){ var Li = parseContatos($("impTxt").value); if (!Li.length) return toast("Cole nome e número, um por linha.");
     S_IMP.busy = true; return gAct(run("importarTelefones", S.me, S.pin, Li), function(r){ S_IMP.res = r; S_IMP.busy = false; S_CAD = null; toast("📲 " + r.atualizados.length + " WhatsApp salvo(s)."); load(null, true); }).finally(function(){ S_IMP.busy = false; }); }
   if (g==="cadNovo"){ S_CADED = {nome:"", telefone:"", livre:false, horarios:[]}; return renderGestao(); }
@@ -3082,6 +3202,7 @@ document.querySelector(".tabs").addEventListener("click", function(e){ var b = e
 $("ativaBox").addEventListener("click", function(ev){
   var btn = ev.target.closest("[data-act]"); if (!btn || S.busy) return;
   var a = btn.dataset.act;
+  if (a === "estouNaOng") return estouNaOngAgir();
   if (a === "loc"){ SOM.play("radar"); if (S_LOC === "ok") toast("📍 Localização ativa. Tudo certo."); return checarLocal(); }
   if (a === "waEdit"){ S_WAEDIT = !S_WAEDIT; renderAtiva(); if (S_WAEDIT && $("waIn")) $("waIn").focus(); return; }
   if (a === "waSalvar"){ var tel = ($("waIn") ? $("waIn").value : "").trim(); if (tel.replace(/\D/g,"").length < 10) return toast("Escreva o WhatsApp com DDD, ex.: 82 99999-9999.");
@@ -3591,7 +3712,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611102207";
+var APP_VERSAO = "202611102225";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
