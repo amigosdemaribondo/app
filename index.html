@@ -9,25 +9,26 @@
 <link rel="apple-touch-icon" href="icone.png">
 <meta name="apple-mobile-web-app-title" content="Gestão do Dia">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#0364D5">
+<meta name="theme-color" content="#2459B8">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700;800&display=swap">
 <style>
 :root{
-  --bg:#F3F5F9; --surface:#FFFFFF; --sunk:#E9EDF4; --ink:#151A24; --muted:#5A6476; --line:#DDE2EB;
-  --accent:#1D4ED8; --ok:#15803D; --ok-bg:#DCFCE7; --warn:#B45309; --warn-bg:#FEF3C7; --bad:#B91C1C; --bad-bg:#FEE2E2;
-  --manha:#D97706; --tarde:#EA580C; --ativ:#4338CA;
+  --bg:#2459B8; --surface:#1A4699; --sunk:#163D85; --ink:#FFFFFF; --muted:#D3E0F8; --line:rgba(255,255,255,.22);
+  --accent:#FFD23F; --ok:#3BE38A; --ok-bg:rgba(59,227,138,.2); --warn:#FFC24D; --warn-bg:rgba(255,194,77,.2); --bad:#FF6B6B; --bad-bg:rgba(255,107,107,.22);
+  --manha:#FFD23F; --tarde:#FFB15C; --ativ:#C9D4FF;
+  color-scheme:dark;
   --f-display:"Bricolage Grotesque","Trebuchet MS",system-ui,sans-serif;
   --f-body:"Figtree",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root{
-  --bg:#0E1117; --surface:#171B24; --sunk:#1F2430; --ink:#E9EDF4; --muted:#9AA3B5; --line:#2A303D;
-  --accent:#7EA2FF; --ok:#4ADE80; --ok-bg:#12301E; --warn:#FBBF24; --warn-bg:#33270C; --bad:#F87171; --bad-bg:#3A1616;
-  --manha:#FBBF24; --tarde:#FB923C; --ativ:#A5B4FC; color-scheme:dark }}
+  --bg:#2459B8; --surface:#1A4699; --sunk:#163D85; --ink:#FFFFFF; --muted:#D3E0F8; --line:rgba(255,255,255,.22);
+  --accent:#FFD23F; --ok:#3BE38A; --ok-bg:rgba(59,227,138,.2); --warn:#FFC24D; --warn-bg:rgba(255,194,77,.2); --bad:#FF6B6B; --bad-bg:rgba(255,107,107,.22);
+  --manha:#FFD23F; --tarde:#FFB15C; --ativ:#C9D4FF; color-scheme:dark }}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
+body{background:radial-gradient(1100px 520px at 50% -180px,#3D74D6 0%,var(--bg) 62%) fixed,var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45}
 .wrap{max-width:760px;margin:0 auto;padding:max(18px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) 96px max(16px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:14px}
 button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:transform .08s ease}
 button:active,.btn:active,a.btn:active,label.btn:active{transform:scale(.96)}
@@ -283,6 +284,19 @@ td.reg span{display:inline-block;margin-right:6px}
 .olist div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:13.5px}
 @media (max-width:420px){.blk{grid-template-columns:44px 1fr;gap:8px}.hora{font-size:16px}.stat .n{font-size:21px}}
 @media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+
+/* tema azul: contraste e ícones amarelos */
+.chip{background:color-mix(in srgb,var(--pc) 38%,var(--surface));color:#fff}
+.btn.fin,.btn.go,.motf .row button[aria-pressed="true"]{color:#082A16}
+.btn.go,.motf .row button[aria-pressed="true"]{color:#3A2600}
+.btn{box-shadow:0 2px 0 rgba(0,0,0,.12)}
+.tabs{background:rgba(10,36,90,.45)}
+.tabs button i{text-shadow:0 1px 0 rgba(0,0,0,.15)}
+.tabs button[aria-selected="true"]{background:var(--accent);color:#1B1400;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.stat,.card2,.gsec,.blk,.task,.sched{box-shadow:0 4px 14px rgba(8,26,70,.18)}
+input::placeholder,textarea::placeholder{color:rgba(255,255,255,.6)}
+input,select,textarea{background:#16408D;color:#fff;border-color:rgba(255,255,255,.25)}
+a.lnk,.lnk{color:#FFE27A}
 </style>
 </head>
 <body>
@@ -1033,7 +1047,8 @@ var SOM = (function(){
     play: function(k){
       try { if (navigator.vibrate && VIB[k]) navigator.vibrate(VIB[k]); } catch(e){}
       if (!on || !SONS[k]) return;
-      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); SONS[k](); } catch(e){}
+      try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch(e){}
+      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); SONS[k](); window.__sons = (window.__sons || 0) + 1; } catch(e){}
     }
   };
 })();
