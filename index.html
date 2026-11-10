@@ -309,7 +309,7 @@ td.t.none{color:var(--line)}
 .podc.agora{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
 .podc .hora{font-family:var(--f-display);font-size:22px;font-weight:800;min-width:64px}
 .podc .info{flex:1 1 160px;display:flex;flex-direction:column;gap:4px;min-width:0}
-.atalhos{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+.atalhos{display:grid;grid-template-columns:repeat(auto-fit,minmax(76px,1fr));gap:6px;margin-top:8px}
 .atalhos .at{display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px solid var(--line);border-radius:12px;padding:8px 4px;background:var(--surface);color:var(--ink);text-decoration:none;font-weight:800;font-size:11.5px;text-align:center;line-height:1.15}
 .atalhos .at i{font-style:normal;font-size:21px}
 .atalhos .at.quente{border-color:var(--accent);background:rgba(255,210,63,.18)}
@@ -370,6 +370,13 @@ body.bloq .wrap,body.bloq #podBar{display:none!important}
 @keyframes sobe2{0%{transform:translateY(38px)}82%,100%{transform:translateY(0)}}
 @keyframes cai{to{stroke-dashoffset:-16}}
 .gate.sai{animation:some .45s ease-in both}
+.alert.faltaSaida{background:var(--bad-bg);border:2px solid var(--bad);color:#fff;display:flex;flex-direction:column;gap:4px;animation:pisca 1.6s ease-in-out infinite}
+.alert.faltaSaida b{font-size:18px}
+@keyframes pisca{0%,100%{box-shadow:0 0 0 0 rgba(255,90,90,.5)}50%{box-shadow:0 0 0 7px rgba(255,90,90,0)}}
+.alert.semFotoAl{background:var(--bad-bg);border:2px solid var(--bad);color:#fff;display:flex;flex-direction:column;gap:4px;margin-bottom:10px}
+.respBox{flex:1 1 100%;display:flex;flex-direction:column;gap:6px;background:var(--sunk);border-radius:12px;padding:10px}
+.respBox textarea{font:inherit;font-size:16px;border-radius:10px;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:10px}
+.respTx{flex:1 1 100%;font-size:13.5px;background:var(--ok-bg);border-radius:10px;padding:6px 10px}
 .gsec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .gsec h2{margin:0;font-family:var(--f-display);font-size:19px;font-weight:800}
 .gsec .sub{margin:0;font-size:13px;color:var(--muted)}
@@ -669,7 +676,7 @@ function render(){
   $("sBar").style.width = bl.length ? (100*done/bl.length)+"%" : "0";
   $("sLive").textContent = live;
   if (d.verTodos){ $("sPonto").textContent = naOng+"/"+d.equipe.length; $("sPontoL").textContent = "na ONG agora"; }
-  else { var mp = d.ponto[S.me] || {}; $("sPonto").textContent = logged() && mp.estado ? (ESTADO[mp.estado]||[""])[0] : "–"; $("sPontoL").textContent = "sua situação"; }
+  else { var mp = d.ponto[S.me] || {}; $("sPonto").textContent = logged() && mp.estado ? (ESTADO[mp.estado]||[""])[0] : "–"; $("sPontoL").textContent = "sua situação"; $("sPonto").style.color = mp.estado === "falta_saida" ? "#FF8A8A" : ""; }
   Array.prototype.forEach.call(document.querySelectorAll(".tabs button"), function(b){ if (b.dataset.v !== "__mais") b.setAttribute("aria-selected", b.dataset.v===S.view); if (ABAS_EXTRA.indexOf(b.dataset.v) >= 0) b.classList.add("extra"); });
   var tb = document.querySelector(".tabs"), abre = S_MAIS || ABAS_EXTRA.indexOf(S.view) >= 0; tb.classList.toggle("aberta", abre); tb.querySelector(".maisBtn").setAttribute("aria-expanded", abre);
   var isG = logged() && S.gestor; $("tabG").hidden = !isG;
@@ -682,27 +689,52 @@ function render(){
     : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
 }
 
+var S_DIATAB = "agora";
+function semFotoTar(b){ var st = S.data.status[b.id] || {}; return st.estado === "concluida" && st.temFotoConclusao === false; }
 function renderDia(mine){
-  var d = S.data, bl = d.tarefas.slice().sort(function(a,b){return a.ordem-b.ordem});
+  var d = S.data, bl = d.tarefas.slice().sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||"") || a.ordem - b.ordem; });
   if (!bl.length) return '<div class="empty"><b>Nenhuma tarefa neste dia</b>O coordenador monta o dia na planilha.</div>';
   if (mine){
     if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN para ver só as suas tarefas.</div>';
     bl = bl.filter(function(b){ return b.pessoas.indexOf(S.me) >= 0; });
     if (!bl.length) return '<div class="empty"><b>Nenhuma tarefa sua neste dia</b>Confira a aba Dia para ver a equipe toda.</div>';
   }
-  var out = "", last = null;
-  bl.forEach(function(b){
+  var estDe = function(b){ return (d.status[b.id] || {}).estado || "pendente"; };
+  var conc = bl.filter(function(b){ return estDe(b) === "concluida"; });
+  var nao = bl.filter(function(b){ return estDe(b) !== "concluida" && (b.vencida || d.dia < d.hoje); });
+  var agora = bl.filter(function(b){ return conc.indexOf(b) < 0 && nao.indexOf(b) < 0; });
+  var tab = S_DIATAB, lista = tab === "concluidas" ? conc : tab === "nao" ? nao : agora;
+  var semFoto = conc.filter(semFotoTar).filter(function(b){ return !mine || b.pessoas.indexOf(S.me) >= 0; });
+  var out = '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
+    + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>Para confirmar</button>'
+    + '<button class="dcc" data-act="diatab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+conc.length+'</b>Concluídas</button>'
+    + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Não confirmadas</button></div>';
+  if (semFoto.length) out += '<div class="alert semFotoAl" role="alert"><b>📷 '+semFoto.length+' atividade'+(semFoto.length>1?'s':'')+' concluída'+(semFoto.length>1?'s':'')+' sem foto</b>'+semFoto.map(function(b){ return esc(b.titulo)+' ('+b.pessoas.map(function(p){ return esc(pessoa(p).nome); }).join(", ")+')'; }).join(" · ")+'<span>Quem fez: abra em <b>Concluídas</b> e toque em <b>📷 Enviar foto</b>.</span></div>';
+  if (!lista.length) return out + '<div class="empty"><b>'+(tab==="agora" ? "🎉 Nada pendente agora" : tab==="concluidas" ? "Nenhuma concluída ainda" : "Nenhuma sem confirmação 👏")+'</b>'+(tab==="agora" ? "As atividades concluídas estão em Concluídas." : "")+'</div>';
+  var last = null;
+  lista.forEach(function(b){
     if (b.turno !== last){ var t = TURNOS[b.turno] || [b.turno,"","--muted"]; out += (last!==null?"</div>":"") + '<div class="turno" style="--tc:var('+t[2]+')"><b>'+esc(t[0])+'</b><span>'+t[1]+'</span><hr></div><div class="list">'; last = b.turno; }
     out += renderBloco(b);
   });
   out += "</div>";
-  if (!mine) out += '<p class="regra"><b>Regra de ouro:</b> lista de frequência com a Patrícia · foto de registro com todos juntos · Klaudinha avisa no grupo: iniciado ✅ e concluído ✅.</p>';
+  if (!mine && tab === "agora") out += '<p class="regra"><b>Regra de ouro:</b> lista de frequência com a Patrícia · foto de registro com todos juntos · Klaudinha avisa no grupo: iniciado ✅ e concluído ✅.</p>';
   return out;
 }
 
 var S_PRAZO = "";
 var S_FOTOALVO = null;
 function fmtPrazo(p){ if (!p) return ""; var d = S.data; return p.slice(0,10) === d.hoje ? p.slice(11) : p.slice(8,10)+"/"+p.slice(5,7)+" "+p.slice(11); }
+function msgCobrar(b, p, tipo){
+  var n = primeiroNome(pessoa(p).nome);
+  return tipo === "semfoto"
+    ? "Oi, " + n + "! Tudo bem? Aqui é da coordenação da ONG Amigos de Maribondo. 💙 A atividade \"" + b.titulo + "\" foi concluída no app, mas ficou sem foto. Consegue enviar a foto pelo app (Dia → Concluídas → 📷 Enviar foto) ou mandar aqui? Obrigado!"
+    : "Oi, " + n + "! Tudo bem? Aqui é da coordenação da ONG Amigos de Maribondo. A atividade \"" + b.titulo + "\" (" + (b.hora||"") + (b.fim ? "–" + b.fim : "") + ") passou do horário e não foi confirmada no app. O que aconteceu? Me responde aqui, por favor. 🙏";
+}
+function botaoCobrar(b, p, tipo){
+  var tel = S.data.telefones && S.data.telefones[p], rot = (tipo === "semfoto" ? "📷 Pedir foto a " : "💬 Cobrar ") + esc(primeiroNome(pessoa(p).nome));
+  return tel ? '<a class="wa cobrar" data-x="cobrar" data-b="'+esc(b.id)+'" data-p="'+esc(p)+'" data-t="'+tipo+'" href="'+esc(waHref(tel, msgCobrar(b, p, tipo)))+'" target="_blank" rel="noopener">'+WA_ICON+rot+'</a>'
+    : '<button class="btn cobrar" data-x="cobrar" data-b="'+esc(b.id)+'" data-p="'+esc(p)+'" data-t="'+tipo+'">'+rot+' (no app · sem WhatsApp)</button>';
+}
 function renderBloco(b){
   var st = S.data.status[b.id] || {}, est = st.estado || "pendente";
   var pc = b.pessoas[0] ? pessoa(b.pessoas[0]).cor : "var(--line)";
@@ -712,13 +744,14 @@ function renderBloco(b){
   var badge = (st.suporte ? '<span class="state help">Precisa de suporte · '+esc(st.suporteHora||"")+'</span> ' : '')
     + (vencida ? '<span class="state help">Prazo vencido</span> ' : (b.atrasada ? '<span class="state help">Atrasada</span> ' : ''))
     + (st.prazoPedido ? '<span class="state live">Prazo adicional solicitado</span> ' : '')
-    + (est==="concluida" ? '<span class="state ok">Concluído</span>' : est==="andamento" ? '<span class="state live">Iniciado</span>' : "");
+    + (est==="concluida" ? '<span class="state ok">Concluído</span>' + (st.temFotoConclusao === false ? ' <span class="state help">📷 Sem foto</span>' : '') : est==="andamento" ? '<span class="state live">Iniciado</span>' : "");
   var acts = "";
   if (minha){
     if (!vencida){
       if (est==="pendente") acts += '<button class="btn go" data-act="start" data-b="'+esc(b.id)+'"'+dis+'>Iniciado</button>';
       else if (est==="andamento") acts += '<label class="btn fin'+(S.busy||!logged()?' off':'')+'" for="fotoTar" data-ftar="'+esc(b.id)+'">📷 Concluído · foto da tarefa</label>';
     }
+    if (est==="concluida" && st.temFotoConclusao === false) acts += '<label class="btn fin'+(S.busy||!logged()?' off':'')+'" for="fotoTar" data-ftar="'+esc(b.id)+'" data-fc="1">📷 Enviar foto</label>';
     if (b.atividade){
       acts += '<button class="tog" aria-pressed="'+!!st.lista+'" data-act="lista" data-b="'+esc(b.id)+'"'+dis+'><span class="box">'+(st.lista?"✓":"")+'</span>Lista</button>';
       acts += '<button class="tog" aria-pressed="'+!!st.foto+'" data-act="foto" data-b="'+esc(b.id)+'"'+dis+'><span class="box">'+(st.foto?"✓":"")+'</span>Foto todos juntos</button>';
@@ -730,6 +763,8 @@ function renderBloco(b){
     else if (minha && S_SUP !== b.id) acts += '<button class="btn sos" data-act="abrirsup" data-b="'+esc(b.id)+'"'+dis+'>Preciso de suporte</button>';
   }
   if (est!=="pendente" && (minha || gest)) acts += '<button class="btn" data-act="undo" data-b="'+esc(b.id)+'"'+dis+'>Desfazer</button>';
+  var cobra = gest && ((vencida || (est !== "concluida" && S.data.dia < S.data.hoje)) ? "vencida" : (est === "concluida" && st.temFotoConclusao === false) ? "semfoto" : "");
+  if (cobra) acts += b.pessoas.map(function(p){ return botaoCobrar(b, p, cobra); }).join("");
   var supForm = S_SUP === b.id && !st.suporte
     ? '<div class="supf"><label for="supTxt">Envie aqui o que precisa para resolver (até 30 letras)</label><input id="supTxt" type="text" maxlength="30" autocomplete="off" placeholder="Ex.: caixa de som sem bateria" style="font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%">'
       + '<span class="when">Sua localização vai junto, para a coordenação saber onde você está.</span>'
@@ -767,7 +802,7 @@ function renderBloco(b){
 
 var ESTADO = {dentro:["Na ONG","ok"], saiu:["Saiu","muted"], fora_intervalo:["Intervalo","muted"], fora_almoco:["Intervalo","muted"], nao_voltou:["Não voltou do intervalo","bad"], fora_externa:["Atividade externa","warn"],
   fora_emergencia:["Saída emergencial","bad"], nao_chegou:["Não chegou","bad"], aguardando:["Aguardando chegada","muted"],
-  sem_tarefa:["Sem tarefa hoje","muted"], faltou:["Faltou","bad"], sem_saida:["Não registrou saída","warn"]};
+  sem_tarefa:["Sem tarefa hoje","muted"], faltou:["Faltou","bad"], sem_saida:["Não registrou saída","warn"], falta_saida:["Falta bater a saída","bad"]};
 var MOTIVO = {fim:"fim do expediente", intervalo:"intervalo", almoco:"intervalo", externa:"atividade externa", emergencia:"saída emergencial"};
 function periodosTxt(e){ return e && e.periodos ? e.periodos.map(function(p){ return p.ini+"–"+p.fim; }).join(" · ") : "—"; }
 var S_MOT = {tipo:"", aberto:false};
@@ -819,6 +854,7 @@ function renderPonto(){
       ? '<div class="sched">'+esp.periodos.map(function(p, i){ return '<div>'+(esp.periodos.length>1?(i+1)+'º turno':'Seu horário')+'<b>'+esc(p.ini)+'–'+esc(p.fim)+'</b></div>'; }).join("")+'</div>'
         + '<span class="when">'+(esp.fonte==="horario"?'Horário da semana definido pela coordenação.':'Pela sua 1ª tarefa: '+esc(esp.tarefa)+'.')+(esp.periodos.length>1?' Entre os turnos a saída é livre.':'')+'</span>'
       : '<span class="when">Você não tem horário neste dia.</span>';
+    if (me.estado === "falta_saida") h += '<div class="alert faltaSaida" role="alert"><b>⛔ Falta bater a saída</b>Seu turno terminou às '+esc(me.faltaSaidaDe||"")+' e a saída não foi registrada. Bata a saída agora.</div>';
     h += '<div class="bigt tnum">'+esc(d.agora)+'<small>horário do servidor</small></div>';
     var locOff = S_LOC !== "ok" && !locLivre();
     if (isToday && S_LOC === "") setTimeout(checarLocal, 0);
@@ -881,7 +917,16 @@ function renderFreq(){
 }
 
 /* ---------------- Demandas da equipe ---------------- */
-var S_DTAB = "abertas";
+var S_DTAB = "abertas", S_RESP = "", S_RESPWA = null;
+function msgResp(x){
+  var c = (S.data.catalogo || []).filter(function(k){ return k.k === x.item; })[0] || {t: x.item};
+  return "Oi, " + primeiroNome(pessoa(x.pessoa).nome) + "! Aqui é da coordenação da ONG Amigos de Maribondo. ✅ Sua demanda \"" + c.t + (x.detalhe ? " — " + x.detalhe : "") + "\" foi atendida." + (S_RESPWA.resp ? " Resposta: " + S_RESPWA.resp : "") + " Qualquer coisa, me chama. 💙";
+}
+function waRespBotao(x){
+  var tel = S.data.telefones && S.data.telefones[x.pessoa];
+  return tel ? '<a class="wa big" data-x="respWaOk" href="'+esc(waHref(tel, msgResp(x)))+'" target="_blank" rel="noopener">'+WA_ICON+'Avisar '+esc(primeiroNome(pessoa(x.pessoa).nome))+' no WhatsApp</a>'
+    : '<span class="when">'+esc(pessoa(x.pessoa).nome)+' não tem WhatsApp cadastrado: o aviso foi só no app.</span>';
+}
 function renderDemandas(){
   var d = S.data;
   if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
@@ -903,7 +948,11 @@ function renderDemandas(){
     var c = porK[x.item] || {t:x.item};
     return '<div class="it'+(x.estado==="atendida"?" ok":"")+'"><span class="pill '+(x.estado==="atendida"?"ok":/terminou|mkt|video|reuniao/.test(x.item)?"bad":"warn")+'">'+(x.estado==="atendida"?"concluída":x.item==="ideia"?(x.estado==="validada"?"validada":"ideia"):sitDe(x)==="nao_respondida"?"não respondida":"aberta")+'</span><b>'+esc(c.t)+'</b>'+(x.detalhe?'<span>— '+esc(x.detalhe)+'</span>':'')
       + '<span class="when">'+esc(pessoa(x.pessoa).nome)+' · '+(x.dia===d.hoje?esc(x.hora):esc(x.dia.slice(8))+'/'+esc(x.dia.slice(5,7))+' '+esc(x.hora))+(x.estado==="atendida"?' · concluída às '+esc(x.atendidaHora):'')+'</span>' + prazoTx(x)
-      + (d.verTodos && x.item==="ideia" && x.estado!=="validada" ? '<button class="btn fin" data-act="validarIdeia" data-id="'+esc(x.id)+'">⭐ Validar ideia +27</button>' : d.verTodos && x.estado!=="atendida" && x.item!=="ideia" ? '<button class="btn fin" data-act="atender" data-id="'+esc(x.id)+'">Atendida</button>' : '') + '</div>';
+      + (d.verTodos && x.item==="ideia" && x.estado!=="validada" ? '<button class="btn fin" data-act="validarIdeia" data-id="'+esc(x.id)+'">⭐ Validar ideia +27</button>' : d.verTodos && x.estado!=="atendida" && x.item!=="ideia" ? (S_RESP === x.id
+          ? '<div class="respBox"><label for="resp_'+esc(x.id)+'">Resposta para '+esc(pessoa(x.pessoa).nome)+'</label><textarea id="resp_'+esc(x.id)+'" rows="2" maxlength="400" placeholder="Ex.: Já comprei, chega amanhã às 9h."></textarea><div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn fin" data-act="atender" data-id="'+esc(x.id)+'">✅ Enviar resposta e marcar atendida</button><button class="btn" data-act="fecharResp">Cancelar</button></div></div>'
+          : '<button class="btn fin" data-act="abrirResp" data-id="'+esc(x.id)+'">✅ Responder e marcar atendida</button>') : '')
+      + (x.resposta ? '<span class="respTx">💬 Resposta da coordenação: '+esc(x.resposta)+'</span>' : '')
+      + (d.verTodos && S_RESPWA && S_RESPWA.id === x.id ? waRespBotao(x) : '') + '</div>';
   };
   var tab = S_DTAB, lista0 = 0, lista = tab === "concluidas" ? feitas : tab === "nao" ? naoResp : abertas;
   var h = fornecedorBox() + '<div class="dtabs" role="tablist">'
@@ -1596,7 +1645,7 @@ $("view").addEventListener("click", function(ev){
   var lft = ev.target.closest("label[data-ftar], label[data-ffreq]");
   if (lft){
     if (S.busy || !logged()){ ev.preventDefault(); return; }
-    S_FOTOALVO = lft.dataset.ftar ? {tipo:"tarefa", b:lft.dataset.ftar} : {tipo:"freq", b:lft.dataset.ffreq, dia:lft.dataset.dia};
+    S_FOTOALVO = lft.dataset.ftar ? (lft.dataset.fc ? {tipo:"fotoConc", b:lft.dataset.ftar} : {tipo:"tarefa", b:lft.dataset.ftar}) : {tipo:"freq", b:lft.dataset.ffreq, dia:lft.dataset.dia};
     return;
   }
   var lab = ev.target.closest("label[data-saida]");
@@ -1617,6 +1666,7 @@ $("view").addEventListener("click", function(ev){
   if (a === "motivo"){ S_MOT.aberto = !S_MOT.aberto; S_MOT.tipo = ""; return render(); }
   if (a === "mt"){ S_MOT.tipo = btn.dataset.m; var keep = $("motObs") ? $("motObs").value : ""; render(); if ($("motObs")) $("motObs").value = keep; return; }
   if (a === "dtab"){ S_DTAB = btn.dataset.t; return render(); }
+  if (a === "diatab"){ S_DIATAB = btn.dataset.t; return render(); }
   if (a === "waEdit"){ S_WAEDIT = !S_WAEDIT; renderAtiva(); if (S_WAEDIT && $("waIn")){ $("waIn").value = ""; $("waIn").focus(); } return; }
   if (a === "waSalvar"){ var tel = ($("waIn") ? $("waIn").value : "").trim(); if (tel.replace(/\D/g,"").length < 10) return toast("Escreva o WhatsApp com DDD, ex.: 82 99999-9999.");
     S_WAEDIT = false; if (document.activeElement) document.activeElement.blur();
@@ -1633,7 +1683,11 @@ $("view").addEventListener("click", function(ev){
     }).catch(function(){});
   }
   if (a === "validarIdeia") return run("validarIdeia", S.me, S.pin, btn.dataset.id).then(function(r){ S_PTS = r; renderMeta(); toast("⭐ Ideia validada (+27 pts)."); return load(null, true); }).catch(function(e){ toast(errMsg(e)); });
-  if (a === "atender") return act(run("atenderDemanda", S.me, S.pin, btn.dataset.id)).then(function(){ toast("Demanda marcada como atendida."); }).catch(function(){});
+  if (a === "abrirResp"){ S_RESP = btn.dataset.id; S_RESPWA = null; render(); var ta = $("resp_" + S_RESP); if (ta) ta.focus(); return; }
+  if (a === "fecharResp"){ S_RESP = ""; return render(); }
+  if (a === "atender"){ var idA = btn.dataset.id, ta2 = $("resp_" + idA), resp = ta2 ? ta2.value.trim() : "";
+    return act(run("atenderDemanda", S.me, S.pin, idA, resp)).then(function(){ S_RESP = ""; S_RESPWA = {id: idA, resp: resp}; S_DTAB = "concluidas"; SOM.play("conclui");
+      toast("✅ Demanda atendida. O aviso foi para a pessoa no app — toque em “Avisar no WhatsApp” para mandar também por lá."); render(); }).catch(function(){}); }
   if (a === "vsalvar"){
     var v = {regiao: $("vReg").value.trim(), data: $("vData").value, nome: $("vNome").value.trim(), telefone: $("vTel").value.trim(), responsaveis: S_VRESP.slice()};
     return act(run("salvarVisita", S.me, S.pin, v)).then(function(){ S_VRESP = []; toast("Visita agendada."); }).catch(function(){});
@@ -1731,6 +1785,7 @@ function fotoFlow(inputEl, enviar){
 }
 $("fotoTar").addEventListener("change", function(e){
   fotoFlow(e.target, function(alvo, b64, loc){
+    if (alvo.tipo === "fotoConc") return act(run("setStatus", S.me, S.pin, S.data.dia, alvo.b, "fotoConclusao", "", {}, b64)).then(function(){ SOM.play("conclui"); toast("📷 Foto enviada. Atividade completa!"); });
     return act(run("setStatus", S.me, S.pin, S.data.dia, alvo.b, "finish", "", loc || {}, b64)).then(function(d){
       var t = d.tarefas.filter(function(x){ return x.id === alvo.b; })[0] || {}, st = d.status[alvo.b] || {};
       toast((t.titulo||"Tarefa")+": concluída com foto.", "✅ " + (t.titulo||"") + " · concluído " + (st.fim||""));
@@ -1837,7 +1892,7 @@ function renderGestao(){
       return '<div style="border:1px solid var(--line);border-radius:10px;padding:8px">'+chip(x.por)+'<b>'+esc(x.titulo)+'</b><span class="when">prazo '+esc(x.prazo)+' · pede '+(x.opcao==="proximo"?"próximo turno":"turno adicional (+2h)")+'</span>'
         +'<div class="row" style="flex-basis:100%"><button class="btn fin" data-g="prazoOk" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Aprovar</button><button class="btn" data-g="prazoNao" data-d="'+esc(x.dia)+'" data-b="'+esc(x.bloco)+'">Recusar</button></div></div>'; }).join("")+'</div>';
   h += '<div class="eyebrow">Na ONG ('+ag.dentro.length+')</div>' + (ag.dentro.length ? '<div class="olist">'+ag.dentro.map(function(x){
-      return '<div>'+chip(x.id)+'<span class="when">desde '+esc(x.desde)+' · sai '+esc(x.saida||"—")+'</span>'+(x.dist!=null&&x.dist>ag.raio?'<small class="nof">entrou a '+fmtD(x.dist)+' da sede</small>':'')+'</div>'; }).join("")+'</div>' : '<p class="sub">Ninguém registrou entrada agora.</p>');
+      return '<div>'+chip(x.id)+(x.faltaSaida?'<span class="pill bad">⛔ falta bater a saída ('+esc(x.faltaSaida)+')</span>':'')+'<span class="when">desde '+esc(x.desde)+' · sai '+esc(x.saida||"—")+'</span>'+(x.dist!=null&&x.dist>ag.raio?'<small class="nof">entrou a '+fmtD(x.dist)+' da sede</small>':'')+'</div>'; }).join("")+'</div>' : '<p class="sub">Ninguém registrou entrada agora.</p>');
   if (ag.fora.length) h += '<div class="eyebrow">Fora com motivo ('+ag.fora.length+')</div><div class="olist">'+ag.fora.map(function(x){
       return '<div>'+chip(x.id)+'<span class="pill '+(x.motivo==="Saída emergencial"?"bad":x.motivo==="Intervalo"?"muted":"warn")+'">'+esc(x.motivo)+'</span><span class="when">desde '+esc(x.desde)+(x.obs?' · '+esc(x.obs):'')+'</span></div>'; }).join("")+'</div>';
   h += '<div class="eyebrow">Não chegou ou não voltou ('+ag.faltando.length+')</div>' + (ag.faltando.length ? '<div class="olist">'+ag.faltando.map(function(x){
@@ -2060,7 +2115,7 @@ $("ativaBox").addEventListener("click", function(ev){
     S_WAEDIT = false; if (document.activeElement) document.activeElement.blur();
     return act(run("salvarMeuWhats", S.me, S.pin, tel)).then(function(){ SOM.play("pop"); toast("💬 WhatsApp ativado. A coordenação já consegue te mandar os avisos por ele."); }).catch(function(){}); }
 });
-var SOM_ACT = {start:"inicio", finish:"conclui", dem:"envio", atender:"conclui", validarIdeia:"conclui", dtab:"aba", waEdit:"abre", abrirsup:"abre", abrirprazo:"abre", motivo:"abre"};
+var SOM_ACT = {start:"inicio", finish:"conclui", dem:"envio", atender:"conclui", validarIdeia:"conclui", diatab:"aba", dtab:"aba", waEdit:"abre", abrirsup:"abre", abrirprazo:"abre", motivo:"abre"};
 function burst(x, y, emo){
   if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   for (var i = 0; i < 9; i++){ (function(i){
@@ -2239,6 +2294,7 @@ function atalhosHtml(){
   return '<div class="atalhos">'
     + '<a class="at" href="' + esc(c.insta || "https://www.instagram.com/amigosdemaribondoal/") + '" target="_blank" rel="noopener"><i>📸</i>Instagram da ONG</a>'
     + (c.post ? '<a class="at quente" href="' + esc(c.post) + '" target="_blank" rel="noopener"><i>🆕</i>Post novo! Comenta lá</a>' : '<button class="at" data-x="ir" data-v="engaja"><i>🆕</i>Post novo</button>')
+    + (c.story ? '<a class="at quente" href="' + esc(c.story) + '" target="_blank" rel="noopener"><i>📲</i>Story novo! Reposta</a>' : '')
     + '<a class="at" href="' + esc(waHref("", c.doacao || "")) + '" target="_blank" rel="noopener" data-x="doacao"><i>💙</i>Pedir doação</a>'
     + '<button class="at" data-x="ir" data-v="ideias"><i>💡</i>Tenho uma ideia</button></div>';
 }
@@ -2249,7 +2305,15 @@ function renderEngaja(){
   if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
   var c = cfg(), T = c.engTipos || {curtida:{t:"Curtida + comentário",p:2}, repost:{t:"Repost",p:4}, status:{t:"Status",p:3}};
   var meus = (S_PTS && S_PTS.meuEng) || [], tot = meus.filter(function(x){ return x.estado !== "invalido"; }).reduce(function(a, x){ return a + x.pontos; }, 0);
-  var h = '<div class="gsec"><h2>📣 Engajamento no Instagram</h2>' + atalhosHtml()
+  var linkBox = '<div class="gsec postBox"><h2>🆕 Postagem e story de hoje</h2>'
+    + (c.post || c.story ? '<div class="row" style="gap:8px;flex-wrap:wrap">' + (c.post ? '<a class="btn primary big" href="' + esc(c.post) + '" target="_blank" rel="noopener">📸 Abrir o post · comenta e curte</a>' : '') + (c.story ? '<a class="btn primary big" href="' + esc(c.story) + '" target="_blank" rel="noopener">📲 Abrir o story · reposta</a>' : '') + '</div>' + (c.postTexto ? '<p class="sub">' + esc(c.postTexto) + '</p>' : '')
+      : '<p class="sub">A coordenação ainda não colocou o link de hoje.</p>')
+    + (S.data && S.data.verTodos ? '<div class="f" style="margin-top:8px"><label class="full">Link do post (Instagram)<input id="lkPost" inputmode="url" placeholder="https://www.instagram.com/p/…" value="' + esc(c.post || "") + '"></label>'
+      + '<label class="full">Link do story<input id="lkStory" inputmode="url" placeholder="https://www.instagram.com/stories/…" value="' + esc(c.story || "") + '"></label>'
+      + '<label class="full">Recado para a equipe (opcional)<input id="lkTx" maxlength="120" value="' + esc(c.postTexto || "") + '"></label>'
+      + '<button class="btn primary full" data-x="lkSalvar">Salvar e avisar a equipe</button></div>' : '')
+    + '</div>';
+  var h = linkBox + '<div class="gsec"><h2>📣 Engajamento no Instagram</h2>' + atalhosHtml()
     + (c.postTexto ? '<p class="sub">🆕 ' + esc(c.postTexto) + '</p>' : '')
     + '<div class="regrasEng">' + Object.keys(T).map(function(k){ return '<span><b>+' + T[k].p + '</b> ' + esc(T[k].t) + '</span>'; }).join("") + '</div>'
     + '<p class="sub">Só vale depois de registrar aqui: escolha o que fez, suba o print e toque em <b>Concluído 👍</b>.</p></div>';
@@ -2447,11 +2511,19 @@ function folhaHtml(){
 document.addEventListener("click", function(ev){
   var b = ev.target.closest("[data-x]"); if (!b) return;
   var x = b.dataset.x;
+  if (x === "cobrar"){ if (b.tagName !== "A") ev.preventDefault(); SOM.play("envio");
+    run("cobrarColaborador", S.me, S.pin, S.data.dia, b.dataset.b, b.dataset.t, b.dataset.p).then(function(){ toast((b.tagName === "A" ? "WhatsApp aberto · " : "") + "Pedido de resposta enviado no app para " + pessoa(b.dataset.p).nome + "."); }).catch(function(e){ toast(errMsg(e)); });
+    return; }
+  if (x === "respWaOk"){ setTimeout(function(){ S_RESPWA = null; render(); }, 600); SOM.play("pop"); return; }
   if (x === "doacao" || x === "msgEnv" || x === "fornOk"){ if (x === "msgEnv"){ marcaEnviado(b.dataset.c); setTimeout(function(){ render(); }, 400); } if (x === "fornOk"){ S_FORN = null; setTimeout(function(){ render(); }, 400); } SOM.play("pop"); return; }
   if (b.tagName === "INPUT") return;
   ev.preventDefault();
   if (x === "ir"){ S.view = b.dataset.v; try { localStorage.setItem("view", S.view); } catch(e){} render(); window.scrollTo({top: $("view").offsetTop - 80, behavior: "smooth"}); return; }
   if (x === "pod") return tocarPodcast(+b.dataset.i);
+  if (x === "lkSalvar"){ var lp = $("lkPost").value.trim(), ls = $("lkStory").value.trim(), lt = $("lkTx").value.trim();
+    if ((lp && !/^https?:\/\//.test(lp)) || (ls && !/^https?:\/\//.test(ls))) return toast("Cole o link completo, começando com https://");
+    return run("salvarConfig", S.me, S.pin, "post", lp).then(function(){ return run("salvarConfig", S.me, S.pin, "story", ls); }).then(function(){ return run("salvarConfig", S.me, S.pin, "postTexto", lt); })
+      .then(function(c){ S.data.config = c; SOM.play("envio"); toast("🆕 Link salvo! A equipe já vê os botões do post e do story."); render(); }).catch(function(e){ toast(errMsg(e)); }); }
   if (x === "remanejar"){ var de = $("rmDe").value, para = $("rmPara").value;
     if (!de || !para || de === para) return toast("Escolha De e Para (pessoas diferentes).");
     return run("remanejarPessoa", S.me, S.pin, de, para, {horarioTarde: $("rmHor").checked, atividadesTarde: $("rmAtv").checked}).then(function(r){
@@ -2510,7 +2582,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611101453";
+var APP_VERSAO = "202611101706";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
