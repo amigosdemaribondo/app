@@ -248,6 +248,45 @@ td.t.none{color:var(--line)}
 .capa .insta{color:#C9D6F2;font-weight:700;text-decoration:none;font-size:15px;display:inline-flex;gap:8px;align-items:center}
 .capa .insta svg{width:18px;height:18px}
 @media (prefers-reduced-motion:no-preference){ .capa .meio{animation:sobe .7s ease-out both} @keyframes sobe{from{opacity:.001;transform:translateY(14px)}to{opacity:1;transform:none}} }
+.dtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:rgba(10,36,90,.45);border-radius:12px;padding:4px}
+.dtabs button{border:none;background:transparent;border-radius:9px;padding:9px 4px;font-weight:800;font-size:13px;color:var(--muted)}
+.dtabs button[aria-pressed="true"]{background:var(--surface);color:var(--ink)}
+.dtabs button b{display:block;font-size:19px;line-height:1.1}
+.dtabs button.dnr b{color:var(--bad)} .dtabs button.dcc b{color:var(--ok)}
+.dtabs button{min-width:0;white-space:normal;line-height:1.15}
+.prazoDem{font-size:12.5px;font-weight:700}
+.prazoDem.ok{color:var(--ok)} .prazoDem.quase{color:var(--warn)} .prazoDem.bad{color:var(--bad)}
+.ativa{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ativa .ab{display:flex;align-items:center;justify-content:center;gap:8px;border-radius:14px;padding:13px 10px;font-weight:800;font-size:15px;border:2px solid var(--accent);background:var(--accent);color:#1A2A55;text-align:center;line-height:1.2}
+.ativa .ab.on{background:var(--ok-bg);border-color:var(--ok);color:var(--ink);font-size:13.5px}
+.ativa .ab i{font-style:normal;font-size:22px}
+.ativa .waf{grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap}
+.ativa .waf input{flex:1 1 160px;font:inherit;font-size:16px;border-radius:10px;border:1.5px solid var(--line);background:var(--sunk);color:var(--ink);padding:10px}
+.diag .pp{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.diag .pp:last-child{border-bottom:0}
+.diag .pc{font-family:var(--f-display);font-size:22px;font-weight:800;text-align:right}
+.diag .trk{grid-column:1/-1;position:relative;height:14px;border-radius:8px;background:rgba(10,36,90,.55);overflow:hidden}
+.diag .trk i{position:absolute;left:0;top:0;bottom:0;border-radius:8px;width:0;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.diag .fl{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:5px}
+.diag .fl span{font-size:12px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--sunk)}
+.diag .fl span.neg{background:var(--bad-bg);color:#FFD0D0} .diag .fl span.okk{background:var(--ok-bg)}
+.diag .tot{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:6px}
+.diag .tot div{background:var(--sunk);border-radius:12px;padding:8px;text-align:center}
+.diag .tot b{display:block;font-family:var(--f-display);font-size:22px}
+.diag .tot small{font-size:11.5px;color:var(--muted)}
+.diag .hero{display:flex;align-items:center;gap:14px}
+.diag .hero .big{font-family:var(--f-display);font-size:44px;font-weight:800;line-height:1}
+.fx{position:fixed;pointer-events:none;z-index:99;font-size:20px;will-change:transform,opacity}
+@media (prefers-reduced-motion:no-preference){
+  .tabs button[aria-selected="true"] i{animation:pulo .45s cubic-bezier(.3,1.6,.5,1)}
+  @keyframes pulo{0%{transform:scale(.7) translateY(4px)}60%{transform:scale(1.18) translateY(-3px)}100%{transform:none}}
+  #view.troca>*{animation:entra .32s ease-out both}
+  #view.troca>*:nth-child(2){animation-delay:.04s} #view.troca>*:nth-child(3){animation-delay:.08s} #view.troca>*:nth-child(4){animation-delay:.12s}
+  @keyframes entra{from{opacity:.001;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .ativa .ab:not(.on){animation:chama 1.8s ease-in-out infinite}
+  @keyframes chama{0%,100%{box-shadow:0 0 0 0 rgba(255,210,63,.55)}50%{box-shadow:0 0 0 8px rgba(255,210,63,0)}}
+  .dlist .it{animation:entra .3s ease-out both}
+}
 .gsec{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px;display:flex;flex-direction:column;gap:10px;margin-top:12px}
 .gsec h2{margin:0;font-family:var(--f-display);font-size:19px;font-weight:800}
 .gsec .sub{margin:0;font-size:13px;color:var(--muted)}
@@ -388,6 +427,7 @@ a.lnk,.lnk{color:#FFE27A}
     <div class="stat"><div class="n tnum" id="sLive">–</div><div class="l">iniciadas agora</div></div>
     <div class="stat"><div class="n tnum" id="sPonto">–</div><div class="l" id="sPontoL">na ONG agora</div></div>
   </div>
+  <div id="ativaBox"></div>
   <div id="metaBox" class="metabox"></div>
   <div class="tabs" role="tablist">
     <button role="tab" aria-selected="true" data-v="dia"><i aria-hidden="true">📋</i>Dia</button>
@@ -434,8 +474,23 @@ function pessoa(id){ var e = (S.data&&S.data.equipe)||[]; for (var i=0;i<e.lengt
 function chip(id){ var p = pessoa(id); return '<span class="chip'+(id===S.me&&S.pin?' me':'')+'" style="--pc:'+esc(p.cor)+'"><i>'+esc((p.nome||"?")[0])+'</i>'+esc(p.nome)+'</span>'; }
 function logged(){ return !!(S.me && S.pin); }
 
+var S_WAEDIT = false, S_VIEWANT = "";
+function renderAtiva(){
+  var box = $("ativaBox"); if (!box || !S.data) return;
+  if (!logged()){ box.innerHTML = ""; return; }
+  var d = S.data, locOk = S_LOC === "ok", waOk = !!d.meuWhats;
+  if (document.activeElement && document.activeElement.id === "waIn") return;
+  var h = '<div class="ativa">'
+    + (locOk ? '<button class="ab on" data-act="loc"><i>📍</i>Localização ativa ✓</button>'
+             : '<button class="ab" data-act="loc"><i>📍</i>' + (S_LOC === "checando" ? "Verificando…" : "Ativar localização") + '</button>')
+    + (waOk ? '<button class="ab on" data-act="waEdit"><i>💬</i>WhatsApp ativo ✓<br>…' + esc(String(d.meuWhats).slice(-4)) + '</button>'
+            : '<button class="ab" data-act="waEdit"><i>💬</i>Ativar WhatsApp</button>');
+  if (S_WAEDIT) h += '<div class="waf"><input id="waIn" inputmode="tel" placeholder="Seu WhatsApp: 82 99999-9999" autocomplete="tel"><button class="btn primary" data-act="waSalvar">Salvar</button><button class="btn" data-act="waEdit">Cancelar</button></div>';
+  box.innerHTML = h + '</div>';
+}
 function render(){
   var d = S.data; if (!d) return;
+  renderAtiva();
   if (!$("metaBox").innerHTML && S_PTS) renderMeta();
   var sel = $("meSel"), k = d.equipe.map(function(p){return p.id}).join(",");
   if (sel.dataset.k !== k){ sel.innerHTML = '<option value="">escolher…</option>' + d.equipe.map(function(p){return '<option value="'+esc(p.id)+'">'+esc(p.nome)+'</option>'}).join(""); sel.dataset.k = k; }
@@ -456,6 +511,7 @@ function render(){
   if (S.view==="gestao" && !isG) S.view = "dia";
   if (S.view==="gestao"){ if (!$("gWrap")) { $("view").innerHTML = '<div id="gWrap"></div>'; } renderGestao(); return; }
   atualizaBadge();
+  var vw = $("view"); if (S_VIEWANT !== S.view){ S_VIEWANT = S.view; vw.classList.remove("troca"); void vw.offsetWidth; vw.classList.add("troca"); clearTimeout(vw._t); vw._t = setTimeout(function(){ vw.classList.remove("troca"); }, 700); }
   $("view").innerHTML = S.view==="ponto" ? renderPonto() : S.view==="avisos" ? renderAvisos() : S.view==="demandas" ? renderDemandas()
     : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
 }
@@ -551,6 +607,8 @@ function periodosTxt(e){ return e && e.periodos ? e.periodos.map(function(p){ re
 var S_MOT = {tipo:"", aberto:false};
 var S_SUP = "";
 var S_LOC = "", S_EXTRA = {};
+function locLivre(){ return !!(S.data && S.data.locLivre); }
+function pegaLoc(){ return locLivre() ? pegarLocal(false) : pegarLocal(true); }
 function checarLocal(){
   var keep = $("motObs") ? $("motObs").value : null;
   var rr = function(){ render(); if (keep != null && $("motObs")) $("motObs").value = keep; };
@@ -559,6 +617,7 @@ function checarLocal(){
     .catch(function(e){ S_LOC = /bloqueada/.test(e.message) ? "bloqueada" : "erro"; rr(); });
 }
 function locBox(){
+  if (S_LOC !== "ok" && locLivre()) return '<span class="when" style="color:var(--ok)">📍 Primeiro acesso: hoje até 12h você pode registrar sem localização. Depois disso, só com a localização ligada.</span>';
   if (S_LOC === "ok") return '<span class="when" style="color:var(--ok)">📍 Localização ativada. O ponto só vale com a foto tirada na ONG.</span>';
   if (S_LOC === "checando" || S_LOC === "") return '<span class="when">📍 Verificando a localização…</span>';
   if (S_LOC === "bloqueada") return '<div class="alert">📍 A localização está bloqueada. Sem ela o ponto não é registrado.</div>'
@@ -595,7 +654,7 @@ function renderPonto(){
         + '<span class="when">'+(esp.fonte==="horario"?'Horário da semana definido pela coordenação.':'Pela sua 1ª tarefa: '+esc(esp.tarefa)+'.')+(esp.periodos.length>1?' Entre os turnos a saída é livre.':'')+'</span>'
       : '<span class="when">Você não tem horário neste dia.</span>';
     h += '<div class="bigt tnum">'+esc(d.agora)+'<small>horário do servidor</small></div>';
-    var locOff = S_LOC !== "ok";
+    var locOff = S_LOC !== "ok" && !locLivre();
     if (isToday && S_LOC === "") setTimeout(checarLocal, 0);
     if (isToday) h += locBox() + '<input type="file" id="fotoIn" accept="image/*" capture="user" hidden>';
     if (!isToday) h += '<span class="when">O ponto só pode ser registrado hoje. Toque em "hoje" no topo.</span>';
@@ -656,19 +715,38 @@ function renderFreq(){
 }
 
 /* ---------------- Demandas da equipe ---------------- */
+var S_DTAB = "abertas";
 function renderDemandas(){
   var d = S.data;
   if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
   var cat = d.catalogo || [], porK = {}; cat.forEach(function(c){ porK[c.k] = c; });
-  var abertas = (d.demandas||[]).filter(function(x){ return x.estado !== "atendida" && x.estado !== "validada"; });
-  var feitas = (d.demandas||[]).filter(function(x){ return x.estado === "atendida"; });
+  var todas = d.demandas||[], agoraMs = Date.now();
+  var sitDe = function(x){ if (x.sit) return x.sit; if (x.item === "ideia") return "ideia"; return x.estado === "atendida" ? "concluida" : "aberta"; };
+  var abertas = todas.filter(function(x){ var s = sitDe(x); return s === "aberta" || (s === "ideia" && x.estado !== "validada"); });
+  var feitas = todas.filter(function(x){ var s = sitDe(x); return s === "concluida" || (s === "ideia" && x.estado === "validada"); });
+  var naoResp = todas.filter(function(x){ return sitDe(x) === "nao_respondida"; });
+  var prazoTx = function(x){
+    if (!x.limite || x.item === "ideia") return "";
+    var s = sitDe(x);
+    if (s === "concluida") return '<span class="prazoDem '+(x.noPrazo?"ok":"bad")+'">'+(x.noPrazo?"✅ respondida no prazo":"⏳ respondida fora do prazo de 5h")+'</span>';
+    var rest = Math.round((x.limite - agoraMs)/60000);
+    if (rest <= 0) return '<span class="prazoDem bad">❌ sem resposta · prazo era '+esc(x.limiteHora||"")+'</span>';
+    return '<span class="prazoDem '+(rest<=60?"quase":"ok")+'">⏱ responder até '+esc((x.limiteHora||"").slice(-5))+' · faltam '+(rest>=60?Math.floor(rest/60)+"h"+String(rest%60).padStart(2,"0"):rest+" min")+'</span>';
+  };
   var item = function(x){
     var c = porK[x.item] || {t:x.item};
-    return '<div class="it'+(x.estado==="atendida"?" ok":"")+'"><span class="pill '+(x.estado==="atendida"?"ok":/terminou|mkt|video|reuniao/.test(x.item)?"bad":"warn")+'">'+(x.estado==="atendida"?"atendida":"aberta")+'</span><b>'+esc(c.t)+'</b>'+(x.detalhe?'<span>— '+esc(x.detalhe)+'</span>':'')
-      + '<span class="when">'+esc(pessoa(x.pessoa).nome)+' · '+(x.dia===d.hoje?esc(x.hora):esc(x.dia.slice(8))+'/'+esc(x.dia.slice(5,7))+' '+esc(x.hora))+(x.estado==="atendida"?' · atendida às '+esc(x.atendidaHora):'')+'</span>'
+    return '<div class="it'+(x.estado==="atendida"?" ok":"")+'"><span class="pill '+(x.estado==="atendida"?"ok":/terminou|mkt|video|reuniao/.test(x.item)?"bad":"warn")+'">'+(x.estado==="atendida"?"concluída":x.item==="ideia"?(x.estado==="validada"?"validada":"ideia"):sitDe(x)==="nao_respondida"?"não respondida":"aberta")+'</span><b>'+esc(c.t)+'</b>'+(x.detalhe?'<span>— '+esc(x.detalhe)+'</span>':'')
+      + '<span class="when">'+esc(pessoa(x.pessoa).nome)+' · '+(x.dia===d.hoje?esc(x.hora):esc(x.dia.slice(8))+'/'+esc(x.dia.slice(5,7))+' '+esc(x.hora))+(x.estado==="atendida"?' · concluída às '+esc(x.atendidaHora):'')+'</span>' + prazoTx(x)
       + (d.verTodos && x.item==="ideia" && x.estado!=="validada" ? '<button class="btn fin" data-act="validarIdeia" data-id="'+esc(x.id)+'">⭐ Validar ideia +27</button>' : d.verTodos && x.estado!=="atendida" && x.item!=="ideia" ? '<button class="btn fin" data-act="atender" data-id="'+esc(x.id)+'">Atendida</button>' : '') + '</div>';
   };
-  var h = '<div class="eyebrow">Pedidos abertos ('+abertas.length+')</div>' + (abertas.length ? '<div class="dlist">'+abertas.map(item).join("")+'</div>' : '<p class="sub">Nenhum pedido aberto.</p>');
+  var tab = S_DTAB, lista = tab === "concluidas" ? feitas : tab === "nao" ? naoResp : abertas;
+  var h = '<div class="dtabs" role="tablist">'
+    + '<button data-act="dtab" data-t="abertas" aria-pressed="'+(tab==="abertas")+'"><b class="tnum">'+abertas.length+'</b>Abertas</button>'
+    + '<button class="dcc" data-act="dtab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+feitas.length+'</b>Concluídas</button>'
+    + '<button class="dnr" data-act="dtab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+naoResp.length+'</b>Não respondidas</button></div>'
+    + '<p class="sub" style="margin:6px 0 8px">Toda demanda deve ser respondida em até <b>5 horas</b>. Concluída vai para <b>Concluídas</b>; sem resposta depois do prazo vai para <b>Não respondidas</b>.</p>'
+    + (lista.length ? '<div class="dlist">'+lista.map(item).join("")+'</div>' : '<p class="sub">'+(tab==="concluidas"?"Nenhuma demanda concluída nos últimos 14 dias.":tab==="nao"?"Nenhuma demanda sem resposta. 👏":"Nenhum pedido aberto.")+'</p>');
+  if (tab !== "abertas") return h;
   var grupos = []; cat.forEach(function(c){ if (grupos.indexOf(c.g) < 0) grupos.push(c.g); });
   h += '<div class="dem" style="margin-top:12px">' + grupos.map(function(g){
     var its = cat.filter(function(c){ return c.g === g; });
@@ -678,7 +756,6 @@ function renderDemandas(){
       + comTexto.map(function(c){ return '<div class="inl"><input id="dem_'+esc(c.k)+'" maxlength="'+c.max+'" placeholder="'+esc(c.t)+' (até '+c.max+' letras)"><button class="btn primary" data-act="dem" data-k="'+esc(c.k)+'"'+(S.busy?' disabled':'')+'>Solicitar</button></div>'; }).join("")
       + '</div>';
   }).join("") + '</div>';
-  if (feitas.length) h += '<div class="eyebrow" style="margin-top:12px">Atendidas hoje</div><div class="dlist">'+feitas.map(item).join("")+'</div>';
   return h;
 }
 
@@ -1091,6 +1168,49 @@ function renderMeta(){
   if (antes != null && (eq.checks || 0) > antes){ try { SOM.play("ok"); } catch(e){} }
 }
 var SELO = {responsabilidade:["🛡️","Responsabilidade"], compromisso:["⏰","Compromisso"], integracao:["🔗","Integração"], criatividade:["💡","Criatividade"], validadas:["⭐","Ideia validada"], suporte:["🆘","Suporte"]};
+function ativPorPessoa(lista, d){
+  var n = {}; lista.forEach(function(t){ (t.pessoas||[]).forEach(function(p){ n[p] = (n[p]||0) + 1; }); });
+  var ids = Object.keys(n).filter(function(p){ return p !== "victor"; });
+  if (!ids.length) return "";
+  return '<div class="eyebrow" style="margin-top:4px">Atividades por pessoa (ideal 3 a 4 · mínimo 2)</div><div class="row" style="flex-wrap:wrap;gap:6px;margin-bottom:6px">' + ids.map(function(p){
+    var k = n[p], cor = k === 1 ? "#FF8A8A" : k > 4 ? "#FFD23F" : k === 2 ? "#FFFFFF" : "#7CF2A6";
+    var tx = k === 1 ? "1 · sem tolerância" : k > 4 ? k + " · acima de 4" : k === 2 ? "2 · ok" : k + " · ideal";
+    return '<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid ' + cor + ';border-radius:999px;padding:3px 10px 3px 4px">' + chip(p) + '<b style="color:' + cor + '">' + tx + '</b></span>';
+  }).join("") + '</div>';
+}
+function corPct(p){ return p >= 100 ? "var(--ok)" : p >= 70 ? "#7FB2FF" : p >= 50 ? "var(--warn)" : "var(--bad)"; }
+function gestaoDiagnostico(){
+  var r = S_PTS;
+  if (!r || !r.pessoas) return '<div class="gsec"><h2>📊 Diagnóstico da semana</h2><p class="sub">Carregando…</p></div>';
+  var L = r.pessoas, eq = r.equipe, dm = r.demandas;
+  var T = {adv:0, prazo:0, atr:0, fal:0, ind:0}, batida = 0;
+  L.forEach(function(p){ var n = p.neg; T.adv += n.advertencias; T.prazo += n.naoFeitasComPrazo; T.atr += n.atrasos; T.fal += n.faltas; T.ind += n.indiretas; if (p.pts >= p.meta && p.meta) batida++; });
+  var h = '<div class="gsec diag"><h2>📊 Diagnóstico da semana · ' + fmtDate(r.de) + ' a ' + fmtDate(r.ate) + '</h2>'
+    + '<div class="hero"><span class="big tnum" style="color:' + corPct(eq.pct) + '" data-cnt="' + eq.pct + '">' + eq.pct + '%</span><div class="mtx2"><span class="ey">da meta da equipe</span><span class="sm"><b class="tnum">' + eq.pts + '</b> de ' + eq.meta + ' pts · <b>' + batida + '</b> de ' + L.length + ' bateram a meta</span></div></div>'
+    + '<div class="tot">'
+    + '<div><b class="tnum" style="color:' + (T.adv ? "var(--bad)" : "var(--ok)") + '">' + T.adv + '</b><small>⚠️ advertências</small></div>'
+    + '<div><b class="tnum" style="color:' + (T.prazo ? "var(--warn)" : "var(--ok)") + '">' + T.prazo + '</b><small>⏱ não feitas c/ prazo</small></div>'
+    + '<div><b class="tnum" style="color:' + (T.atr ? "var(--warn)" : "var(--ok)") + '">' + T.atr + '</b><small>🐢 atrasos de ponto</small></div>'
+    + '<div><b class="tnum" style="color:' + (T.fal ? "var(--bad)" : "var(--ok)") + '">' + T.fal + '</b><small>🚫 faltas</small></div>'
+    + '<div><b class="tnum" style="color:' + (T.ind ? "var(--warn)" : "var(--ok)") + '">' + T.ind + '</b><small>📵 fora do app</small></div>'
+    + (dm ? '<div><b class="tnum" style="color:' + (dm.naoRespondidas ? "var(--bad)" : "var(--ok)") + '">' + dm.naoRespondidas + '</b><small>📦 demandas sem resposta</small></div>' : '')
+    + '</div>'
+    + L.map(function(p){
+        var n = p.neg, fp = n.atrasos + n.faltas, fa = n.advertencias + n.naoFeitasComPrazo, c = corPct(p.pct), fl = "";
+        fl += '<span class="' + (fp > 1 ? "neg" : fp ? "" : "okk") + '">⏰ Ponto: ' + fp + ' falha' + (fp === 1 ? "" : "s") + (fp > 1 ? " · passou da tolerância" : fp ? " · tolerada" : "") + '</span>';
+        fl += '<span class="' + (fa > 1 || n.advertencias ? "neg" : fa ? "" : "okk") + '">🛡️ Atividades: ' + fa + ' falha' + (fa === 1 ? "" : "s") + (n.advertencias ? " · " + n.advertencias + " advertência(s)" : fa ? " · tolerada" : "") + '</span>';
+        if (n.indiretas) fl += '<span class="neg">📵 ' + n.indiretas + ' fora do app</span>';
+        return '<div class="pp"><span class="row" style="gap:8px;min-width:0">' + chip(p.id) + '<span class="sub tnum">' + p.pts + ' / ' + p.meta + ' pts' + (p.pts >= p.meta && p.meta ? ' · 🏆 meta batida' : ' · faltam ' + Math.max(0, p.meta - p.pts)) + '</span></span>'
+          + '<span class="pc tnum" style="color:' + c + '">' + p.pct + '%</span>'
+          + '<div class="trk"><i data-w="' + p.pct + '" style="background:' + c + '"></i></div><div class="fl">' + fl + '</div></div>';
+      }).join("")
+    + (dm ? '<div style="background:var(--sunk);border-radius:12px;padding:10px"><b>📦 Demandas (prazo ' + dm.prazoH + 'h)</b><div class="sub" style="margin-top:4px">' + dm.total + ' pedidos · ✅ ' + dm.noPrazo + ' no prazo · ⏳ ' + dm.foraPrazo + ' fora do prazo · ❌ ' + dm.naoRespondidas + ' sem resposta · ' + dm.abertas + ' abertas</div><div class="trk" style="margin-top:8px"><i data-w="' + dm.pct + '" style="background:' + corPct(dm.pct) + '"></i></div><span class="sub">' + dm.pct + '% respondidas no prazo</span></div>' : '')
+    + '<p class="sub">Verde: meta batida · Azul: 70% ou mais · Amarelo: 50–69% · Vermelho: abaixo de 50%. Tolerância da semana: 1 falha de ponto + 1 falha de atividade.</p>'
+    + '<button class="btn" data-g="diagEmail">📧 Enviar este diagnóstico por e-mail agora</button>'
+    + '<p class="sub">Todo sábado às 10h o diagnóstico chega sozinho no seu e-mail (segunda a sexta).</p></div>';
+  setTimeout(function(){ Array.prototype.forEach.call(document.querySelectorAll(".diag .trk i[data-w]"), function(i){ i.style.width = Math.max(2, Math.min(100, +i.dataset.w)) + "%"; }); }, 60);
+  return h;
+}
 function gestaoPontos(){
   var r = S_PTS;
   if (!r || !r.pessoas) return '<div class="gsec"><h2>🏆 Pontos da semana</h2><p class="sub">Carregando…</p></div>';
@@ -1106,18 +1226,25 @@ function gestaoPontos(){
       if (n.indiretas) tags += '<span class="neg">📵 Fora do app ×' + n.indiretas + '</span>';
       if (n.faltas) tags += '<span class="neg">🚫 Falta ×' + n.faltas + '</span>';
       return '<div class="rk' + cls + '">' + chip(p.id) + '<b class="pp tnum">' + p.pts + ' / ' + p.meta + ' · ' + p.pct + '%</b><div class="bar2"><i style="width:' + p.pct + '%"></i></div><div class="sel">' + (tags || '<span>Sem registros ainda</span>') + '</div></div>'; }).join("") + '</div>'
-    + '<div class="row" style="border-top:1px dashed var(--line);padding-top:10px;flex-wrap:wrap"><span class="sub">📵 Pedido feito fora do app</span><select id="indQuem" style="flex:1 1 120px">' + (S.data ? S.data.equipe : []).map(function(x){ return '<option value="' + esc(x.id) + '">' + esc(x.nome) + '</option>'; }).join("") + '</select><input id="indObs" maxlength="200" placeholder="O que foi pedido" style="flex:1 1 160px"><button class="btn" data-g="indireta">Lançar −5</button></div>';
+    + '<div class="row" style="border-top:1px dashed var(--line);padding-top:10px;flex-wrap:wrap"><span class="sub">📵 Pedido feito fora do app</span><select id="indQuem" style="flex:1 1 120px">' + (S.data ? S.data.equipe : []).filter(function(x){ return !R.EXCLUIR || R.EXCLUIR.indexOf(x.id) < 0; }).map(function(x){ return '<option value="' + esc(x.id) + '">' + esc(x.nome) + '</option>'; }).join("") + '</select><input id="indObs" maxlength="200" placeholder="O que foi pedido" style="flex:1 1 160px"><button class="btn" data-g="indireta">Lançar −5</button></div>';
   var ideias = (r.ideias || []).filter(function(x){ return x.estado !== "validada"; });
   h += '<div class="eyebrow" style="margin-top:6px">💡 Ideias para validar (' + ideias.length + ')</div>' + (ideias.length ? ideias.map(function(x){ return '<div class="row" style="justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0">' + chip(x.pessoa) + '<span style="flex:1 1 160px;min-width:0">' + esc(x.texto) + '</span><button class="btn fin" data-g="validar" data-id="' + esc(x.id) + '">⭐ Validar +27</button></div>'; }).join("") : '<p class="sub">Nenhuma ideia esperando.</p>');
   h += '<details style="margin-top:6px"><summary class="sub" style="cursor:pointer">Regras de pontuação</summary><div class="regrasP" style="margin-top:8px">'
     + [["🛡️ Responsabilidade: dia com todas as atividades concluídas no prazo", R.RESPONSABILIDADE],["⏰ Compromisso: dia com todos os pontos no horário", R.COMPROMISSO],["🔗 Integração: pedido pelo app (1 por dia)", R.INTEGRACAO],["💡 Criatividade: ideia enviada", R.IDEIA_ENVIO],["⭐ Ideia validada", R.IDEIA_VALIDADA],["🆘 Pedido de suporte pelo app", R.SUPORTE],["⚠️ Advertência: atividade não feita, sem pedir prazo", R.ADVERTENCIA],["⏱ Atividade não feita, com prazo pedido", R.NAO_FEITA_COM_PRAZO],["🐢 A cada 30 min de atraso no ponto (por turno)", R.ATRASO_30MIN],["📵 Pedido fora do app", R.INDIRETA]]
       .map(function(x){ return '<span>' + x[0] + '</span><span class="p ' + (x[1] < 0 ? "neg" : "pos") + '">' + (x[1] > 0 ? "+" : "") + x[1] + '</span>'; }).join("")
-    + '<span><b>🎯 Meta semanal de cada um</b>: máximo possível − ' + R.FALHAS_PERMITIDAS + ' (1 atraso de turno + 1 atividade com prazo)</span><span></span></div></details></div>';
+    + '<span><b>🎯 Meta semanal de cada um</b>: máximo possível − ' + R.FALHAS_PERMITIDAS + '</span><span></span></div>'
+    + '<ul class="sub" style="margin:10px 0 0;padding-left:18px;line-height:1.5">'
+    + '<li><b>A pontuação é por dia, não por atividade.</b> Quem tem 2 ou 4 atividades ganha o mesmo selo de Responsabilidade (+' + R.RESPONSABILIDADE + ') ao concluir todas do dia. O objetivo é concluir o dia.</li>'
+    + '<li>Cada pessoa tem de <b>2 a 4 atividades</b> por dia trabalhado, dentro da carga horária (ideal: 3 a 4 ações). Atividades a mais entram no mesmo dia, sem pesar mais.</li>'
+    + '<li><b>Tolerância da semana:</b> 1 falha de ponto + 1 falha de atividade (com prazo pedido). Vale também para quem tem 2 atividades.</li>'
+    + '<li><b>Dia com só 1 atividade:</b> sem tolerância. Se não concluir, desconta na hora como advertência (' + R.ADVERTENCIA + ').</li>'
+    + '<li>Pontuação zerada: conta a partir de ' + (R.INICIO ? fmtDate(R.INICIO) : "10/11") + ', 08h. Coordenação geral fora do ranking.</li></ul></details></div>';
   return h;
 }
 $("view").addEventListener("click", function(e){
   var b = e.target.closest("[data-g]"); if (!b || S.busy) return;
   var g = b.dataset.g;
+  if (g === "diagEmail"){ S.busy = true; toast("Enviando o diagnóstico…"); return run("enviarDiagnostico", S.me, S.pin).then(function(r){ SOM.play("envio"); toast("📧 Diagnóstico enviado para o seu e-mail."); }).catch(function(err){ toast(errMsg(err)); }).finally(function(){ S.busy = false; }); }
   if (g === "ptsPrev" || g === "ptsNext"){ ptsRef = isoAdd((S_PTS && S_PTS.de) || S.data.hoje, g === "ptsPrev" ? -7 : 7); loadPts(true); return; }
   if (g === "indireta"){ var q = $("indQuem").value, o = $("indObs").value.trim(); if (o.length < 3) return toast("Escreva o que foi pedido fora do app.");
     if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Confirmar −5"; return; }
@@ -1200,8 +1327,8 @@ function renderAvisos(){
 /* toast */
 var tTimer;
 var SOM = (function(){
-  var ctx = null, on = true;
-  try { on = localStorage.getItem("som") !== "0"; } catch(e){}
+  var ctx = null, on = true; // som sempre ativo
+  try { localStorage.removeItem("som"); } catch(e){}
   function nota(freq, ini, dur, vol, tipo){
     var o = ctx.createOscillator(), g = ctx.createGain(), t = ctx.currentTime + ini;
     o.type = tipo || "sine"; o.frequency.setValueAtTime(freq, t);
@@ -1213,22 +1340,36 @@ var SOM = (function(){
     ok:    function(){ nota(784, 0, 0.12, 0.10); nota(1175, 0.09, 0.18, 0.10); },
     ponto: function(){ nota(659, 0, 0.12, 0.11); nota(880, 0.1, 0.12, 0.11); nota(1319, 0.2, 0.28, 0.11); },
     erro:  function(){ nota(330, 0, 0.16, 0.12, "square"); nota(247, 0.14, 0.24, 0.10, "square"); },
-    nao:   function(){ nota(440, 0, 0.1, 0.08, "triangle"); nota(330, 0.08, 0.14, 0.08, "triangle"); }
+    nao:   function(){ nota(440, 0, 0.1, 0.08, "triangle"); nota(330, 0.08, 0.14, 0.08, "triangle"); },
+    aba:   function(i){ var f = [523,587,659,698,784,880,988,1047,1175,1319,1397][i % 11]; nota(f, 0, 0.07, 0.07, "triangle"); nota(f * 1.5, 0.05, 0.08, 0.04); },
+    inicio:function(){ nota(523, 0, 0.09, 0.10); nota(659, 0.07, 0.09, 0.10); nota(784, 0.14, 0.16, 0.10); },
+    conclui:function(){ nota(784, 0, 0.1, 0.10); nota(988, 0.08, 0.1, 0.10); nota(1175, 0.16, 0.1, 0.10); nota(1568, 0.24, 0.3, 0.09); },
+    envio: function(){ var t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(); o.type = "sine"; o.frequency.setValueAtTime(400, t); o.frequency.exponentialRampToValueAtTime(1400, t + 0.18);
+             g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.09, t + 0.03); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.22); o.connect(g); g.connect(ctx.destination); o.start(t); o.stop(t + 0.25); },
+    sino:  function(){ nota(1319, 0, 0.5, 0.08); nota(1976, 0, 0.35, 0.04); nota(1319, 0.18, 0.5, 0.06); },
+    radar: function(){ nota(1046, 0, 0.08, 0.08); nota(1046, 0.16, 0.08, 0.06); nota(1568, 0.32, 0.16, 0.07); },
+    pop:   function(){ nota(1200, 0, 0.05, 0.10, "triangle"); nota(1800, 0.04, 0.08, 0.07); },
+    abre:  function(){ nota(392, 0, 0.08, 0.07, "triangle"); nota(523, 0.06, 0.1, 0.07, "triangle"); }
   };
-  var VIB = {tap:8, ok:20, ponto:[20,40,30], erro:[60,40,60], nao:15};
+  var VIB = {tap:8, ok:20, ponto:[20,40,30], erro:[60,40,60], nao:15, aba:6, inicio:[15,30,15], conclui:[20,30,20,30,40], envio:12, sino:[30,60,30], radar:[10,40,10], pop:10, abre:8};
+  function destrava(){ try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch(e){}
+    try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state !== "running") ctx.resume(); } catch(e){} }
+  ["pointerdown","touchstart","keydown"].forEach(function(ev){ document.addEventListener(ev, destrava, {capture:true, passive:true}); });
+  document.addEventListener("visibilitychange", function(){ if (!document.hidden && ctx) { try { ctx.resume(); } catch(e){} } });
   return {
     on: function(){ return on; },
-    set: function(v){ on = v; try { localStorage.setItem("som", v ? "1" : "0"); } catch(e){} },
-    play: function(k){
+    set: function(v){ on = true; },
+    play: function(k, arg){
       try { if (navigator.vibrate && VIB[k]) navigator.vibrate(VIB[k]); } catch(e){}
       if (!on || !SONS[k]) return;
       try { if (navigator.audioSession && navigator.audioSession.type !== "playback") navigator.audioSession.type = "playback"; } catch(e){}
-      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state === "suspended") ctx.resume(); SONS[k](); window.__sons = (window.__sons || 0) + 1; } catch(e){}
+      try { ctx = ctx || new (window.AudioContext || window.webkitAudioContext)(); if (ctx.state !== "running") ctx.resume(); SONS[k](arg); window.__sons = (window.__sons || 0) + 1; } catch(e){}
     }
   };
 })();
 function somDoAviso(msg){
   var m = String(msg || "");
+  if (/^(🔔|📢|⚠️ "|⛔|⏰)/.test(m)) return "sino";
   if (/…$/.test(m)) return "";
   if (/toque de novo|confirmar/i.test(m)) return "tap";
   if (/n[aã]o (foi|consegui|achei|é|pode|est)|erro|inv[aá]lid|obrigat[oó]ri|precisa|bloquead|fraco|acabou|incorreto|s[oó] (a|quem|pode|para)|escreva|escolha|informe|ative|passa de|fora d|j[aá] (est|foi|exist)|espere/i.test(m)) return "erro";
@@ -1273,7 +1414,7 @@ $("view").addEventListener("click", function(ev){
   }
   var lab = ev.target.closest("label[data-saida]");
   if (lab){
-    if (S.busy || S_LOC !== "ok"){ ev.preventDefault(); if (S_LOC !== "ok") toast("Ative a localização para registrar o ponto."); return; }
+    if (S.busy || (S_LOC !== "ok" && !locLivre())){ ev.preventDefault(); if (!S.busy) toast("Ative a localização para registrar o ponto."); return; }
     S_EXTRA = {};
     if (lab.dataset.saida === "motivo"){
       if (!S_MOT.tipo){ ev.preventDefault(); return toast("Escolha: atividade externa ou saída emergencial."); }
@@ -1288,7 +1429,12 @@ $("view").addEventListener("click", function(ev){
   if (a === "unpunch") return act(run("punch", S.me, S.pin, null, true)).then(function(d){ toast(d.msg); }).catch(function(){});
   if (a === "motivo"){ S_MOT.aberto = !S_MOT.aberto; S_MOT.tipo = ""; return render(); }
   if (a === "mt"){ S_MOT.tipo = btn.dataset.m; var keep = $("motObs") ? $("motObs").value : ""; render(); if ($("motObs")) $("motObs").value = keep; return; }
-  if (a === "loc") return checarLocal();
+  if (a === "dtab"){ S_DTAB = btn.dataset.t; return render(); }
+  if (a === "waEdit"){ S_WAEDIT = !S_WAEDIT; renderAtiva(); if (S_WAEDIT && $("waIn")){ $("waIn").value = ""; $("waIn").focus(); } return; }
+  if (a === "waSalvar"){ var tel = ($("waIn") ? $("waIn").value : "").trim(); if (tel.replace(/\D/g,"").length < 10) return toast("Escreva o WhatsApp com DDD, ex.: 82 99999-9999.");
+    S_WAEDIT = false; if (document.activeElement) document.activeElement.blur();
+    return act(run("salvarMeuWhats", S.me, S.pin, tel)).then(function(){ SOM.play("pop"); toast("💬 WhatsApp ativado. A coordenação já consegue te mandar os avisos por ele."); }).catch(function(){}); }
+  if (a === "loc"){ SOM.play("radar"); if (S_LOC === "ok") toast("📍 Localização ativa. Tudo certo."); return checarLocal(); }
   if (a === "avf"){ S_AVF = btn.dataset.f; return render(); }
   if (a === "dem"){
     var k = btn.dataset.k, inp = $("dem_"+k), det = inp ? inp.value.trim() : "";
@@ -1320,7 +1466,7 @@ $("view").addEventListener("click", function(ev){
   if (a === "suporte"){ texto = ($("supTxt") ? $("supTxt").value : "").trim(); if (texto.length < 3) return toast("Escreva o que você precisa para resolver."); }
   if (a === "prazo") texto = btn.dataset.o;
   var precisaLocal = a === "start" || a === "finish" || a === "suporte";
-  var pLoc = precisaLocal ? (S.busy = true, render(), pegarLocal(true)) : Promise.resolve(null);
+  var pLoc = precisaLocal ? (S.busy = true, render(), pegaLoc()) : Promise.resolve(null);
   pLoc.then(function(loc){
     S.busy = false;
     if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
@@ -1366,11 +1512,11 @@ $("view").addEventListener("change", function(e){
   shrink(e.target.files[0]).then(function(x){
     b64 = x;
     if (!b64) throw new Error("Não consegui ler a foto. Tente de novo.");
-    return pegarLocal(true);
+    return pegaLoc();
   }).then(function(loc){
     S.busy = false;
-    S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
-    var extra = {lat:loc.lat, lng:loc.lng, acc:loc.acc, motivo:S_EXTRA.motivo, obs:S_EXTRA.obs};
+    if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
+    var extra = loc ? {lat:loc.lat, lng:loc.lng, acc:loc.acc, motivo:S_EXTRA.motivo, obs:S_EXTRA.obs} : {motivo:S_EXTRA.motivo, obs:S_EXTRA.obs};
     return act(run("punch", S.me, S.pin, b64, false, extra)).then(function(d){ S_MOT.aberto = false; S_MOT.tipo = ""; S_EXTRA = {}; toast(d.msg); });
   }).catch(function(err){ S.busy = false; if (err && /localiza/i.test(err.message||"")) S_LOC = /bloqueada/.test(err.message) ? "bloqueada" : "erro"; render(); if (err && err.message) toast(err.message); });
   e.target.value = "";
@@ -1384,7 +1530,7 @@ function fotoFlow(inputEl, enviar){
   var b64;
   shrink(f).then(function(x){
     b64 = x; if (!b64) throw new Error("Não consegui ler a foto. Tente de novo.");
-    return alvo.tipo === "tarefa" ? pegarLocal(true) : null;
+    return alvo.tipo === "tarefa" ? pegaLoc() : null;
   }).then(function(loc){
     S.busy = false;
     if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
@@ -1469,7 +1615,7 @@ function renderGestao(){
   var w = $("gWrap"); if (!w) return;
   var p = S.painel, d = S.data;
   if (!p){ w.innerHTML = '<div class="empty"><b>Carregando o painel…</b>Frequência da semana, atrasos e quem falta bater ponto.</div>'; return; }
-  var h = gestaoPontos();
+  var h = gestaoDiagnostico() + gestaoPontos();
   // relatório final do dia
   var OPD = p.opcoesDia || {seguir:"Dia de atividades executadas · seguir", ajustes:"Dia de necessidade de ajustes", urgencias:"Dia de reavaliação de urgências"};
   var fe = p.fechamento;
@@ -1539,7 +1685,8 @@ function renderGestao(){
   h += '<div class="gsec"><h2>Montar o dia</h2><div class="row"><label class="sub" for="gDia">Dia</label><input type="date" id="gDia" value="'+esc(gd)+'"></div>';
   if (lista === null) h += '<p class="sub">Carregando tarefas…</p>';
   else if (!lista.length) h += '<p class="sub">Nenhuma tarefa neste dia ainda.</p>';
-  else h += '<div class="tl">'+lista.map(function(t){
+  if (lista && lista.length) h += ativPorPessoa(lista, d);
+  if (lista && lista.length) h += '<div class="tl">'+lista.map(function(t){
     if (S_EDT && S_EDT.id === t.id) return '<div style="flex-direction:column;align-items:stretch;gap:8px"><b>'+esc(t.titulo)+'</b>'
       + '<div class="row"><label class="sub">Início <input type="time" id="eIni" value="'+esc(toHHMM(t.hora))+'"></label><label class="sub">Fim <input type="time" id="eFim" value="'+esc(t.fim||"")+'"></label></div>'
       + '<div class="pick">'+(d?d.equipe:[]).map(function(x){ return '<button type="button" data-ep="'+esc(x.id)+'" aria-pressed="'+(S_EDT.pessoas.indexOf(x.id)>=0)+'">'+chip(x.id)+'</button>'; }).join("")+'</div>'
@@ -1700,10 +1847,40 @@ $("view").addEventListener("change", function(e){
   if (e.target.id === "gDia" && e.target.value){ S.gDia = e.target.value; load(S.gDia, true).then(renderGestao); }
 });
 
-function somIcone(){ $("somBtn").textContent = SOM.on() ? "🔊" : "🔇"; }
+function somIcone(){ $("somBtn").hidden = true; }
 somIcone();
 $("somBtn").addEventListener("click", function(){ SOM.set(!SOM.on()); somIcone(); if (SOM.on()) SOM.play("ok"); });
-document.querySelector(".tabs").addEventListener("click", function(e){ if (e.target.closest("button")) SOM.play("tap"); }, true);
+document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; var bs = Array.prototype.slice.call(document.querySelectorAll(".tabs button")); SOM.play("aba", bs.indexOf(b)); }, true);
+// sons e efeitos nos botões
+$("ativaBox").addEventListener("click", function(ev){
+  var btn = ev.target.closest("[data-act]"); if (!btn || S.busy) return;
+  var a = btn.dataset.act;
+  if (a === "loc"){ SOM.play("radar"); if (S_LOC === "ok") toast("📍 Localização ativa. Tudo certo."); return checarLocal(); }
+  if (a === "waEdit"){ S_WAEDIT = !S_WAEDIT; renderAtiva(); if (S_WAEDIT && $("waIn")) $("waIn").focus(); return; }
+  if (a === "waSalvar"){ var tel = ($("waIn") ? $("waIn").value : "").trim(); if (tel.replace(/\D/g,"").length < 10) return toast("Escreva o WhatsApp com DDD, ex.: 82 99999-9999.");
+    S_WAEDIT = false; if (document.activeElement) document.activeElement.blur();
+    return act(run("salvarMeuWhats", S.me, S.pin, tel)).then(function(){ SOM.play("pop"); toast("💬 WhatsApp ativado. A coordenação já consegue te mandar os avisos por ele."); }).catch(function(){}); }
+});
+var SOM_ACT = {start:"inicio", finish:"conclui", dem:"envio", atender:"conclui", validarIdeia:"conclui", dtab:"aba", waEdit:"abre", abrirsup:"abre", abrirprazo:"abre", motivo:"abre"};
+function burst(x, y, emo){
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  for (var i = 0; i < 9; i++){ (function(i){
+    var e = document.createElement("span"); e.className = "fx"; e.textContent = emo[i % emo.length]; e.style.left = x + "px"; e.style.top = y + "px"; document.body.appendChild(e);
+    var ang = (Math.PI * 2 * i / 9) + Math.random() * .5, dist = 50 + Math.random() * 40;
+    var an = e.animate([{transform:"translate(-50%,-50%) scale(.4)", opacity:1},{transform:"translate(calc(-50% + " + Math.cos(ang)*dist + "px), calc(-50% + " + (Math.sin(ang)*dist - 20) + "px)) scale(1)", opacity:0}], {duration:700 + Math.random()*200, easing:"cubic-bezier(.2,.8,.3,1)"});
+    an.onfinish = function(){ e.remove(); };
+  })(i); }
+}
+document.addEventListener("click", function(e){
+  var b = e.target.closest("[data-act],[data-g],.btn,.dem .btns button,.day,label.btn"); if (!b || b.disabled) return;
+  if (b.closest(".tabs")) return;
+  var a = b.dataset.act, k = (a && SOM_ACT[a]) || "tap";
+  if (a !== "loc") SOM.play(k, a === "dtab" ? ["abertas","concluidas","nao"].indexOf(b.dataset.t) + 3 : 0);
+  var r = b.getBoundingClientRect();
+  if (k === "conclui") burst(r.left + r.width/2, r.top + r.height/2, ["🎉","✨","⭐"]);
+  else if (k === "inicio") burst(r.left + r.width/2, r.top + r.height/2, ["🚀","✨"]);
+  else if (k === "envio") burst(r.left + r.width/2, r.top + r.height/2, ["📦","✨"]);
+}, true);
 $("view").addEventListener("click", function(e){ var p = e.target.closest('[data-pg="pres"]'); if (p) SOM.play(p.dataset.v === "sim" ? "ok" : "nao"); }, true);
 $("iniciarDia").addEventListener("click", function(){ SOM.play("ponto"); $("capa").hidden = true; if (logged()) checarLocal(); });
 (function(){ var c = lerCache(), hj = new Date(Date.now() - 3*3600*1000).toISOString().slice(0,10); if (c && logged() && c.hoje === hj){ S.data = c; try { render(); } catch(e){ S.data = null; } } })();
@@ -1719,7 +1896,7 @@ document.addEventListener("visibilitychange", function(){ if (!document.hidden &
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611100414";
+var APP_VERSAO = "202611100438";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
