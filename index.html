@@ -698,6 +698,10 @@ body.modoPainel #pnPub{max-width:1180px;margin:0 auto;padding:16px 16px 40px}
 body.modoPainel .pnTopo h2{font-size:24px}
 @media print{body > *:not(.app):not(#pnPub){display:none!important}.tabs,.top,.fab{display:none!important}.pn .btn,.pn .tog{display:none!important}}
 
+.folTot{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.folTot div{background:var(--sunk);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:2px}.folTot span{font-size:12px;font-weight:800;color:var(--muted)}.folTot b{font-size:20px;font-weight:900}
+.folTabW{overflow-x:auto;-webkit-overflow-scrolling:touch}.folTab{width:100%;border-collapse:collapse;font-size:13.5px;min-width:440px}.folTab th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
+.folTab td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}.folTab td small{display:block;color:var(--muted);font-size:11.5px}.folTab .fv{font-weight:900;white-space:nowrap;text-align:right}.folTab tfoot td{font-weight:900;font-size:15px;border-bottom:0;color:var(--accent)}
+details.folha > summary{list-style:none}details.folha > summary::-webkit-details-marker{display:none}
 </style>
 </head>
 <body>
@@ -3814,18 +3818,30 @@ function folhaHtml(){
   if (!S_FOLHA){ if (!S_FOLHA_LOAD){ S_FOLHA_LOAD = true; run("folha", S.me, S.pin).then(function(r){ S_FOLHA = r; renderGestao(); }).catch(function(e){ toast(errMsg(e)); }).finally(function(){ S_FOLHA_LOAD = false; }); }
     return '<div class="gsec"><h2>💼 Folha interna</h2><p class="sub">Carregando…</p></div>'; }
   var F = S_FOLHA, T = F.tipos;
-  var h = '<div class="gsec"><h2>💼 Folha interna · só você vê</h2><p class="sub">Selo semanal de evolução (semana de ' + fmtDate(F.semana) + '). No mês: 2 “urgente”, 3 “conversar pessoalmente” ou 4 “precisa evoluir” geram alerta de reunião.</p>';
+  var num = function(v){ var t = String(v || "").replace(/[^\d,.-]/g, ""); if (/,\d{1,2}$/.test(t)) t = t.replace(/\./g, "").replace(",", "."); else t = t.replace(/,/g, ""); return Number(t) || 0; };
+  var brl = function(n){ return "R$ " + n.toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, "."); };
+  var tot = 0, comValor = 0;
+  var tab = F.equipe.map(function(e){ var f = F.folha[e.id] || {}, v = num(f.valor); tot += v; if (v) comValor++;
+    return '<tr><td><b>' + esc(e.nome) + '</b>' + (f.obs ? '<small>' + esc(f.obs) + '</small>' : '') + '</td><td>' + esc(f.funcao || "—") + '</td><td class="fv">' + (v ? brl(v) : "—") + '</td><td>' + esc(f.data || "—") + (f.adicoes ? '<small>+ ' + esc(f.adicoes) + '</small>' : '') + '</td></tr>'; }).join("");
+  var resumo = "💼 *Folha interna — ONG Amigos de Maribondo*\n" + F.equipe.map(function(e){ var f = F.folha[e.id] || {}, v = num(f.valor); return "• " + e.nome + (f.funcao ? " (" + f.funcao + ")" : "") + ": " + (v ? brl(v) : "—") + (f.data ? " · " + f.data : ""); }).join("\n") + "\n\n*Total: " + brl(tot) + "*";
+  var h = '<div class="gsec"><h2>💼 Folha total · só você vê</h2><div class="folTot"><div><span>Total da folha</span><b>' + brl(tot) + '</b></div><div><span>Pessoas</span><b>' + F.equipe.length + '</b></div><div><span>Com valor</span><b>' + comValor + '</b></div></div>'
+    + '<div class="folTabW"><table class="folTab"><thead><tr><th>Nome</th><th>Função</th><th>Valor</th><th>Pagamento</th></tr></thead><tbody>' + tab + '</tbody><tfoot><tr><td colspan="2">Total</td><td class="fv">' + brl(tot) + '</td><td></td></tr></tfoot></table></div>'
+    + '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" data-x="folhaCopia" data-t="' + esc(resumo) + '">📋 Copiar folha</button><button class="btn" data-x="folhaPdf">🖨️ PDF</button></div></div>';
+  h += '<div class="gsec"><h2>✏️ Editar folha e selos</h2><p class="sub">Selo semanal de evolução (semana de ' + fmtDate(F.semana) + '). No mês: 2 “urgente”, 3 “conversar pessoalmente” ou 4 “precisa evoluir” geram alerta de reunião.</p>';
   h += F.equipe.map(function(e){
     var f = F.folha[e.id] || {}, s = F.selos[e.id] || {mes:{}, semana:""}, m = s.mes || {};
     var reuniao = (m.urgente >= 2) || (m.conversar >= 3) || (m.evoluir >= 4);
-    return '<div class="folha">' + '<div class="row" style="justify-content:space-between">' + chip(e.id) + (reuniao ? '<span class="pill bad">📅 marcar reunião</span>' : '') + '</div>'
+    return '<details class="folha"><summary class="row" style="justify-content:space-between;cursor:pointer">' + chip(e.id) + '<span class="row" style="gap:6px">' + (reuniao ? '<span class="pill bad">📅 marcar reunião</span>' : '') + '<span class="muted">' + esc(f.valor ? "R$ " + f.valor : "sem valor") + ' ✏️</span></span></summary>'
       + '<div class="f"><label>Função<input id="fF_' + esc(e.id) + '" value="' + esc(f.funcao || "") + '"></label><label>Valor (R$)<input id="fV_' + esc(e.id) + '" inputmode="decimal" value="' + esc(f.valor || "") + '"></label>'
       + '<label>Data de pagamento<input id="fD_' + esc(e.id) + '" value="' + esc(f.data || "") + '" placeholder="dia 5"></label><label>Adições / prazos<input id="fA_' + esc(e.id) + '" value="' + esc(f.adicoes || "") + '"></label>'
       + '<label class="full">Observação<input id="fO_' + esc(e.id) + '" value="' + esc(f.obs || "") + '"></label><button class="btn primary full" data-x="folhaSalvar" data-id="' + esc(e.id) + '">Salvar</button></div>'
-      + '<div class="selosEv">' + Object.keys(T).map(function(k){ return '<button class="tog sev-' + k + '" data-x="seloEv" data-id="' + esc(e.id) + '" data-k="' + k + '" aria-pressed="' + (s.semana === k) + '">' + esc(T[k]) + (m[k] ? ' <b>×' + m[k] + '</b>' : '') + '</button>'; }).join("") + '</div></div>';
+      + '<div class="selosEv">' + Object.keys(T).map(function(k){ return '<button class="tog sev-' + k + '" data-x="seloEv" data-id="' + esc(e.id) + '" data-k="' + k + '" aria-pressed="' + (s.semana === k) + '">' + esc(T[k]) + (m[k] ? ' <b>×' + m[k] + '</b>' : '') + '</button>'; }).join("") + '</div></details>';
   }).join("");
   return h + '</div>';
 }
+document.addEventListener("click", function(ev){ var b = ev.target.closest('[data-x="folhaCopia"],[data-x="folhaPdf"]'); if (!b) return;
+  if (b.dataset.x === "folhaPdf"){ window.print(); return; }
+  try { navigator.clipboard.writeText(b.dataset.t); toast("📋 Folha copiada. Cole no WhatsApp ou nas notas."); } catch(e){ toast("Não consegui copiar."); } });
 
 /* ---------- cliques dos novos recursos ---------- */
 document.addEventListener("click", function(ev){
@@ -3918,7 +3934,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611110329";
+var APP_VERSAO = "202611110404";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
