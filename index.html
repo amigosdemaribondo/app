@@ -648,6 +648,56 @@ a.lnk,.lnk{color:#FFE27A}
 .sc i{font-style:normal;width:20px;height:20px;border-radius:50%;background:var(--c);display:grid;place-items:center;font-size:11px}
 .sc b{color:var(--c)}
 @media (prefers-reduced-motion: reduce){.aring .sg{transition:none}.aring.on .ic,.sc,.aring .coroa{animation:none;transform:translate(-50%,-50%)}}
+/* ===== 📊 Painel ao vivo ===== */
+.pn{display:flex;flex-direction:column;gap:12px}
+.pnTopo{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;flex-wrap:wrap}.pnTopo h2{margin:0;font-size:19px}
+.pnVivo{font-size:12px;font-weight:800;color:var(--ok)}.pnVivo::first-letter{animation:pnPulsa 1.4s infinite}.pnVivo.off{color:var(--bad)}
+@keyframes pnPulsa{50%{opacity:.2}}
+.pnSub{margin:0;font-weight:800;color:var(--muted);font-size:13px}
+.pnKs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+@media (min-width:640px){.pnKs{grid-template-columns:repeat(5,1fr)}}
+.pnK{position:relative;display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto auto auto;align-items:center;text-align:left;border:1.5px solid var(--line);background:linear-gradient(160deg,color-mix(in srgb,var(--c) 22%,var(--surface)),var(--surface));border-radius:18px;padding:12px;color:var(--ink);overflow:hidden}
+.pnK[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}
+.pnK .pnKi{font-size:20px}.pnK b{font-size:36px;line-height:1;font-weight:900;grid-column:1}.pnK small{font-weight:800;font-size:12px;color:var(--muted);grid-column:1}
+.pnK .pnRing{grid-column:2;grid-row:1 / span 3;width:56px;height:56px}.pnK em{grid-column:2;font-style:normal;font-size:10.5px;font-weight:800;color:var(--muted);text-align:center}
+.pnK i{grid-column:1 / span 2;font-style:normal;font-size:11.5px;font-weight:800;color:var(--muted);margin-top:4px}.pnK i.up{color:var(--ok)}.pnK i.dn{color:var(--bad)}
+.pnK.bateu{border-color:var(--ok)}.pnK.bateu::after{content:"🏆";position:absolute;top:6px;right:8px;font-size:15px}
+.pnK.pisca{animation:pnPisca 1.2s ease}@keyframes pnPisca{25%{transform:scale(1.05);box-shadow:0 0 0 4px var(--c)}}
+.pnMais{position:absolute;right:12px;top:30px;font-size:22px;font-weight:900;color:var(--c);animation:pnSobe 1.5s ease forwards;pointer-events:none}@keyframes pnSobe{to{transform:translateY(-34px);opacity:0}}
+.pnMets{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.pnMets::-webkit-scrollbar{display:none}.pnMets .tog{flex:none}
+.pnMets .tog[aria-pressed="true"],.pnGraf .tog[aria-pressed="true"]{border-style:solid;border-color:var(--c,var(--accent));color:var(--ink);background:rgba(255,255,255,.1)}
+.pnSvg{width:100%;height:auto;display:block}.pnBar{transform-origin:bottom;transform-box:fill-box;animation:pnCresce .6s cubic-bezier(.2,.9,.2,1) both}@keyframes pnCresce{from{transform:scaleY(0)}}
+.pnDia{margin:0;font-size:13px;font-weight:700;color:var(--muted)}.pnDia b{color:var(--ink)}
+.pnSem{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}@media (min-width:640px){.pnSem{grid-template-columns:repeat(5,1fr)}}
+.pnS{border-left:4px solid var(--c);background:var(--sunk);border-radius:12px;padding:8px 10px;display:flex;flex-direction:column;gap:2px}.pnS span{font-size:12px;font-weight:800;color:var(--muted)}.pnS b{font-size:26px;font-weight:900;line-height:1.1}
+.pnS i{font-style:normal;font-size:12px;font-weight:900}.pnS i.up{color:var(--ok)}.pnS i.dn{color:var(--bad)}.pnS i small{display:block;font-weight:700;color:var(--muted)}
+.pnDuo{display:grid;gap:12px}@media (min-width:640px){.pnDuo{grid-template-columns:1fr 1fr}}.pnDuo .gsec{margin-top:0}
+.pnB{display:grid;grid-template-columns:minmax(80px,38%) 1fr auto;gap:8px;align-items:center;font-size:13px;font-weight:700}.pnB div{height:12px;background:var(--sunk);border-radius:6px;overflow:hidden}.pnB i{display:block;height:100%;border-radius:6px;animation:pnLarg .8s cubic-bezier(.2,.9,.2,1) both;transform-origin:left}
+@keyframes pnLarg{from{transform:scaleX(0)}}.pnB b small{color:var(--muted);font-weight:700}
+/* organograma */
+.pnOrgW{overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
+.pnOrg{display:inline-block;min-width:100%}
+.pnOrg ul{padding:18px 0 0;margin:0;position:relative;display:flex;justify-content:center}
+.pnOrg li{list-style:none;position:relative;padding:18px 5px 0;display:flex;flex-direction:column;align-items:center}
+.pnOrg li::before,.pnOrg li::after{content:"";position:absolute;top:0;right:50%;width:50%;height:18px;border-top:2px solid rgba(255,255,255,.45)}
+.pnOrg li::after{right:auto;left:50%;border-left:2px solid rgba(255,255,255,.45)}
+.pnOrg li:only-child::before,.pnOrg li:only-child::after{display:none}.pnOrg li:only-child{padding-top:0}
+.pnOrg li:first-child::before,.pnOrg li:last-child::after{border:0 none}
+.pnOrg li:last-child::before{border-right:2px solid rgba(255,255,255,.45);border-radius:0 8px 0 0}.pnOrg li:first-child::after{border-radius:8px 0 0 0}
+.pnOrg ul ul::before{content:"";position:absolute;top:0;left:50%;border-left:2px solid rgba(255,255,255,.45);height:18px}
+.pnOrg > ul{padding-top:0}
+.pnN{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;min-width:96px;max-width:130px;background:var(--sunk);border:1.5px solid color-mix(in srgb,var(--c) 70%,transparent);border-radius:16px;padding:10px 8px;animation:pnNasce .5s cubic-bezier(.2,1.4,.4,1) both;box-shadow:0 6px 16px rgba(0,0,0,.2)}
+@keyframes pnNasce{from{opacity:0;transform:translateY(10px) scale(.9)}}
+.pnAv{width:42px;height:42px;border-radius:50%;background:var(--c);color:#0B1E45;display:grid;place-items:center;font-weight:900;font-size:15px;box-shadow:0 0 0 3px rgba(255,255,255,.15)}
+.pnN b{font-size:13px;text-align:center;line-height:1.15}.pnN small{font-size:10.5px;font-weight:800;color:var(--c);text-align:center;text-transform:uppercase;letter-spacing:.03em;line-height:1.2}
+.pnN em{position:absolute;top:-8px;right:-8px;font-style:normal;background:var(--accent);color:#1B1400;border-radius:999px;font-size:11px;font-weight:900;padding:1px 7px}
+.pnOE{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:8px 0;border-bottom:1px solid var(--line)}.pnOE select{grid-column:1}.pnOE input[type=color]{width:100%;height:40px;padding:2px}.pnOE .btn{grid-column:2;justify-self:end}
+/* modo público / TV */
+body.modoPainel > *:not(#pnPub):not(script):not(.toast){display:none!important}
+body.modoPainel #pnPub{max-width:1180px;margin:0 auto;padding:16px 16px 40px}
+body.modoPainel .pnTopo h2{font-size:24px}
+@media print{body > *:not(.app):not(#pnPub){display:none!important}.tabs,.top,.fab{display:none!important}.pn .btn,.pn .tog{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -729,6 +779,7 @@ a.lnk,.lnk{color:#FFE27A}
     <button role="tab" aria-selected="false" data-v="suporte"><i aria-hidden="true">🆘</i>Suporte<span class="badge" id="supBadge" hidden></span></button>
     <button role="tab" aria-selected="false" data-v="gestao" id="tabG" hidden><i aria-hidden="true">⚙️</i>Gestão</button>
     <button type="button" class="maisBtn" data-v="__mais" aria-expanded="false"><i aria-hidden="true">☰</i>Mais</button>
+    <button role="tab" aria-selected="false" data-v="painel"><i aria-hidden="true">📊</i>Painel ao vivo</button>
     <button role="tab" aria-selected="false" data-v="docsong"><i aria-hidden="true">📂</i>Documentos</button>
     <button role="tab" aria-selected="false" data-v="atend"><i aria-hidden="true">📋</i>Atendimento</button>
     <button role="tab" aria-selected="false" data-v="cadastro"><i aria-hidden="true">🪪</i>Cadastro ONG</button>
@@ -873,7 +924,7 @@ function render(){
   var vw = $("view"); if (S_VIEWANT !== S.view){ S_VIEWANT = S.view; vw.classList.remove("troca"); void vw.offsetWidth; vw.classList.add("troca"); clearTimeout(vw._t); vw._t = setTimeout(function(){ vw.classList.remove("troca"); }, 700); }
   renderGalBox();
   $("view").innerHTML = S.view==="playlist" ? renderPlaylist() : S.view==="engaja" ? renderEngaja() : S.view==="ideias" ? renderIdeias() : S.view==="galeria" ? renderGaleria() : S.view==="ponto" ? renderPonto() : S.view==="avisos" ? renderAvisos() : S.view==="demandas" ? renderDemandas()
-    : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="suporte" ? renderSuporte() : S.view==="docsong" ? renderDocsOng() : S.view==="cadastro" ? renderMembrosONG() : S.view==="atend" ? renderAtend() : S.view==="editais" ? renderEditais() : renderDia(S.view==="minhas");
+    : S.view==="freq" ? renderFreq() : S.view==="visitas" ? renderVisitas() : S.view==="programas" ? renderProgramas() : S.view==="saude" ? renderSaude() : S.view==="suporte" ? renderSuporte() : S.view==="docsong" ? renderDocsOng() : S.view==="cadastro" ? renderMembrosONG() : S.view==="atend" ? renderAtend() : S.view==="editais" ? renderEditais() : S.view==="painel" ? renderPainel() : renderDia(S.view==="minhas");
 }
 
 var S_DIATAB = "agora";
@@ -2179,6 +2230,107 @@ function loadSa(){
 }
 var SIT_PILL = {"Agendado":"warn","Realizado":"ok","Atrasado":"bad","Cancelado":"muted","A analisar":"muted","Em preparação":"warn","Enviado":"warn","Aprovado":"ok","Não aprovado":"bad"};
 function fd(iso){ return iso ? iso.slice(8)+"/"+iso.slice(5,7) : ""; }
+
+/* ================= 📊 PAINEL AO VIVO DA ONG ================= */
+var PN = {d:null, met:"atendimentos", dias:14, sel:null, ant:{}, timer:null, pub:false, edOrg:false, edMeta:false, padF:false, carregando:false};
+var PN_M = [["cadastros","🪪","Cadastros","#FFD23F"],["atendimentos","📋","Atendimentos","#3BE38A"],["presentes","🙋","Presentes nas aulas","#7CC4FF"],["entradas","🚪","Entradas na ONG","#FF9F6B"],["padrinhos","💛","Padrinhos novos","#FF7EB6"]];
+function pnBr(iso){ return iso ? iso.slice(8, 10) + "/" + iso.slice(5, 7) : ""; }
+function pnDs(iso){ return ["dom","seg","ter","qua","qui","sex","sáb"][new Date(iso + "T12:00:00").getDay()]; }
+function pnCarregar(silencio){
+  if (PN.carregando) return; PN.carregando = true;
+  var p = PN.pub ? fetch(API, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body:JSON.stringify({fn:"painelPublico", args:[]})}).then(function(r){ return r.json(); }).then(function(j){ if (!j.ok) throw new Error(j.error); return j.data; }) : run("painelAoVivo", S.me, S.pin);
+  p.then(function(d){ var novo = !PN.d; pnNovidades(d); PN.d = d; if (PN.pub) pnRenderPub(); else if (S.view === "painel") pnAtualizaTela(novo); })
+   .catch(function(e){ if (!silencio) toast(errMsg(e)); var st = document.querySelector(".pnVivo"); if (st) st.classList.add("off"); })
+   .then(function(){ PN.carregando = false; });
+}
+function pnNovidades(d){ if (!PN.d) return; var h = d.hoje, sub = [];
+  PN_M.forEach(function(m){ var a = PN.d.series[m[0]][h] || 0, b = d.series[m[0]][h] || 0; if (b > a) sub.push({k:m[0], n:b - a, i:m[1], t:m[2]}); });
+  if (sub.length){ try { SOM.play("ponto"); } catch(e){} sub.forEach(function(s, i){ setTimeout(function(){ var el = document.querySelector('.pnK[data-k="' + s.k + '"]'); if (el){ el.classList.remove("pisca"); void el.offsetWidth; el.classList.add("pisca"); var f = document.createElement("span"); f.className = "pnMais"; f.textContent = "+" + s.n; el.appendChild(f); setTimeout(function(){ f.remove(); }, 1600); } }, i * 250); }); } }
+function pnTimer(){ clearInterval(PN.timer); PN.timer = setInterval(function(){ if (document.hidden) return; if (PN.pub || S.view === "painel") pnCarregar(true); else { clearInterval(PN.timer); PN.timer = null; } }, PN.pub ? 30000 : 20000); }
+function renderPainel(){
+  if (!PN.d){ pnCarregar(); pnTimer(); return '<div class="gsec"><h2>📊 Painel ao vivo</h2><p class="muted">Carregando os números…</p></div>'; }
+  if (!PN.timer) pnTimer();
+  setTimeout(function(){ pnAnima(true); pnFit(); }, 0); return pnHtml(false);
+}
+function pnAtualizaTela(primeira){ var v = $("view"); if (!v || S.view !== "painel") return; var a = document.activeElement; if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && a.closest(".pn")) return; var y = window.scrollY; v.innerHTML = pnHtml(false); window.scrollTo(0, y); pnAnima(primeira); pnFit(); }
+function pnAnima(tudo){ document.querySelectorAll(".pnK b[data-n]").forEach(function(el){ var k = el.closest(".pnK").dataset.k, alvo = +el.dataset.n, de = tudo ? 0 : (PN.ant[k] != null ? PN.ant[k] : alvo); PN.ant[k] = alvo; if (de === alvo){ el.textContent = alvo; return; }
+  var t0 = performance.now(); (function q(now){ var p = Math.min(1, (now - t0) / 700), v = Math.round(de + (alvo - de) * (1 - Math.pow(1 - p, 3))); el.textContent = v; if (p < 1) requestAnimationFrame(q); })(t0); }); }
+function pnRing(v, meta, cor){ var p = meta ? Math.min(1, v / meta) : 0, r = 22, c = 2 * Math.PI * r;
+  return '<svg class="pnRing" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="' + r + '" stroke="rgba(255,255,255,.18)" stroke-width="6" fill="none"/><circle cx="27" cy="27" r="' + r + '" stroke="' + cor + '" stroke-width="6" fill="none" stroke-linecap="round" stroke-dasharray="' + (c * p).toFixed(1) + ' ' + c.toFixed(1) + '" transform="rotate(-90 27 27)" style="transition:stroke-dasharray .8s"/><text x="27" y="31" text-anchor="middle" font-size="12" font-weight="900" fill="#fff">' + Math.round(p * 100) + '%</text></svg>'; }
+function pnHtml(pub){
+  var d = PN.d, h = d.hoje, ontem = d.dias[d.dias.length - 2], M = d.metas || {}, s = '';
+  s += '<div class="pn' + (pub ? ' pub' : '') + '"><div class="pnTopo"><div><h2>📊 Painel ao vivo · ONG Amigos de Maribondo</h2><span class="pnVivo">● ao vivo · atualizado ' + esc(d.atualizado.slice(11)) + '</span></div>'
+    + (pub ? '<button class="btn" data-pn="cheia">⛶ Tela cheia</button>' : '<div class="row" style="gap:6px;flex-wrap:wrap"><button class="btn" data-pn="link">🔗 Link público</button><button class="btn" data-pn="cheia">⛶</button><button class="btn" data-pn="atualiza">🔄</button></div>') + '</div>';
+  s += '<p class="pnSub">Hoje, ' + pnDs(h) + ' ' + pnBr(h) + ' · metas do dia</p><div class="pnKs">' + PN_M.map(function(m){ var v = d.series[m[0]][h] || 0, o = d.series[m[0]][ontem] || 0, meta = M[m[0]] || 0, df = v - o;
+      return '<button class="pnK' + (meta && v >= meta ? ' bateu' : '') + '" data-k="' + m[0] + '" data-pn="met" data-v="' + m[0] + '" style="--c:' + m[3] + '" aria-pressed="' + (PN.met === m[0]) + '"><span class="pnKi">' + m[1] + '</span><b data-n="' + v + '">' + v + '</b><small>' + m[2] + '</small>'
+        + (meta ? pnRing(v, meta, m[3]) + '<em>meta ' + meta + (v >= meta ? ' ✓' : '') + '</em>' : '') + '<i class="' + (df > 0 ? "up" : df < 0 ? "dn" : "") + '">' + (df > 0 ? "▲ " + df : df < 0 ? "▼ " + (-df) : "=") + ' vs ontem</i></button>'; }).join("") + '</div>';
+  /* gráfico interativo */
+  var met = PN_M.filter(function(m){ return m[0] === PN.met; })[0], N = PN.dias, D = d.dias.slice(-N), vals = D.map(function(x){ return d.series[met[0]][x] || 0; }), mx = Math.max(1, Math.max.apply(null, vals), M[met[0]] || 0), W = 360, H = 190, bw = (W - 20) / N;
+  s += '<div class="gsec pnGraf"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><h3 style="margin:0">' + met[1] + ' ' + met[2] + ' por dia</h3><div class="row" style="gap:4px">' + [7, 14, 30].map(function(n){ return '<button class="tog" data-pn="dias" data-v="' + n + '" aria-pressed="' + (N === n) + '">' + n + 'd</button>'; }).join("") + '</div></div>'
+    + '<div class="pnMets">' + PN_M.map(function(m){ return '<button class="tog" data-pn="met" data-v="' + m[0] + '" aria-pressed="' + (PN.met === m[0]) + '" style="--c:' + m[3] + '">' + m[1] + ' ' + m[2] + '</button>'; }).join("") + '</div>'
+    + '<svg viewBox="0 0 ' + W + ' ' + H + '" class="pnSvg" role="img" aria-label="' + esc(met[2]) + ' por dia">' + (M[met[0]] ? '<line x1="10" x2="' + (W - 10) + '" y1="' + (H - 24 - (M[met[0]] / mx) * (H - 50)) + '" y2="' + (H - 24 - (M[met[0]] / mx) * (H - 50)) + '" stroke="#FFD23F" stroke-dasharray="5 5" stroke-width="1.5"/><text x="' + (W - 12) + '" y="' + (H - 28 - (M[met[0]] / mx) * (H - 50)) + '" fill="#FFD23F" font-size="10" text-anchor="end" font-weight="800">meta ' + M[met[0]] + '</text>' : '')
+    + D.map(function(x, i){ var v = vals[i], hh = Math.max(2, v / mx * (H - 50)), xx = 12 + i * bw, sel = PN.sel === x || (!PN.sel && x === h);
+      return '<g data-pn="dia" data-v="' + x + '" style="cursor:pointer"><rect x="' + xx + '" y="0" width="' + bw + '" height="' + H + '" fill="transparent"/><rect class="pnBar" x="' + (xx + 2) + '" y="' + (H - 24 - hh) + '" width="' + Math.max(3, bw - 4) + '" height="' + hh + '" rx="4" fill="' + met[3] + '" opacity="' + (sel ? 1 : .55) + '" style="animation-delay:' + (i * 25) + 'ms"/>' + (v && (N <= 14 || sel) ? '<text x="' + (xx + bw / 2) + '" y="' + (H - 28 - hh) + '" fill="#fff" font-size="10.5" font-weight="900" text-anchor="middle">' + v + '</text>' : '')
+        + (N <= 14 || i % 5 === 0 ? '<text x="' + (xx + bw / 2) + '" y="' + (H - 8) + '" fill="rgba(255,255,255,.75)" font-size="9" text-anchor="middle">' + (N <= 7 ? pnDs(x) : pnBr(x)) + '</text>' : '') + '</g>'; }).join("") + '</svg>';
+  var ds = PN.sel || h; s += '<p class="pnDia"><b>' + pnDs(ds) + ' ' + pnBr(ds) + ':</b> ' + PN_M.map(function(m){ return m[1] + ' ' + (d.series[m[0]][ds] || 0); }).join(" · ") + '</p></div>';
+  /* relatório da semana */
+  s += '<div class="gsec"><div class="row" style="justify-content:space-between;flex-wrap:wrap;gap:6px"><h3 style="margin:0">🗓️ Relatório da semana (desde ' + pnBr(d.semIni) + ')</h3>' + (pub ? '' : '<div class="row" style="gap:6px"><a class="btn" target="_blank" rel="noopener" href="' + esc(waHref("", pnTextoSemana())) + '">' + WA_ICON + ' Enviar</a><button class="btn" data-pn="imprimir">🖨️ PDF</button></div>') + '</div><div class="pnSem">'
+    + PN_M.map(function(m){ var a = d.semana[m[0]].atual, b = d.semana[m[0]].anterior, pc = b ? Math.round((a - b) * 100 / b) : (a ? 100 : 0);
+      return '<div class="pnS" style="--c:' + m[3] + '"><span>' + m[1] + ' ' + m[2] + '</span><b>' + a + '</b><i class="' + (a > b ? "up" : a < b ? "dn" : "") + '">' + (a > b ? "▲ " : a < b ? "▼ " : "") + (b || a ? Math.abs(pc) + "%" : "—") + ' <small>sem. passada: ' + b + '</small></i></div>'; }).join("") + '</div>'
+    + '<p class="muted" style="margin:0">🪪 ' + d.totais.membros + ' cadastrados na ONG · 💛 ' + d.totais.padrinhos + ' padrinhos e madrinhas no total</p></div>';
+  /* programas e temas */
+  s += '<div class="pnDuo"><div class="gsec"><h3 style="margin:0">🙋 Presença por programa (semana)</h3>' + pnBarras(d.progsSemana, "#7CC4FF", d.progsHoje, "hoje") + '</div><div class="gsec"><h3 style="margin:0">📋 Atendimentos por tema (semana)</h3>' + pnBarras(d.temasSemana, "#3BE38A", d.temasHoje, "hoje") + '</div></div>';
+  /* padrinhos */
+  if (!pub){ s += '<div class="gsec"><div class="row" style="justify-content:space-between"><h3 style="margin:0">💛 Padrinhos e madrinhas</h3><button class="btn primary" data-pn="padF">＋ Novo padrinho</button></div>'
+      + (PN.padF ? '<div class="f"><label class="full">Nome<input id="pdNome" maxlength="80"></label><label>WhatsApp<input id="pdTel" type="tel"></label><label>Valor mensal (R$)<input id="pdVal" inputmode="decimal" placeholder="30"></label><label>Forma<select id="pdForma"><option>Pix mensal</option><option>Boleto</option><option>Cartão</option><option>Doação de itens</option><option>Outra</option></select></label><label class="full">Observação<input id="pdObs" maxlength="200"></label><button class="btn primary big full" data-pn="padOk">💛 Registrar padrinho</button></div>' : '')
+      + '<p class="muted" style="margin:0">Hoje: ' + (d.series.padrinhos[h] || 0) + ' novo(s) · semana: ' + d.semana.padrinhos.atual + (d.valorPadrinhos ? ' · valor mensal novo na semana: R$ ' + d.dias.filter(function(x){ return x >= d.semIni; }).reduce(function(a, x){ return a + (d.valorPadrinhos[x] || 0); }, 0).toFixed(2).replace(".", ",") : '') + '</p></div>'; }
+  /* organograma */
+  s += '<div class="gsec"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🏛️ Organograma da ONG</h3>' + (!pub && d.gestor ? '<button class="btn" data-pn="edOrg">' + (PN.edOrg ? "✓ Concluir" : "✏️ Editar") + '</button>' : '') + '</div>' + (PN.edOrg ? pnOrgEditor() : pnOrg(d.organograma || [])) + '</div>';
+  /* metas (gestão) */
+  if (!pub && d.gestor) s += '<div class="gsec"><div class="row" style="justify-content:space-between"><h3 style="margin:0">🎯 Metas por dia</h3><button class="btn" data-pn="edMeta">' + (PN.edMeta ? "Fechar" : "✏️ Ajustar") + '</button></div>' + (PN.edMeta ? '<div class="f">' + PN_M.map(function(m){ return '<label>' + m[1] + ' ' + m[2] + '<input type="number" min="0" class="pnMetaIn" data-k="' + m[0] + '" value="' + esc(M[m[0]] || 0) + '"></label>'; }).join("") + '<button class="btn primary big full" data-pn="metaOk">Salvar metas</button></div>' : '<p class="muted" style="margin:0">' + PN_M.map(function(m){ return m[1] + ' ' + (M[m[0]] || 0); }).join(" · ") + '</p>') + '</div>';
+  return s + '</div>';
+}
+function pnBarras(o, cor, hj, rot){ var K = Object.keys(o || {}).sort(function(a, b){ return o[b] - o[a]; }), mx = Math.max(1, Math.max.apply(null, K.map(function(k){ return o[k]; }).concat([0])));
+  if (!K.length || !K.some(function(k){ return o[k]; })) return '<p class="muted" style="margin:0">Sem registros nesta semana ainda.</p>';
+  return K.map(function(k){ return '<div class="pnB"><span>' + esc(k) + '</span><div><i style="width:' + Math.round(o[k] * 100 / mx) + '%;background:' + cor + '"></i></div><b>' + o[k] + (hj && hj[k] ? ' <small>(' + hj[k] + ' ' + rot + ')</small>' : '') + '</b></div>'; }).join(""); }
+function pnOrg(L){ if (!L.length) return '<p class="muted">Sem organograma.</p>';
+  var filhos = {}, ids = {}; L.forEach(function(n){ ids[n.id] = 1; }); L.forEach(function(n){ var p = ids[n.pai] ? n.pai : ""; (filhos[p] = filhos[p] || []).push(n); });
+  function no(n, nv){ var f = filhos[n.id] || [], ini = String(n.nome || "?").trim().split(/\s+/).slice(0, 2).map(function(x){ return x.charAt(0); }).join("").toUpperCase();
+    return '<li><div class="pnN" style="--c:' + esc(n.cor || "#FFD23F") + ';animation-delay:' + nv * 120 + 'ms"><span class="pnAv">' + esc(ini) + '</span><b>' + esc(n.nome) + '</b><small>' + esc(n.cargo || "") + '</small>' + (f.length ? '<em>' + f.length + '</em>' : '') + '</div>' + (f.length ? '<ul>' + f.map(function(c){ return no(c, nv + 1); }).join("") + '</ul>' : '') + '</li>'; }
+  return '<div class="pnOrgW"><div class="pnOrg"><ul>' + (filhos[""] || []).map(function(r){ return no(r, 0); }).join("") + '</ul></div></div>'; }
+function pnOrgEditor(){ var L = PN.org || (PN.org = JSON.parse(JSON.stringify(PN.d.organograma || [])));
+  return '<p class="muted" style="margin:0">Nome, cargo e a quem responde. Quem não responde a ninguém fica no topo.</p>' + L.map(function(n, i){ return '<div class="pnOE"><input data-oi="' + i + '" data-of="nome" value="' + esc(n.nome) + '" placeholder="Nome"><input data-oi="' + i + '" data-of="cargo" value="' + esc(n.cargo || "") + '" placeholder="Cargo / área"><select data-oi="' + i + '" data-of="pai"><option value="">— topo —</option>' + L.filter(function(x){ return x.id !== n.id; }).map(function(x){ return '<option value="' + esc(x.id) + '"' + (x.id === n.pai ? " selected" : "") + '>' + esc(x.nome) + '</option>'; }).join("") + '</select><input type="color" data-oi="' + i + '" data-of="cor" value="' + esc(n.cor || "#FFD23F") + '"><button class="btn" data-pn="orgX" data-v="' + i + '">✕</button></div>'; }).join("")
+    + '<div class="row"><button class="btn" data-pn="orgAdd">＋ Caixa</button><button class="btn primary" data-pn="orgOk">Salvar organograma</button></div>'; }
+function pnTextoSemana(){ var d = PN.d; return "📊 *Relatório da semana — ONG Amigos de Maribondo*\n(" + pnBr(d.semIni) + " a " + pnBr(d.hoje) + ")\n\n" + PN_M.map(function(m){ var a = d.semana[m[0]].atual, b = d.semana[m[0]].anterior; return m[1] + " " + m[2] + ": *" + a + "*" + (a > b ? " ▲" : a < b ? " ▼" : "") + " (semana passada " + b + ")"; }).join("\n")
+  + "\n\n🙋 Presença por programa: " + Object.keys(d.progsSemana).filter(function(k){ return d.progsSemana[k]; }).map(function(k){ return k + " " + d.progsSemana[k]; }).join(" · ") + "\n🪪 Total de cadastrados: " + d.totais.membros + "\n💛 Padrinhos e madrinhas: " + d.totais.padrinhos + "\n\nJuntos estamos reescrevendo histórias 💙"; }
+document.addEventListener("click", function(e){ var b = e.target.closest("[data-pn]"); if (!b) return; var a = b.dataset.pn, v = b.dataset.v;
+  if (a === "met"){ PN.met = v; PN.sel = null; try { SOM.play("tap"); } catch(x){} return PN.pub ? pnRenderPub() : pnAtualizaTela(); }
+  if (a === "dias"){ PN.dias = +v; return PN.pub ? pnRenderPub() : pnAtualizaTela(); }
+  if (a === "dia"){ PN.sel = v; return PN.pub ? pnRenderPub() : pnAtualizaTela(); }
+  if (a === "atualiza"){ toast("🔄 Atualizando…"); return pnCarregar(); }
+  if (a === "cheia"){ try { (document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen()); } catch(x){} return; }
+  if (a === "link"){ var u = location.origin + location.pathname + "?painel=1"; try { navigator.clipboard.writeText(u); toast("🔗 Link público copiado: só números, sem dados pessoais."); } catch(x){ toast(u); } return; }
+  if (a === "imprimir"){ window.print(); return; }
+  if (a === "padF"){ PN.padF = !PN.padF; return pnAtualizaTela(); }
+  if (a === "padOk"){ var nm = $("pdNome").value.trim(); if (!nm) return toast("Coloque o nome."); toast("Registrando…"); return run("addPadrinho", S.me, S.pin, {nome:nm, telefone:$("pdTel").value, valor:$("pdVal").value, forma:$("pdForma").value, obs:$("pdObs").value}).then(function(d){ pnNovidades(d); PN.d = d; PN.padF = false; try { SOM.play("conquista"); } catch(x){} toast("💛 Padrinho registrado! O painel já mostra."); pnAtualizaTela(); }).catch(function(er){ toast(errMsg(er)); }); }
+  if (a === "edMeta"){ PN.edMeta = !PN.edMeta; return pnAtualizaTela(); }
+  if (a === "metaOk"){ var m = {}; document.querySelectorAll(".pnMetaIn").forEach(function(i){ m[i.dataset.k] = +i.value || 0; }); return run("salvarMetasPainel", S.me, S.pin, m).then(function(d){ PN.d = d; PN.edMeta = false; toast("🎯 Metas salvas."); pnAtualizaTela(); }).catch(function(er){ toast(errMsg(er)); }); }
+  if (a === "edOrg"){ PN.edOrg = !PN.edOrg; PN.org = null; return pnAtualizaTela(); }
+  if (a === "orgAdd"){ PN.org.push({id:"o" + Date.now().toString(36), nome:"Nova área", cargo:"", pai:(PN.org[0] || {}).id || "", cor:"#7CC4FF"}); return pnAtualizaTela(); }
+  if (a === "orgX"){ var rm = PN.org.splice(+v, 1)[0]; PN.org.forEach(function(n){ if (n.pai === rm.id) n.pai = rm.pai; }); return pnAtualizaTela(); }
+  if (a === "orgOk"){ return run("salvarOrganograma", S.me, S.pin, PN.org).then(function(L){ PN.d.organograma = L; PN.edOrg = false; PN.org = null; toast("🏛️ Organograma salvo."); pnAtualizaTela(); }).catch(function(er){ toast(errMsg(er)); }); }
+});
+document.addEventListener("input", function(e){ var t = e.target; if (t.dataset && t.dataset.oi != null && PN.org){ PN.org[+t.dataset.oi][t.dataset.of] = t.value; } });
+document.addEventListener("change", function(e){ var t = e.target; if (t.dataset && t.dataset.of === "pai" && PN.org) pnAtualizaTela(); });
+/* link público: index.html?painel=1 mostra só o painel, sem login (bom para TV) */
+function pnRenderPub(){ var box = $("pnPub"); if (!box) return; if (!PN.d){ box.innerHTML = '<p style="text-align:center;padding:40px">Carregando o painel…</p>'; return; } box.innerHTML = pnHtml(true); pnAnima(!pnRenderPub.ja); pnRenderPub.ja = true; pnFit(); }
+(function(){ if (!/[?&]painel=1/.test(location.search)) return; PN.pub = true;
+  var box = document.createElement("div"); box.id = "pnPub"; document.body.appendChild(box); document.body.classList.add("modoPainel");
+  pnRenderPub(); pnCarregar(); pnTimer(); })();
+/* organograma sempre inteiro na tela: encolhe para caber */
+function pnFit(){ document.querySelectorAll(".pnOrgW").forEach(function(w){ var o = w.querySelector(".pnOrg"); if (!o) return; o.style.transform = ""; w.style.height = ""; var W = w.clientWidth, L = o.scrollWidth; if (L > W + 2){ var z = Math.max(.5, W / L); o.style.transformOrigin = "0 0"; o.style.transform = "scale(" + z + ")"; w.style.height = Math.ceil(o.scrollHeight * z) + "px"; w.style.overflow = z > .5 ? "hidden" : "auto"; } }); }
+window.addEventListener("resize", function(){ if (PN.pub || S.view === "painel") pnFit(); });
+
 function renderSaude(){
   if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
   if (S_SA.erro) return '<div class="need">'+esc(S_SA.erro)+'</div>';
@@ -2815,7 +2967,7 @@ $("pinOk").addEventListener("click", function(){
 });
 $("pinIn").addEventListener("keydown", function(e){ if (e.key === "Enter") $("pinOk").click(); });
 $("sair").addEventListener("click", function(){ VOZ_MEM = null; try { localStorage.removeItem("vozHoje"); } catch(e){} $("gateImg").removeAttribute("data-h"); S.me = ""; S.pin = ""; S.gestor = false; S.painel = null; if (S.view==="gestao") S.view="dia"; save(); load(null, true); });
-var ABAS_EXTRA = ["docsong","atend","cadastro","playlist","galeria","freq","programas","saude","editais","visitas"], S_MAIS = false;
+var ABAS_EXTRA = ["painel","docsong","atend","cadastro","playlist","galeria","freq","programas","saude","editais","visitas"], S_MAIS = false;
 document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest(".maisBtn"); if (!b) return; e.stopImmediatePropagation(); S_MAIS = !(S_MAIS || ABAS_EXTRA.indexOf(S.view) >= 0); if (!S_MAIS && ABAS_EXTRA.indexOf(S.view) >= 0){ S.view = "dia"; save(); } render(); }, true);
 document.querySelector(".tabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if (!b) return; S.view = b.dataset.v; save(); if (S.view==="programas" && S_PG.d && !S_PG.loading) loadPg(); if (S.view==="saude" && S_SA.d && !S_SA.loading) loadSa(); if ((S.view==="cadastro" || S.view==="atend") && S_MB.lista && !S_MB.loading) loadMb(); if (S.view==="docsong" && S_DO.lista && !S_DO.loading) loadDo(); if (S.view==="editais" && S_ED.d && !S_ED.loading) loadEd(); if (S.view==="gestao") { $("view").innerHTML = '<div id="gWrap"></div>'; loadPainel(); } render(); });
 $("days").addEventListener("click", function(e){ var b = e.target.closest("[data-d]"); if (b) load(b.dataset.d); });
@@ -3766,7 +3918,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611110138";
+var APP_VERSAO = "202611110329";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }

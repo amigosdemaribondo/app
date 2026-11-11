@@ -479,7 +479,7 @@ function gate(){
     pinV(); };
   if (!S.equipe.length) api("mkEquipeLista").then(function(L){ S.equipe = L; try { localStorage.setItem("mk_lista", JSON.stringify(L)); } catch(e){} if (!S.me) gate(); }).catch(function(){ gmsg("Sem conexão. Tente de novo em instantes."); });
 }
-function pinV(){ var v = $("gPinV"); if (v) v.innerHTML = new Array(Math.max(4, G.pin.length) + 1).join("x").split("").map(function(_, i){ return '<i class="' + (i < G.pin.length ? "on" : "") + '"></i>'; }).join(""); }
+function pinV(){ var v = $("gPinV"); if (v) v.innerHTML = new Array((G.sel === "victor" ? 8 : Math.max(4, G.pin.length)) + 1).join("x").split("").map(function(_, i){ return '<i class="' + (i < G.pin.length ? "on" : "") + '"></i>'; }).join(""); }
 function entrar(p, pin, viaFace, viaSalvo){
   gmsg("Entrando…");
   api("mkCarregar", p, pin).then(function(d){
@@ -1137,7 +1137,7 @@ if (S.equipe.length) {} else api("mkEquipeLista").then(function(L){ S.equipe = S
 
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611110305";
+var APP_VERSAO = "202611110331";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }
