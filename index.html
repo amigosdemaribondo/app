@@ -265,6 +265,20 @@ body.visAberto{overflow:hidden}
 .doRow input{flex:1;min-width:0}
 .doAbre{display:flex;align-items:center;gap:10px;background:none;border:0;color:inherit;font:inherit;text-align:left;cursor:pointer;flex:1;min-width:0;padding:4px 0}
 .doIc{font-size:26px}
+.camp{border:2px solid #FFD23F;background:linear-gradient(160deg,rgba(255,210,63,.16),var(--surface))}
+.campTop{display:flex;align-items:center;gap:10px}.campIco{font-size:32px;animation:pulsaNa 1.6s ease-in-out infinite;border-radius:50%}
+.campTop b{font-size:20px;font-family:var(--f-display)}.campTop small{display:block;color:var(--muted);font-size:12px}
+.campCont{margin-left:auto;font-family:var(--f-display);font-size:14px;background:#FFD23F;color:#1B1400;border-radius:999px;padding:4px 12px}.campCont b{font-size:20px}
+.campFoto{width:100%;max-height:420px;object-fit:cover;border-radius:14px;cursor:zoom-in}
+.campTx{margin:0;font-size:17px;font-weight:800}
+.campFeito{display:flex;flex-direction:column;gap:8px;background:rgba(0,0,0,.18);border-radius:14px;padding:10px}
+.campPasso{margin:0;font-size:13.5px}.campPasso b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:#FFD23F;color:#1B1400;font-size:12px}
+.campOk{margin:0;font-weight:800;color:#86EFAC}
+.campBt:not([disabled]){animation:pulsaNa 1.6s ease-in-out infinite}
+.campLs{display:flex;flex-direction:column;gap:6px}.campLs div{display:flex;flex-wrap:wrap;gap:6px}
+.campLs span{background:rgba(255,255,255,.1);border-radius:999px;padding:4px 10px;font-size:13px}.campLs span.ok{background:rgba(47,208,122,.22)}.campLs i{font-style:normal;opacity:.7;font-size:11.5px}.campLs .vz{background:none;opacity:.75}
+.campWa{justify-content:center}
+.campNova summary{cursor:pointer;list-style:none}
 .engPub{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
 .engPub figure{margin:0;background:var(--bg);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
 .engPub img{width:100%;aspect-ratio:3/4;object-fit:cover;background:#0A1A3F;cursor:zoom-in}
@@ -3417,6 +3431,39 @@ function atalhosHtml(){
 
 /* ---------- engajamento (vale pontos com print) ---------- */
 var S_ENG = {tipo: "", foto: null, nome: ""};
+/* ---------- campanha de postagem #BoraEngajar ---------- */
+var S_CAMPF = null;
+function msgBora(c){ var nomes = function(L){ return L.map(function(id){ return primeiroNome(pessoa(id).nome); }).join(", "); };
+  return "📣 *Bora postar, pessoal!* #BoraEngajar\n" + (c.texto ? c.texto + "\n" : "") + (c.link ? "👉 " + c.link + "\n" : "")
+    + "\n✅ Já postaram (" + c.postaram.length + "): " + (c.postaram.length ? nomes(c.postaram.map(function(x){ return x.pessoa; })) : "ninguém ainda")
+    + "\n⏳ Faltam (" + c.faltam.length + "): " + (c.faltam.length ? nomes(c.faltam) : "ninguém. Equipe completa! 🎉")
+    + "\n\nPoste, curta, comente e mande o print no app em 📣 Engaja → ✅ Feito. 💙"; }
+function campanhaHtml(T){
+  var c = S.data && S.data.campanha, gest = S.data && S.data.verTodos, h = "";
+  if (c){
+    var eu = c.postaram.filter(function(x){ return x.pessoa === S.me; })[0];
+    h += '<div class="gsec camp"><div class="campTop"><span class="campIco">📣</span><div><b>#BoraEngajar</b><small>Campanha de ' + esc(c.dia.slice(8) + "/" + c.dia.slice(5, 7)) + ' às ' + esc(c.hora) + ' · ' + esc(c.por) + '</small></div><span class="campCont"><b>' + c.postaram.length + '</b>/' + (c.postaram.length + c.faltam.length) + '</span></div>'
+      + (c.foto ? '<img class="campFoto" src="' + esc(c.foto) + '" alt="Imagem para postar" data-x="engZoom" data-src="' + esc(c.foto.replace("sz=w1200", "sz=w2000")) + '">' : '')
+      + '<p class="campTx">' + esc(c.texto) + '</p>'
+      + '<div class="row" style="gap:6px;flex-wrap:wrap">' + (c.link ? '<a class="btn primary" href="' + esc(c.link) + '" target="_blank" rel="noopener">🔗 Abrir o post</a>' : '') + (c.foto ? '<a class="btn" href="' + esc(c.foto.replace("sz=w1200", "sz=w2000")) + '" target="_blank" rel="noopener">⬇️ Foto para postar</a>' : '') + '<button class="btn" data-x="campCopia">📋 Copiar legenda</button></div>'
+      + '<div class="campFeito">' + (eu ? '<p class="campOk">✅ Você já postou às ' + esc(eu.hora) + '. Valeu! Pode registrar outro engajamento abaixo.</p>' : '<p class="campPasso"><b>1</b> Poste · <b>2</b> tire o print · <b>3</b> toque em ✅ Feito</p>')
+      + '<div class="row" style="flex-wrap:wrap;gap:6px">' + Object.keys(T).map(function(k){ return '<button class="tog" data-x="engTipo" data-k="' + k + '" aria-pressed="' + (S_ENG.tipo === k) + '">' + esc(T[k].t) + ' · +' + T[k].p + '</button>'; }).join("") + '</div>'
+      + '<label class="btn big" for="engFoto" style="justify-content:center">📷 ' + (S_ENG.foto ? "Print escolhido ✓ (trocar)" : "Subir o print") + '</label>'
+      + '<button class="btn fin big campBt" data-x="engOk"' + (S_ENG.tipo && S_ENG.foto ? "" : " disabled") + '>✅ Feito</button></div>'
+      + '<div class="campLs"><b>✅ Já postaram (' + c.postaram.length + ')</b><div>' + (c.postaram.length ? c.postaram.map(function(x){ return '<span class="ok">' + esc(primeiroNome(pessoa(x.pessoa).nome)) + ' <i>' + esc(x.hora) + '</i></span>'; }).join("") : '<span class="vz">Seja o primeiro! 💪</span>') + '</div>'
+      + '<b>⏳ Ainda não (' + c.faltam.length + ')</b><div>' + (c.faltam.length ? c.faltam.map(function(id){ return '<span>' + esc(primeiroNome(pessoa(id).nome)) + '</span>'; }).join("") : '<span class="ok">Todo mundo postou! 🎉</span>') + '</div></div>'
+      + '<a class="wa grupoBt campWa" href="' + esc(waHref("", msgBora(c))) + '" target="_blank" rel="noopener">' + WA_ICON + 'Mensagem pública: Bora postar, pessoal!</a></div>';
+  }
+  if (gest){
+    var f = S_CAMPF || {};
+    h += '<details class="gsec campNova"' + (c ? '' : ' open') + '><summary><b>📣 ' + (c ? 'Trocar a campanha' : 'Nova campanha de postagem') + '</b></summary><div class="f" style="margin-top:8px">'
+      + '<label class="full">Link do post (Instagram etc.)<input id="cpLink" inputmode="url" placeholder="https://www.instagram.com/p/…" value="' + esc(f.link || (c && c.link) || "") + '"></label>'
+      + '<label class="full">Chamada<input id="cpTx" maxlength="200" value="' + esc(f.texto || (c && c.texto) || "Poste e mande print aqui! #BoraEngajar") + '"></label>'
+      + '<label class="btn full" for="cpFoto" style="justify-content:center">🖼️ ' + (f.foto ? 'Foto escolhida ✓ (trocar)' : 'Foto para a equipe postar') + '</label><input type="file" id="cpFoto" accept="image/*" hidden>'
+      + '<button class="btn primary big full" data-x="campSalvar">Publicar para a equipe</button>' + (c ? '<button class="btn full" data-x="campFim">Encerrar campanha</button>' : '') + '</div></details>';
+  }
+  return h;
+}
 function renderEngaja(){
   if (!logged()) return '<div class="need">Escolha seu nome no topo e digite seu PIN.</div>';
   var c = cfg(), T = c.engTipos || {curtida:{t:"Curtida + comentário",p:2}, repost:{t:"Repost",p:4}, status:{t:"Status",p:3}};
@@ -3429,11 +3476,12 @@ function renderEngaja(){
       + '<label class="full">Recado para a equipe (opcional)<input id="lkTx" maxlength="120" value="' + esc(c.postTexto || "") + '"></label>'
       + '<button class="btn primary full" data-x="lkSalvar">Salvar e avisar a equipe</button></div>' : '')
     + '</div>';
-  var h = linkBox + '<div class="gsec"><h2>📣 Engajamento no Instagram</h2>' + atalhosHtml()
+  var temC = !!(S.data && S.data.campanha);
+  var h = campanhaHtml(T) + (temC ? '' : linkBox) + '<div class="gsec"><h2>📣 Engajamento no Instagram</h2>' + atalhosHtml()
     + (c.postTexto ? '<p class="sub">🆕 ' + esc(c.postTexto) + '</p>' : '')
     + '<div class="regrasEng">' + Object.keys(T).map(function(k){ return '<span><b>+' + T[k].p + '</b> ' + esc(T[k].t) + '</span>'; }).join("") + '</div>'
     + '<p class="sub">Só vale depois de registrar aqui: escolha o que fez, suba o print e toque em <b>Concluído 👍</b>.</p></div>';
-  h += '<div class="gsec"><h2>Registro de engajamento</h2><div class="row" style="flex-wrap:wrap;gap:6px">'
+  h += '<div class="gsec"' + (temC ? ' hidden' : '') + '><h2>Registro de engajamento</h2><div class="row" style="flex-wrap:wrap;gap:6px">'
     + Object.keys(T).map(function(k){ return '<button class="tog" data-x="engTipo" data-k="' + k + '" aria-pressed="' + (S_ENG.tipo === k) + '">' + esc(T[k].t) + ' · +' + T[k].p + '</button>'; }).join("") + '</div>'
     + '<label class="btn big" for="engFoto" style="justify-content:center">📷 ' + (S_ENG.foto ? "Print escolhido ✓ (trocar)" : "Subir o print") + '</label><input type="file" id="engFoto" accept="image/*" hidden>'
     + '<button class="btn fin big" data-x="engOk"' + (S_ENG.tipo && S_ENG.foto ? "" : " disabled") + '>Concluído 👍</button></div>';
@@ -3660,13 +3708,18 @@ document.addEventListener("click", function(ev){
   if (x === "galToggle"){ try { localStorage.setItem("galOff", galOff() ? "0" : "1"); } catch(e){} GAL_K = ""; renderGalBox(); if (S.view === "galeria") render(); return; }
   if (x === "galIr"){ var box = $("galBox"); if (box && box._ir) box._ir(+b.dataset.i); return; }
   if (x === "galAbre") return abreFoto(b.dataset.u, b.dataset.l);
+  if (x === "campCopia"){ var cc = S.data.campanha || {}; try { navigator.clipboard.writeText(cc.texto + (cc.link ? "\n" + cc.link : "")); toast("📋 Legenda copiada."); } catch(e){ toast(cc.texto); } return; }
+  if (x === "campSalvar"){ var cf = {link: $("cpLink").value.trim(), texto: $("cpTx").value.trim(), fotoB64: (S_CAMPF || {}).foto || null, manterFoto: !(S_CAMPF || {}).foto};
+    if (!cf.link && !cf.fotoB64 && !(S.data.campanha && S.data.campanha.foto)) return toast("Coloque o link do post ou a foto.");
+    toast("Publicando…"); return run("salvarCampanha", S.me, S.pin, cf).then(function(r){ S.data.campanha = r; S_CAMPF = null; SOM.play("sino"); toast("📣 Campanha publicada! A equipe já vê em Engaja."); render(); }).catch(function(e){ toast(errMsg(e)); }); }
+  if (x === "campFim"){ if (!confirm("Encerrar a campanha atual?")) return; return run("encerrarCampanha", S.me, S.pin).then(function(){ S.data.campanha = null; toast("Campanha encerrada."); render(); }).catch(function(e){ toast(errMsg(e)); }); }
   if (x === "engTipo"){ S_ENG.tipo = b.dataset.k; return render(); }
   if (x === "engOk"){
     if (!S_ENG.tipo || !S_ENG.foto) return toast("Escolha o tipo e suba o print.");
     S.busy = true; toast("Enviando o print…");
     return run("registrarEngajamento", S.me, S.pin, S_ENG.tipo, S_ENG.foto, cfg().post || "").then(function(r){
       S_ENG = {tipo: "", foto: null}; if (S_PTS) S_PTS.meuEng = r.lista; SOM.play("conclui"); toast("👍 Registrado! +" + r.pts + " pts no seu engajamento.");
-      var rr = b.getBoundingClientRect(); burst(rr.left + rr.width / 2, rr.top, ["👍","✨","💙"]); loadPts(true);
+      var rr = b.getBoundingClientRect(); burst(rr.left + rr.width / 2, rr.top, ["👍","✨","💙"]); loadPts(true); load(null, true);
     }).catch(function(e){ toast(errMsg(e)); }).finally(function(){ S.busy = false; render(); });
   }
   if (x === "ideiaEnviar"){
@@ -3703,7 +3756,8 @@ document.addEventListener("change", function(ev){
   var t = ev.target;
   if (t.dataset && t.dataset.x === "galChk"){ try { localStorage.setItem("galOff", t.checked ? "0" : "1"); } catch(e){} GAL_K = ""; renderGalBox(); return; }
   if (t.id === "msgTxt"){ S_MSG.txt = t.value; return; }
-  if (t.id === "engFoto" && t.files && t.files[0]){ toast("Preparando o print…"); shrink(t.files[0]).then(function(b64){ S_ENG.foto = b64; render(); toast(b64 ? "Print pronto. Toque em Concluído 👍" : "Não consegui ler a imagem."); }); return; }
+  if (t.id === "cpFoto" && t.files && t.files[0]){ var lk = $("cpLink") ? $("cpLink").value : "", tx = $("cpTx") ? $("cpTx").value : ""; toast("Preparando a foto…"); shrink(t.files[0]).then(function(b64){ S_CAMPF = {foto: b64, link: lk, texto: tx}; render(); var d = document.querySelector(".campNova"); if (d) d.open = true; }); return; }
+  if (t.id === "engFoto" && t.files && t.files[0]){ toast("Preparando o print…"); shrink(t.files[0]).then(function(b64){ S_ENG.foto = b64; render(); toast(b64 ? "Print pronto. Toque em ✅ Feito 👍" : "Não consegui ler a imagem."); }); return; }
   if (t.id === "galIn" && t.files && t.files[0]){ var leg = $("galLeg") ? $("galLeg").value.trim() : ""; toast("Enviando a foto…");
     shrink(t.files[0]).then(function(b64){ return run("addGaleria", S.me, S.pin, b64, leg); }).then(function(g){ S.data.galeria = g; GAL_K = ""; renderGalBox(); renderGestao(); toast("🖼️ Foto adicionada à galeria."); }).catch(function(e){ toast(errMsg(e)); }); t.value = ""; }
 });
@@ -3712,7 +3766,7 @@ document.addEventListener("input", function(ev){ if (ev.target.id === "msgTxt") 
 })();
 
 /* ===== atualização automática: confere se há versão nova no GitHub e recarrega ===== */
-var APP_VERSAO = "202611102225";
+var APP_VERSAO = "202611110138";
 (function(){
   var checando = false;
   function ocupado(){ var el = document.activeElement; return !!(el && /INPUT|TEXTAREA|SELECT/.test(el.tagName)); }

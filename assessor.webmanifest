@@ -1,6 +1,6 @@
 {
- "name": "Meu Assessor",
- "short_name": "Meu Assessor",
+ "name": "PLANO 2028",
+ "short_name": "PLANO 2028",
  "start_url": "./assessor.html",
  "scope": "./",
  "display": "standalone",
