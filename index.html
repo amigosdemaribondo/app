@@ -2785,7 +2785,7 @@ function load(dia, quiet){
 function act(p){
   S.busy = true; ACT_SEQ++; render();
   return p.then(function(d){ S.data = d; try { ULT_JSON = JSON.stringify(d); } catch(x){} return d; })
-    .catch(function(e){ var m = errMsg(e); if (/PIN/.test(m)){ S.pin = ""; save(); } toast(m); throw e; })
+    .catch(function(e){ var m = errMsg(e); if (/PIN/.test(m)){ S.pin = ""; save(); } toast(m); try { e.jaAvisado = true; } catch(x){} throw e; })
     .finally(function(){ S.busy = false; render(); });
 }
 
@@ -2823,7 +2823,7 @@ $("view").addEventListener("click", function(ev){
       S.busy = false; if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
       var ex = loc ? {lat:loc.lat, lng:loc.lng, acc:loc.acc, selfie: sf.id} : {selfie: sf.id};
       return act(run("punch", S.me, S.pin, null, false, ex)).then(function(d){ selfieUsada(); render(); toast(d.msg); if (d.turnoOk) parabensTurno(d.turnoOk); });
-    }).catch(function(err){ S.busy = false; if (err && /venceu|já foi usada|não encontrada/.test(err.message || "")) selfieUsada(); render(); if (err && err.message) toast(err.message); });
+    }).catch(function(err){ S.busy = false; if (err && /venceu|já foi usada|não encontrada/.test(err.message || "")) selfieUsada(); render(); if (err && err.message && !err.jaAvisado) toast(err.message); });
   }
   if (a === "unpunch") return act(run("punch", S.me, S.pin, null, true)).then(function(d){ toast(d.msg); }).catch(function(){});
   if (a === "motivo"){ S_MOT.aberto = !S_MOT.aberto; S_MOT.tipo = ""; return render(); }
@@ -2944,7 +2944,7 @@ $("view").addEventListener("change", function(e){
     if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
     var extra = loc ? {lat:loc.lat, lng:loc.lng, acc:loc.acc, motivo:S_EXTRA.motivo, obs:S_EXTRA.obs} : {motivo:S_EXTRA.motivo, obs:S_EXTRA.obs};
     return act(run("punch", S.me, S.pin, b64, false, extra)).then(function(d){ S_MOT.aberto = false; S_MOT.tipo = ""; S_EXTRA = {}; toast(d.msg); if (d.turnoOk) parabensTurno(d.turnoOk); });
-  }).catch(function(err){ S.busy = false; if (err && /localiza/i.test(err.message||"")) S_LOC = /bloqueada/.test(err.message) ? "bloqueada" : "erro"; render(); if (err && err.message) toast(err.message); });
+  }).catch(function(err){ S.busy = false; if (err && /localiza/i.test(err.message||"")) S_LOC = /bloqueada/.test(err.message) ? "bloqueada" : "erro"; render(); if (err && err.message && !err.jaAvisado) toast(err.message); });
   e.target.value = "";
 });
 
@@ -2960,8 +2960,12 @@ function fotoFlow(inputEl, enviar){
   }).then(function(loc){
     S.busy = false;
     if (loc) S_LASTLOC = {lat:loc.lat, lng:loc.lng, acc:loc.acc, ms:Date.now()};
-    return enviar(alvo, b64, loc);
-  }).catch(function(err){ S.busy = false; render(); if (err && err.message) toast(err.message); });
+    return enviar(alvo, b64, loc).catch(function(err){
+      if (!/Sem conex|demorou/i.test((err && err.message) || "")) throw err;
+      toast("Sem internet: tentando enviar a foto de novo…");
+      return new Promise(function(r){ setTimeout(r, 4000); }).then(function(){ return enviar(alvo, b64, loc); });
+    });
+  }).catch(function(err){ S.busy = false; render(); if (err && err.message && !err.jaAvisado) toast(err.message); });
   inputEl.value = "";
 }
 $("fotoTar").addEventListener("change", function(e){
