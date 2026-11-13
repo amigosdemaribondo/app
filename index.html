@@ -1098,7 +1098,9 @@ function periodosTxt(e){ return e && e.periodos ? e.periodos.map(function(p){ re
 var S_MOT = {tipo:"", aberto:false};
 var S_SUP = "";
 var S_LOC = "", S_EXTRA = {};
-function locLivre(){ return !!(S.data && S.data.locLivre); }
+/* LOC_LIBERADA = true: ponto e atividades valem sem localização até o Victor mandar ativar (trocar para false) */
+var LOC_LIBERADA = true;
+function locLivre(){ return LOC_LIBERADA || !!(S.data && S.data.locLivre); }
 function pegaLoc(){ return locLivre() ? pegarLocal(false) : pegarLocal(true); }
 function checarLocal(){
   var keep = $("motObs") ? $("motObs").value : null;
@@ -1108,7 +1110,7 @@ function checarLocal(){
     .catch(function(e){ S_LOC = /bloqueada/.test(e.message) ? "bloqueada" : "erro"; rr(); });
 }
 function locBox(){
-  if (S_LOC !== "ok" && locLivre()) return '<span class="when" style="color:var(--ok)">📍 Liberado: até sexta 13/11 o ponto e as atividades valem sem localização.</span>';
+  if (S_LOC !== "ok" && locLivre()) return '<span class="when" style="color:var(--ok)">📍 Localização liberada: o ponto e as atividades valem sem localização.</span>';
   if (S_LOC === "ok") return '<span class="when" style="color:var(--ok)">📍 Localização ativada. O ponto só vale com a foto tirada na ONG.</span>';
   if (S_LOC === "checando" || S_LOC === "") return '<span class="when">📍 Verificando a localização…</span>';
   if (S_LOC === "bloqueada") return '<div class="alert">📍 A localização está bloqueada. Sem ela o ponto não é registrado.</div>'
