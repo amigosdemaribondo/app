@@ -702,6 +702,7 @@ body.modoPainel .pnTopo h2{font-size:24px}
 .folTabW{overflow-x:auto;-webkit-overflow-scrolling:touch}.folTab{width:100%;border-collapse:collapse;font-size:13.5px;min-width:440px}.folTab th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding:6px 8px;border-bottom:1px solid var(--line)}
 .folTab td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}.folTab td small{display:block;color:var(--muted);font-size:11.5px}.folTab .fv{font-weight:900;white-space:nowrap;text-align:right}.folTab tfoot td{font-weight:900;font-size:15px;border-bottom:0;color:var(--accent)}
 details.folha > summary{list-style:none}details.folha > summary::-webkit-details-marker{display:none}
+.dtabs{display:flex!important;overflow-x:auto;gap:6px;scrollbar-width:none}.dtabs::-webkit-scrollbar{display:none}.dtabs button{flex:none;min-width:96px}.dtabs .dca b{color:var(--warn,#d97706)}.dtabs .dpz b{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -937,6 +938,15 @@ function render(){
 
 var S_DIATAB = "agora";
 function semFotoTar(b){ var st = S.data.status[b.id] || {}; return st.estado === "concluida" && st.temFotoConclusao === false; }
+
+/* ===== prazo × conclusão: feito no prazo / com atraso, atualizado em tempo real ===== */
+function agoraISO(){ return new Date(Date.now() - 3*3600*1000).toISOString().slice(0,16); }
+function isoDe(v, dia){ v = String(v || "").replace(" ", "T"); if (!v) return ""; if (/^\d{1,2}:\d{2}/.test(v)) return dia + "T" + (v.length === 4 ? "0" + v : v.slice(0,5)); return v.slice(0,16); }
+function prazoDe(b, st){ var d = S.data; return isoDe(st.prazoExt, d.dia) || (b.fim ? d.dia + "T" + (b.fim.length === 4 ? "0" + b.fim : b.fim) : ""); }
+function minEntre(a, b){ return Math.round((new Date(b + ":00Z") - new Date(a + ":00Z")) / 60000); }
+function fmtMin(m){ var h = Math.floor(m / 60), r = m % 60; return h ? h + "h" + (r ? " " + r + "min" : "") : r + "min"; }
+function atrasoDe(b){ var st = S.data.status[b.id] || {}; if (st.estado !== "concluida") return 0; var p = prazoDe(b, st), f = isoDe(st.fimEm || st.fim, S.data.dia); if (!p || !f) return 0; return Math.max(0, minEntre(p, f)); }
+function vencidaAgora(b){ var st = S.data.status[b.id] || {}; if (st.estado === "concluida") return false; if (b.vencida || S.data.dia < S.data.hoje) return true; var p = prazoDe(b, st); return !!p && S.data.dia === S.data.hoje && agoraISO() > p; }
 function renderDia(mine){
   var d = S.data, bl = d.tarefas.slice().sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||"") || a.ordem - b.ordem; });
   if (!bl.length) return '<div class="empty"><b>Nenhuma tarefa neste dia</b>O coordenador monta o dia na planilha.</div>';
@@ -947,19 +957,23 @@ function renderDia(mine){
   }
   var estDe = function(b){ return (d.status[b.id] || {}).estado || "pendente"; };
   var conc = bl.filter(function(b){ return estDe(b) === "concluida"; });
-  var nao = bl.filter(function(b){ return estDe(b) !== "concluida" && (b.vencida || d.dia < d.hoje); });
+  var nao = bl.filter(function(b){ return estDe(b) !== "concluida" && vencidaAgora(b); });
   var agora = bl.filter(function(b){ return conc.indexOf(b) < 0 && nao.indexOf(b) < 0; });
-  var tab = S_DIATAB, lista = tab === "concluidas" ? conc : tab === "nao" ? nao : agora;
+  var concOk = conc.filter(function(b){ return !atrasoDe(b); }), concAtr = conc.filter(function(b){ return atrasoDe(b) > 0; });
+  var pedPrazo = bl.filter(function(b){ var st = d.status[b.id] || {}; return st.prazoPedido && estDe(b) !== "concluida"; });
+  var tab = S_DIATAB, lista = tab === "concluidas" ? concOk : tab === "concAtr" ? concAtr : tab === "nao" ? nao : tab === "prazo" ? pedPrazo : agora;
   var topoG = (d.verTodos && !mine) ? avisoGrupoBox() + '<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:wrap">' + botaoAlerta() + botaoGrupo(MSG_GRUPO.pontos(), "🎯 Atenção aos pontos") + '</div>' : '';
   var pendAv = avisosPendentes();
   if (pendAv.length) topoG = '<button class="alert avPend" data-act="irAvisos"><b>🔔 '+pendAv.length+' aviso'+(pendAv.length>1?'s':'')+' para confirmar</b><span>'+esc(pendAv[0].texto)+'</span><span>Toque aqui e confirme que viu. 👍</span></button>' + topoG;
   var semFoto = conc.filter(semFotoTar).filter(function(b){ return !mine || b.pessoas.indexOf(S.me) >= 0; });
   var out = naOngListaHtml() + topoG + '<div class="dtabs" role="tablist" style="margin-bottom:10px">'
     + '<button data-act="diatab" data-t="agora" aria-pressed="'+(tab==="agora")+'"><b class="tnum">'+agora.length+'</b>No horário</button>'
-    + '<button class="dcc" data-act="diatab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+conc.length+'</b>Concluídas</button>'
-    + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Não respondidas</button></div>';
+    + '<button class="dnr" data-act="diatab" data-t="nao" aria-pressed="'+(tab==="nao")+'"><b class="tnum">'+nao.length+'</b>Atrasadas</button>'
+    + '<button class="dcc" data-act="diatab" data-t="concluidas" aria-pressed="'+(tab==="concluidas")+'"><b class="tnum">'+concOk.length+'</b>Realizadas no prazo</button>'
+    + '<button class="dca" data-act="diatab" data-t="concAtr" aria-pressed="'+(tab==="concAtr")+'"><b class="tnum">'+concAtr.length+'</b>Realizadas com atraso</button>'
+    + '<button class="dpz" data-act="diatab" data-t="prazo" aria-pressed="'+(tab==="prazo")+'"><b class="tnum">'+pedPrazo.length+'</b>Pedidos de novo prazo</button></div>';
   if (semFoto.length) out += '<div class="alert semFotoAl" role="alert"><b>📷 '+semFoto.length+' atividade'+(semFoto.length>1?'s':'')+' concluída'+(semFoto.length>1?'s':'')+' sem foto</b>'+semFoto.map(function(b){ return esc(b.titulo)+' ('+b.pessoas.map(function(p){ return esc(pessoa(p).nome); }).join(", ")+')'; }).join(" · ")+'<span>Quem fez: abra em <b>Concluídas</b> e toque em <b>📷 Enviar foto</b>.</span></div>';
-  if (!lista.length) return out + '<div class="empty"><b>'+(tab==="agora" ? "🎉 Nada pendente agora" : tab==="concluidas" ? "Nenhuma concluída ainda" : "Nenhuma sem resposta 👏")+'</b>'+(tab==="agora" ? "As atividades concluídas estão em Concluídas." : "")+'</div>';
+  if (!lista.length) return out + '<div class="empty"><b>'+(tab==="agora" ? "🎉 Nada pendente agora" : tab==="concluidas" ? "Nenhuma realizada no prazo ainda" : tab==="concAtr" ? "Nenhuma realizada com atraso 👏" : tab==="prazo" ? "Nenhum pedido de novo prazo" : "Nenhuma atrasada 👏")+'</b>'+(tab==="agora" ? "As atividades concluídas estão em Concluídas." : "")+'</div>';
   var last = null;
   lista.forEach(function(b){
     if (b.turno !== last){ var t = TURNOS[b.turno] || [b.turno,"","--muted"]; out += (last!==null?"</div>":"") + '<div class="turno" style="--tc:var('+t[2]+')"><b>'+esc(t[0])+'</b><span>'+t[1]+'</span><hr></div><div class="list">'; last = b.turno; }
@@ -1018,17 +1032,19 @@ function renderBloco(b){
   var pc = b.pessoas[0] ? pessoa(b.pessoas[0]).cor : "var(--line)";
   var minha = b.minha, gest = S.gestor && logged();
   var dis = (S.busy || !logged()) ? " disabled" : "";
-  var vencida = b.vencida && est !== "concluida";
+  var vencida = vencidaAgora(b);
+  var atrMin = atrasoDe(b), venceEm = prazoDe(b, st);
   var badge = (st.suporte ? '<span class="state help">Precisa de suporte · '+esc(st.suporteHora||"")+'</span> ' : '')
     + (vencida ? '<span class="state help">Prazo vencido</span> ' : (b.atrasada ? '<span class="state help">Atrasada</span> ' : ''))
     + (st.prazoPedido ? '<span class="state live">Prazo adicional solicitado</span> ' : '')
-    + (est==="concluida" ? '<span class="state ok">Concluído</span>' + (st.temFotoConclusao === false ? ' <span class="state help">📷 Sem foto</span>' : '') : est==="andamento" ? '<span class="state live">Iniciado</span>' : "");
+    + (est==="concluida" ? (atrMin ? '<span class="state help">⏰ Realizada com '+fmtMin(atrMin)+' de atraso</span>' : '<span class="state ok">✅ Realizada no prazo</span>') + (st.temFotoConclusao === false ? ' <span class="state help">📷 Sem foto</span>' : '') : est==="andamento" ? '<span class="state live">Iniciado</span>' : "");
   var acts = "";
   if (minha){
     if (!vencida){
       if (est==="pendente") acts += '<button class="btn go" data-act="start" data-b="'+esc(b.id)+'"'+dis+'>Iniciado</button>';
       else if (est==="andamento") acts += '<label class="btn fin'+(S.busy||!logged()?' off':'')+'" for="fotoTar" data-ftar="'+esc(b.id)+'">📷 Concluído · foto da tarefa</label>';
     }
+    if (vencida && est !== "concluida") acts += '<label class="btn fin'+(S.busy||!logged()?' off':'')+'" for="fotoTar" data-ftar="'+esc(b.id)+'" data-ini="'+(est==="pendente"?"1":"")+'">✅ Realizado · foto da tarefa</label>';
     if (est==="concluida" && st.temFotoConclusao === false) acts += '<label class="btn fin'+(S.busy||!logged()?' off':'')+'" for="fotoTar" data-ftar="'+esc(b.id)+'" data-fc="1">📷 Enviar foto</label>';
     if (b.atividade){
       acts += '<button class="tog" aria-pressed="'+!!st.lista+'" data-act="lista" data-b="'+esc(b.id)+'"'+dis+'><span class="box">'+(st.lista?"✓":"")+'</span>Lista</button>';
@@ -1070,7 +1086,7 @@ function renderBloco(b){
       + (st.suporteResp ? '<div style="margin-top:6px;color:var(--ink)"><b style="color:var(--accent)">💬 Coordenação às '+esc(st.suporteRespHora||"")+':</b> '+esc(st.suporteResp)+'</div>'
         : (st.suporteCobrado ? '<div style="margin-top:6px"><b>⏰ Sem resposta em 2h: execute a tarefa ou solicite prazo.</b></div>' : '<div class="when" style="margin-top:4px">A coordenação tem até 2h para responder.</div>'))
       + '</div>' : '';
-  var prazoTxt = '<div class="when tnum">⏱ '+esc(b.hora)+' até '+esc(b.fim)+(b.atrasada && !vencida ? ' · <b style="color:var(--bad)">não iniciada há mais de 1h</b>' : '')+(st.prazoExt ? ' · <b>prazo estendido até '+esc(fmtPrazo(st.prazoExt))+'</b>' : '')+(vencida ? ' · <b style="color:var(--bad)">prazo vencido: só suporte ou prazo adicional</b>' : '')+'</div>';
+  var prazoTxt = '<div class="when tnum">⏱ '+esc(b.hora)+' até '+esc(b.fim)+(b.atrasada && !vencida ? ' · <b style="color:var(--bad)">não iniciada há mais de 1h</b>' : '')+(st.prazoExt ? ' · <b>prazo estendido até '+esc(fmtPrazo(st.prazoExt))+'</b>' : '')+(vencida ? ' · <b style="color:var(--bad)">'+(venceEm ? 'atrasada há '+fmtMin(Math.max(1, minEntre(venceEm, agoraISO()))) : 'atrasada')+': marque Realizado, peça suporte ou prazo</b>' : '')+'</div>';
   var when = [st.inicio?"iniciado "+st.inicio:"", st.fim?"concluído "+st.fim:"", st.por?"por "+pessoa(st.por).nome:""].filter(Boolean).join(" · ");
   var AV = {aprovada:"⭐ Aprovada", aprimorar:"🛠 Aprimorar", refazer:"🔁 Refazer"};
   var avalHtml = "";
@@ -2798,7 +2814,7 @@ $("view").addEventListener("click", function(ev){
   if (lft){
     if (S.busy || !logged()){ ev.preventDefault(); return; }
     if (lft.dataset.ftar && !lft.dataset.fc && precisaConfirmar()){ ev.preventDefault(); return avisoConfirmar(); }
-    S_FOTOALVO = lft.dataset.ftar ? (lft.dataset.fc ? {tipo:"fotoConc", b:lft.dataset.ftar} : {tipo:"tarefa", b:lft.dataset.ftar}) : {tipo:"freq", b:lft.dataset.ffreq, dia:lft.dataset.dia};
+    S_FOTOALVO = lft.dataset.ftar ? (lft.dataset.fc ? {tipo:"fotoConc", b:lft.dataset.ftar} : {tipo:"tarefa", b:lft.dataset.ftar, ini:lft.dataset.ini === "1"}) : {tipo:"freq", b:lft.dataset.ffreq, dia:lft.dataset.dia};
     return;
   }
   var lab = ev.target.closest("label[data-saida]");
@@ -2973,9 +2989,10 @@ function fotoFlow(inputEl, enviar){
 $("fotoTar").addEventListener("change", function(e){
   fotoFlow(e.target, function(alvo, b64, loc){
     if (alvo.tipo === "fotoConc") return act(run("setStatus", S.me, S.pin, S.data.dia, alvo.b, "fotoConclusao", "", {}, b64)).then(function(){ SOM.play("conclui"); toast("📷 Foto enviada. Atividade completa!"); });
-    return act(run("setStatus", S.me, S.pin, S.data.dia, alvo.b, "finish", "", loc || {}, b64)).then(function(d){
-      var t = d.tarefas.filter(function(x){ return x.id === alvo.b; })[0] || {}, st = d.status[alvo.b] || {};
-      toast((t.titulo||"Tarefa")+": concluída com foto.", "✅ " + (t.titulo||"") + " · concluído " + (st.fim||""));
+    var pre = alvo.ini ? run("setStatus", S.me, S.pin, S.data.dia, alvo.b, "start", "", loc || {}) : Promise.resolve();
+    return act(pre.then(function(){ return run("setStatus", S.me, S.pin, S.data.dia, alvo.b, "finish", "", loc || {}, b64); })).then(function(d){
+      var t = d.tarefas.filter(function(x){ return x.id === alvo.b; })[0] || {}, st = d.status[alvo.b] || {}, am = atrasoDe(t);
+      toast((t.titulo||"Tarefa")+(am ? ": realizada com "+fmtMin(am)+" de atraso." : ": realizada no prazo."), "✅ " + (t.titulo||"") + " · concluído " + (st.fim||""));
     });
   });
 });
@@ -3447,6 +3464,9 @@ setInterval(function(){
   if (document.hidden || !logged() || S_LOC === "bloqueada") return;
   pegarLocal(false).then(function(l){ if (l){ S_LASTLOC = {lat:l.lat, lng:l.lng, acc:l.acc, ms:Date.now()}; if (S_LOC !== "ok"){ S_LOC = "ok"; } } });
 }, 5 * 60 * 1000);
+var ULT_MIN = "";
+setInterval(function(){ var m = agoraISO(); if (m === ULT_MIN) return; ULT_MIN = m;
+  if (!document.hidden && S.data && (S.view === "dia" || S.view === "minhas") && !S.busy && !digitando() && !S_SUP && !S_PRAZO && !(S_MOT && S_MOT.aberto)) render(); }, 30000);
 function digitando(){ var el = document.activeElement; return !!(el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && $("view").contains(el)); }
 setInterval(function(){ if (!document.hidden && !S.busy && S.view!=="gestao" && !digitando() && !(S.view==="ponto" && (S_MOT.aberto || $("motObs"))) && !S_SUP && !S_PRAZO) load(null, true); }, 20000);
 document.addEventListener("visibilitychange", function(){ if (!document.hidden) aoVoltar(); });
