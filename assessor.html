@@ -2059,7 +2059,8 @@ var DB = null, UID = null, ASSETS = null, DL = null, LOCAL = true;
 var base = function(){ return DB.doc("data/users/" + UID + "/perfil"); };
 function lerLocal(){ try { var d = JSON.parse(localStorage.getItem("ma_dados") || "null"); if (d){ S.dias = d.dias || {}; S.acoes = d.acoes || {}; S.objs = d.objs || {}; S.refs = d.refs || {}; S.contatos = d.contatos || {}; S.viagens = d.viagens || {}; S.notas = d.notas || {}; S.semanas = d.semanas || {}; S.fin = d.fin || {}; ["projetos","galeria","mapas","perfis","posts","listas","msgs","saude","cfgs","livros","icones","time"].forEach(function(k){ S[k] = d[k] || {}; }); } } catch(e){} }
 function fotoSrc(x){ x = String(x || ""); return esc(/^(https?:|data:|blob:)/.test(x) ? x : "/_blob/" + x); }
-function gravarLocal(){ try { localStorage.setItem("ma_dados", JSON.stringify({dias:S.dias, acoes:S.acoes, objs:S.objs, refs:S.refs, contatos:S.contatos, viagens:S.viagens, notas:S.notas, semanas:S.semanas, fin:S.fin, projetos:S.projetos, galeria:S.galeria, mapas:S.mapas, perfis:S.perfis, posts:S.posts, listas:S.listas, msgs:S.msgs, saude:S.saude, cfgs:S.cfgs, livros:S.livros, icones:S.icones, time:S.time})); } catch(e){} }
+var DADOS_VER = 0, AVISO_CHEIO = false;
+function gravarLocal(){ DADOS_VER++; try { localStorage.setItem("ma_dados", JSON.stringify({dias:S.dias, acoes:S.acoes, objs:S.objs, refs:S.refs, contatos:S.contatos, viagens:S.viagens, notas:S.notas, semanas:S.semanas, fin:S.fin, projetos:S.projetos, galeria:S.galeria, mapas:S.mapas, perfis:S.perfis, posts:S.posts, listas:S.listas, msgs:S.msgs, saude:S.saude, cfgs:S.cfgs, livros:S.livros, icones:S.icones, time:S.time})); } catch(e){ if (!AVISO_CHEIO){ AVISO_CHEIO = true; try { toast("Memória do celular cheia para o app: os dados seguem na nuvem, mas sem cópia offline."); } catch(x){} } } }
 var gravando = {}, fila = {}, pend = {};
 function gravar(col, id, body){
   var key = col + "/" + id; pend[key] = true;
@@ -3308,12 +3309,16 @@ ASSETS = { upload: function(blob){ return new Promise(function(res, rej){ var fr
 var FOTOQ = {}, FOTO_RE = /"(data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+\/=]{200,})"/g;
 var COL_S = {dias:"dias", acoes:"acoes", objs:"objetivos", refs:"refs", contatos:"contatos", viagens:"viagens", notas:"notas", semanas:"semanas", fin:"financeiro", projetos:"projetos", galeria:"galeria", mapas:"mapas", perfis:"perfis", posts:"posts", listas:"listas", msgs:"msgs", saude:"saude", cfgs:"config", livros:"livros", time:"time"};
 function estadoFotos(){ var n = Object.keys(FOTOQ).length, el = $("estado"); if (el && n) el.textContent = "📷 Enviando " + n + " foto" + (n > 1 ? "s" : "") + " em segundo plano…"; }
+var FOTO_VER = -1;
 function subirFotosPendentes(){
-  if (!PIN) return; var achadas = {};
+  if (!PIN) return;
+  /* só varre os dados quando algo mudou desde a última varredura (antes varria tudo a cada 30 s) */
+  if (FOTO_VER === DADOS_VER && !Object.keys(FOTOQ).length) return; FOTO_VER = DADOS_VER;
+  var achadas = {};
   Object.keys(COL_S).forEach(function(k){ var c = S[k] || {}; Object.keys(c).forEach(function(id){ var js = c[id] && JSON.stringify(c[id]); if (!js || js.indexOf('"data:image') < 0) return; var mm; FOTO_RE.lastIndex = 0; while ((mm = FOTO_RE.exec(js))) achadas[mm[1]] = 1; }); });
   Object.keys(achadas).forEach(function(d){ if (FOTOQ[d]) return; FOTOQ[d] = 1; estadoFotos();
     apiRun("maFoto", d.split(",")[1]).then(function(r){ delete FOTOQ[d]; trocarFoto(d, r.url); })
-      .catch(function(){ setTimeout(function(){ delete FOTOQ[d]; }, 20000); $("estado").textContent = "Sem internet: a foto fica no celular e sobe depois."; })
+      .catch(function(){ FOTO_VER = -1; setTimeout(function(){ delete FOTOQ[d]; }, 20000); $("estado").textContent = "Sem internet: a foto fica no celular e sobe depois."; })
       .then(function(){ if (!Object.keys(FOTOQ).length && /Enviando/.test($("estado").textContent)) $("estado").textContent = "Fotos salvas na nuvem ✓"; else estadoFotos(); });
   });
 }
@@ -3342,17 +3347,23 @@ DL = { save: function(o){ var blob = new Blob([o.data], {type:"text/calendar"}),
   DIT.onFinal(function(e){ var cur = S.gravTexto || ""; S.gravTexto = (cur ? cur.replace(/\s+$/, "") + " " : "") + String(e.text || "").trim(); gravParcial = ""; if (S.view === "mais" && S.sub === "grav") render(); });
   DIT.onState(function(e){ gravAtivo = e.state === "listening"; if (!gravAtivo) gravParcial = ""; SOM.play(gravAtivo ? "foto" : "feito"); if (S.view === "mais" && S.sub === "grav") render(); });
 })();
+var NUVEM_VOO = false, NUVEM_ULT = 0;
 function carregarNuvem(){
   if (!PIN){ $("estado").textContent = "Entre com a sua senha para salvar na nuvem."; return; }
+  /* uma sincronização por vez, e no máximo uma a cada 8 s */
+  if (NUVEM_VOO || Date.now() - NUVEM_ULT < 8000) return; NUVEM_VOO = true; NUVEM_ULT = Date.now();
   $("estado").textContent = "Sincronizando…";
   apiRun("maCarregar").then(function(d){
+    var antes = ""; try { antes = localStorage.getItem("ma_dados") || ""; } catch(x){}
     LOCAL = false;
     var mapa = {dias:"dias", acoes:"acoes", objetivos:"objs", refs:"refs", contatos:"contatos", viagens:"viagens", notas:"notas", semanas:"semanas", financeiro:"fin",
       projetos:"projetos", galeria:"galeria", mapas:"mapas", perfis:"perfis", posts:"posts", listas:"listas", msgs:"msgs", saude:"saude", config:"cfgs", livros:"livros", icones:"icones", time:"time"};
     Object.keys(mapa).forEach(function(col){ var novo = d[col] || {}; Object.keys(S[mapa[col]] || {}).forEach(function(id){ if (pendentesNuvem[col + "/" + id] || pend[col + "/" + id] || (col !== "icones" && JSON.stringify(S[mapa[col]][id] || "").indexOf('"data:image') >= 0)) novo[id] = S[mapa[col]][id]; }); S[mapa[col]] = novo; });
     gravarLocal(); enviarPendentes(); $("estado").textContent = "Sincronizado na nuvem ✓"; setTimeout(subirFotosPendentes, 400);
-    if (!document.activeElement || !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) render();
-  }).catch(function(e){ if (/PIN/.test(e.message)){ PIN = ""; try { localStorage.removeItem("ma_pin"); } catch(x){} pedirPin("Senha incorreta. Tente de novo."); } else $("estado").textContent = "Sem internet agora. Usando o que está no celular."; });
+    var depois = ""; try { depois = localStorage.getItem("ma_dados") || ""; } catch(x){}
+    var mudou = !antes || !depois || antes !== depois; /* nada mudou: não redesenha (sem piscar nem pular a rolagem) */
+    if (mudou && (!document.activeElement || !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))) render();
+  }).finally(function(){ NUVEM_VOO = false; }).catch(function(e){ if (/PIN/.test(e.message)){ PIN = ""; try { localStorage.removeItem("ma_pin"); } catch(x){} pedirPin("Senha incorreta. Tente de novo."); } else $("estado").textContent = "Sem internet agora. Usando o que está no celular."; });
 }
 function pedirPin(msg){
   var box = $("pinBox"); box.hidden = false; $("pinMsg").textContent = msg || "Digite a senha do PLANO 2028."; setTimeout(function(){ $("pinIn").focus(); }, 100);

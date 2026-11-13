@@ -816,7 +816,11 @@ function save(){ try{ localStorage.setItem("me",S.me); localStorage.setItem("pin
 /* Link do App da Web do Google (termina em /exec). */
 var API = "https://script.google.com/macros/s/AKfycbwLzuB3AAmSOr9GozIxPNYFpXR2KYhYqVzwbxU1NmbCYftjypv1icqmeTkc0gKUrFY1/exec";
 function run(fn){ var a = Array.prototype.slice.call(arguments,1);
-  return fetch(API, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({fn:fn, args:a, device:DEVICE, loc:S_LASTLOC})})
+  /* leitura (getData) tem limite de 25 s para não travar a tela se a planilha demorar */
+  var ctl = (fn === "getData" && window.AbortController) ? new AbortController() : null, tmo = ctl ? setTimeout(function(){ ctl.abort(); }, 25000) : 0;
+  return fetch(API, {method:"POST", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify({fn:fn, args:a, device:DEVICE, loc:S_LASTLOC}), signal: ctl ? ctl.signal : undefined})
+    .catch(function(e){ throw new Error(e && e.name === "AbortError" ? "A planilha demorou para responder. Tente de novo." : "Sem conexão com a planilha. Tente de novo."); })
+    .finally(function(){ if (tmo) clearTimeout(tmo); })
     .then(function(r){ if (!r.ok) throw new Error("Sem conexão com a planilha. Tente de novo."); return r.json(); })
     .then(function(j){ if (!j.ok) throw new Error(j.error || "Erro desconhecido."); return j.data; }); }
 function errMsg(e){ return (e && e.message ? e.message : String(e)).replace(/^Error:\s*/,""); }
@@ -2757,18 +2761,30 @@ $("tCopy").addEventListener("click", function(){
 function cacheKey(){ return "cache_" + (S.me || "anon"); }
 function salvarCache(d){ try { if (d && d.dia === d.hoje) localStorage.setItem(cacheKey(), JSON.stringify(d)); } catch(e){} }
 function lerCache(){ try { var d = JSON.parse(localStorage.getItem(cacheKey()) || "null"); return d; } catch(e){ return null; } }
+var LOAD_SEQ = 0, ACT_SEQ = 0, LOAD_VOO = null, ULT_JSON = "";
 function load(dia, quiet){
-  return run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){
+  /* evita várias leituras iguais ao mesmo tempo (intervalo + foco + volta ao app) */
+  if (quiet && !dia && LOAD_VOO) return LOAD_VOO;
+  var seq = ++LOAD_SEQ, actAntes = ACT_SEQ;
+  var pr = run("getData", dia || (S.data && S.data.dia) || "", S.me, S.pin).then(function(d){
+      /* resposta velha: chegou depois de outra leitura ou de uma ação do usuário — descarta */
+      if (seq !== LOAD_SEQ || actAntes !== ACT_SEQ) return;
+      var js = ""; try { js = JSON.stringify(d); } catch(x){}
+      if (quiet && js && js === ULT_JSON && !(d && d.bloqueado)){ loadPts(false); return; } /* nada mudou: não redesenha a tela */
+      ULT_JSON = js;
       if (d && d.bloqueado && logged()){ // PIN trocado ou celular não liberado: volta para a tela de entrada com o motivo
         S.pin = ""; save(); try { localStorage.removeItem("cache"); } catch(e){}
         setTimeout(function(){ if ($("gMsg")) $("gMsg").textContent = (d.motivo && !/incorreto/i.test(d.motivo)) ? d.motivo : "Seu PIN mudou. Digite o PIN novo para entrar."; }, 50);
       }
       S.data = d; salvarCache(d); $("note").textContent = ""; render(); loadPts(!quiet); })
-    .catch(function(e){ if (!quiet) $("note").textContent = "Não foi possível carregar: " + errMsg(e); });
+    .catch(function(e){ if (!quiet) $("note").textContent = "Não foi possível carregar: " + errMsg(e); })
+    .finally(function(){ if (LOAD_VOO === pr) LOAD_VOO = null; });
+  if (quiet && !dia) LOAD_VOO = pr;
+  return pr;
 }
 function act(p){
-  S.busy = true; render();
-  return p.then(function(d){ S.data = d; return d; })
+  S.busy = true; ACT_SEQ++; render();
+  return p.then(function(d){ S.data = d; try { ULT_JSON = JSON.stringify(d); } catch(x){} return d; })
     .catch(function(e){ var m = errMsg(e); if (/PIN/.test(m)){ S.pin = ""; save(); } toast(m); throw e; })
     .finally(function(){ S.busy = false; render(); });
 }
@@ -3427,7 +3443,7 @@ setInterval(function(){
 }, 5 * 60 * 1000);
 function digitando(){ var el = document.activeElement; return !!(el && /^(INPUT|TEXTAREA|SELECT)$/.test(el.tagName) && $("view").contains(el)); }
 setInterval(function(){ if (!document.hidden && !S.busy && S.view!=="gestao" && !digitando() && !(S.view==="ponto" && (S_MOT.aberto || $("motObs"))) && !S_SUP && !S_PRAZO) load(null, true); }, 20000);
-document.addEventListener("visibilitychange", function(){ if (!document.hidden && !S.busy) load(null, true); });
+document.addEventListener("visibilitychange", function(){ if (!document.hidden) aoVoltar(); });
 var ULT_FOCO = 0;
 function aoVoltar(){ var t = Date.now(); if (t - ULT_FOCO < 4000) return; ULT_FOCO = t; if (!S.busy && logged()){ load(null, true); try { loadPts(false); } catch(e){} } }
 window.addEventListener("pageshow", function(e){ aoVoltar(); if (e.persisted && window.__checarApp) window.__checarApp(true); });
