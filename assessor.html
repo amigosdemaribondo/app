@@ -10,7 +10,8 @@
 <link rel="apple-touch-icon" href="assessor-icone.png">
 <link rel="icon" href="assessor-icone.png">
 <link rel="manifest" href="assessor.webmanifest">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.fabas{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.fabas::-webkit-scrollbar{display:none}.fabas button,.fchips button,.fseg button{flex:none;border:1px solid var(--line);background:var(--navy);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;color:inherit}.fabas button.on,.fchips button.on,.fseg button.on{background:var(--gold);color:#0b1020;border-color:var(--gold)}.fchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.fseg{display:flex;gap:6px;flex-wrap:wrap}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.fgrid .chipc b{font-size:16px}.flist{display:flex;flex-direction:column;gap:4px}.frow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;padding:9px 2px;font-size:14px}.ftot{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:8px 2px;color:var(--muted,#9aa)}.ftot b{color:var(--text,#fff)}.fnum{flex:none;min-width:36px;height:36px;border-radius:12px;background:var(--gold-soft);color:var(--gold);font-weight:800;font-size:13px;display:grid;place-items:center}.fanx{display:flex;gap:6px;overflow-x:auto}.fanx img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.fgal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.fgal a{display:flex;flex-direction:column;gap:3px;color:inherit;text-decoration:none}.fgal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}.fgal small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fctl{display:flex;justify-content:space-between;align-items:center;gap:8px}.fnav{display:flex;justify-content:space-between;align-items:center;margin:6px 0}#finBusca,#fObs{width:100%}
+</style>
 </head><body>
 <title>PLANO 2028</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -2401,7 +2402,7 @@ function enviarFoto(file){
   reduzir(file).then(function(blob){ return ASSETS.upload(blob); }).then(function(r){
     SOM.play("foto");
     if (alvo.indexOf("acaoF:") === 0){ var ai = alvo.slice(6); if (S.acoes[ai]){ S.acoes[ai] = Object.assign({}, S.acoes[ai], {foto:r.url || r.id, feito:true, feitoEm:S.acoes[ai].feitoEm || agoraStamp(), naoFeita:false}); gravar("acoes", ai, S.acoes[ai]); SOM.play("meta"); toast("📷 Ação registrada com foto e marcada como feita"); } }
-    else if (alvo.indexOf("fin:") === 0){ var fi = alvo.slice(4); if (S.fin[fi]){ S.fin[fi] = Object.assign({}, S.fin[fi], {comp:r.url || r.id}); gravar("financeiro", fi, S.fin[fi]); toast("📎 Comprovante anexado"); } }
+    else if (alvo.indexOf("fin:") === 0){ var fi = alvo.slice(4); if (S.fin[fi]){ S.fin[fi] = Object.assign({}, S.fin[fi], {anexos:(S.fin[fi].anexos || []).concat([r.url || r.id])}); gravar("financeiro", fi, S.fin[fi]); toast("📎 Anexo adicionado ao #" + (S.fin[fi].num || "")); } }
     else if (alvo.indexOf("ref:") === 0){ var id = alvo.slice(4), rf = S.refs[id]; if (!rf) return; S.refs[id] = Object.assign({}, rf, {fotos:(rf.fotos || []).concat([r.id])}); gravar("refs", id, S.refs[id]); toast("📷 Foto adicionada"); }
     else { var p = parseKey(alvo), r0 = regDe(p.dia, p.k) || {}; setReg(p.dia, p.k, Object.assign({}, r0, {foto:r.id, s:"feito", em:r0.em || agoraStamp()})); SOM.play("feito"); toast("📷 Comprovado e marcado como feito"); }
     render();
@@ -2836,10 +2837,37 @@ $("view").addEventListener("click", function(e){
 });
 
 
-/* ---------- FINANCEIRO / PROGRAMAÇÃO DE PAGAMENTOS ---------- */
+/* ---------- FINANCEIRO 2.0: folhas, lista numerada, períodos, execução, anexos ---------- */
 var CATS_FIN = ["ONG","Rádio","Política","Casa","Pessoal","Fornecedor","Outro"];
-function finLista(){ return Object.keys(S.fin).map(function(id){ return Object.assign({id:id}, S.fin[id]); }); }
+var FOLHAS = [
+  {k:"ong", n:"Folha da ONG", i:"💙", t:"saida"},
+  {k:"liderancas", n:"Folha de lideranças", i:"🤝", t:"saida"},
+  {k:"singular", n:"Folha singular", i:"👤", t:"saida"},
+  {k:"custos_ong", n:"Custos da ONG", i:"🏢", t:"saida"},
+  {k:"custos_mkt", n:"Custos do MKT", i:"📣", t:"saida"},
+  {k:"extras", n:"Custos extras", i:"➕", t:"saida"},
+  {k:"apps", n:"Apps e assinaturas", i:"📱", t:"saida"},
+  {k:"invest", n:"Investimentos programados", i:"📈", t:"saida"},
+  {k:"projecoes", n:"Projeções / outros", i:"🧭", t:"saida"},
+  {k:"receitas", n:"Previsões de receitas", i:"💵", t:"entrada"},
+  {k:"alianca", n:"Folha aliança", i:"🤲", t:"entrada"}
+];
+var EXEC_ST = {resolver:["var(--red)","A resolver"], andamento:["var(--amber)","Em andamento"], resolvido:["var(--green)","Resolvido"]};
+function folhaInfo(k){ for (var i = 0; i < FOLHAS.length; i++) if (FOLHAS[i].k === k) return FOLHAS[i]; return {k:"exec", n:"Programação de execução", i:"🛠️", t:"saida"}; }
+function folhaDe(f){ if (f.exec) return "exec"; if (f.folha) return f.folha; return ({"ONG":"custos_ong","Rádio":"custos_mkt","Política":"liderancas","Fornecedor":"custos_ong"})[f.cat] || "extras"; }
+function tipoDe(f){ return f.exec ? "saida" : (f.tipo || folhaInfo(folhaDe(f)).t); }
+function finLista(){
+  var L = Object.keys(S.fin).map(function(id){ return Object.assign({id:id}, S.fin[id]); }).filter(function(f){ return f && !f._del && f.demanda; });
+  L.sort(function(a, b){ return String(a.criado || "").localeCompare(String(b.criado || "")) || a.id.localeCompare(b.id); });
+  var n = 0; L.forEach(function(f){ n = Math.max(n, Number(f.num) || 0); });
+  L.forEach(function(f){ if (!f.num){ f.num = ++n; if (S.fin[f.id]){ S.fin[f.id] = Object.assign({}, S.fin[f.id], {num:f.num}); FIN_NUMSAVE[f.id] = 1; } } });
+  if (Object.keys(FIN_NUMSAVE).length) setTimeout(function(){ Object.keys(FIN_NUMSAVE).forEach(function(id){ if (S.fin[id]) gravar("financeiro", id, S.fin[id]); }); FIN_NUMSAVE = {}; }, 0);
+  return L;
+}
+var FIN_NUMSAVE = {};
+function finProxNum(){ var n = 0; finLista().forEach(function(f){ n = Math.max(n, Number(f.num) || 0); }); return n + 1; }
 function finEstado(f){
+  if (f.exec) return f.execSt === "resolvido" ? "pago" : (f.venc && f.venc.slice(0,10) < hojeISO() ? "atrasado" : "aberto");
   if (f.pago) return "pago";
   if (!f.venc) return "aberto";
   var d = f.venc.slice(0,10), h = hojeISO();
@@ -2848,66 +2876,167 @@ function finEstado(f){
   return diasDesde(d) >= -3 ? "breve" : "aberto";
 }
 function brl(v){ var n = Number(v) || 0; return n.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}); }
+function soma(L){ return L.reduce(function(s, f){ return s + (Number(f.valor) || 0); }, 0); }
 function finAlertaHoje(){
-  var L = finLista().filter(function(f){ var e = finEstado(f); return e === "atrasado" || e === "hoje" || e === "breve"; });
+  var L = finLista().filter(function(f){ if (f.exec || tipoDe(f) === "entrada") return false; var e = finEstado(f); return e === "atrasado" || e === "hoje" || e === "breve"; });
   if (!L.length) return "";
   var atr = L.filter(function(f){ return finEstado(f) === "atrasado"; }).length, hj = L.filter(function(f){ return finEstado(f) === "hoje"; }).length;
-  var tot = L.reduce(function(s, f){ return s + (Number(f.valor) || 0); }, 0);
-  return '<button class="finalert' + (atr || hj ? " quente" : "") + '" data-b="irFin"><span>💸</span><span><b>' + (atr ? atr + " atrasado(s) · " : "") + (hj ? hj + " vence(m) hoje · " : "") + L.length + ' pagamento(s) próximos</b><small>' + brl(tot) + ' · toque para ver</small></span></button>';
+  return '<button class="finalert' + (atr || hj ? " quente" : "") + '" data-b="irFin"><span>💸</span><span><b>' + (atr ? atr + " atrasado(s) · " : "") + (hj ? hj + " vence(m) hoje · " : "") + L.length + ' pagamento(s) próximos</b><small>' + brl(soma(L)) + ' · toque para ver</small></span></button>';
 }
-function renderFin(){
-  var L = finLista(), ordem = {atrasado:0, hoje:1, breve:2, aberto:3, pago:4};
-  L.sort(function(a,b){ return ordem[finEstado(a)] - ordem[finEstado(b)] || String(a.venc || "9").localeCompare(String(b.venc || "9")); });
-  var ab = L.filter(function(f){ return !f.pago; }), pg = L.filter(function(f){ return f.pago; });
-  var mes = hojeISO().slice(0,7), aPagar = ab.reduce(function(s, f){ return s + (Number(f.valor) || 0); }, 0);
-  var pagoMes = pg.filter(function(f){ return String(f.pagoEm || "").slice(0,7) === mes; }).reduce(function(s, f){ return s + (Number(f.valor) || 0); }, 0);
-  var atras = ab.filter(function(f){ return finEstado(f) === "atrasado"; });
-  var e = S.editF || null;
-  var h = '<div class="placar" style="grid-template-columns:repeat(3,1fr)"><div class="chipc nao"><b class="tnum">' + atras.length + '</b><span>atrasados</span></div><div class="chipc pend"><b class="tnum" style="font-size:16px">' + brl(aPagar) + '</b><span>a pagar</span></div><div class="chipc feito"><b class="tnum" style="font-size:16px">' + brl(pagoMes) + '</b><span>pago no mês</span></div></div>';
-  h += '<div class="card form"><h2 class="u" style="align-self:flex-start">' + (e && e.id ? "Editar pagamento" : "💰 Programar pagamento") + '</h2>'
-    + '<input id="fDem" maxlength="120" placeholder="Demanda (o que é) *" value="' + esc(e ? e.demanda : "") + '">'
-    + '<div class="grid2"><input id="fValor" inputmode="decimal" placeholder="Valor (R$)" value="' + esc(e && e.valor ? String(e.valor).replace(".", ",") : "") + '"><input id="fRec" maxlength="80" placeholder="Recebedor *" value="' + esc(e ? e.recebedor : "") + '"></div>'
-    + '<div class="grid2"><label class="muted sm">Vencimento (data e hora do lembrete)<input type="datetime-local" id="fVenc" value="' + esc(e && e.venc ? e.venc : hojeISO() + "T09:00") + '"></label><label class="muted sm">Categoria<select id="fCat">' + CATS_FIN.map(function(c){ return '<option' + ((e && e.cat || "ONG") === c ? " selected" : "") + '>' + c + '</option>'; }).join("") + '</select></label></div>'
-    + '<input id="fPix" maxlength="120" placeholder="Pix / conta / observação" value="' + esc(e ? e.pix || "" : "") + '">'
-    + '<label class="chk"><input type="checkbox" id="fRep"' + (e && e.mensal ? " checked" : "") + '> 🔁 Repete todo mês (ao pagar, já agenda o próximo)</label>'
-    + '<div class="grid2"><button class="bprim" data-b="salvaF">' + (e && e.id ? "Salvar" : "+ Programar") + '</button>' + (e ? '<button class="lbtn" data-b="cancelaF">Cancelar</button>' : '<span></span>') + '</div></div>';
-  h += '<div class="contatos">' + (ab.length ? ab.map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nenhum pagamento em aberto.</p>') + '</div>';
-  if (pg.length) h += '<details class="card"><summary class="muted" style="cursor:pointer;font-weight:700">✅ Pagos (' + pg.length + ')</summary><div class="contatos">' + pg.slice(0, 40).map(cardFin).join("") + '</div></details>';
-  return h;
+function tagFin(f){
+  var e = finEstado(f), ent = tipoDe(f) === "entrada";
+  if (f.exec){ var x = EXEC_ST[f.execSt || "resolver"]; return [x[0], x[1]]; }
+  return {pago:["var(--green)", ent ? "Recebido" : "Pago"], atrasado:["var(--red)", "Atrasado"], hoje:["var(--red)", ent ? "Entra hoje" : "Vence hoje"], breve:["var(--amber)", ent ? "Entra em breve" : "Vence em breve"], aberto:["var(--gold)", ent ? "Previsto" : "Programado"]}[e];
 }
 function cardFin(f){
-  var e = finEstado(f), tag = {pago:["var(--green)","Pago"], atrasado:["var(--red)","Atrasado"], hoje:["var(--red)","Vence hoje"], breve:["var(--amber)","Vence em breve"], aberto:["var(--gold)","Programado"]}[e];
-  return '<div class="ct' + (e === "atrasado" || e === "hoje" ? " finq" : "") + '"><div class="ctc"><span class="ico">💸</span><div class="ctt"><b>' + esc(f.demanda) + '</b><small>para <b>' + esc(f.recebedor || "—") + '</b> · ' + esc(f.cat || "") + (f.mensal ? " · 🔁 mensal" : "") + '</small></div><span class="valor tnum">' + brl(f.valor) + '</span></div>'
-    + '<div class="ctl"><span class="st" style="--c:' + tag[0] + '">● ' + tag[1] + '</span><span class="muted sm tnum">' + (f.venc ? fmtDT(f.venc) : "sem data") + (f.pago && f.pagoEm ? " · pago " + fmtD(f.pagoEm.slice(0,10)) : "") + '</span></div>'
-    + (f.pix ? '<div class="obj">🏦 ' + esc(f.pix) + '</div>' : '')
-    + (f.comp ? '<div class="foto"><img src="' + fotoSrc(f.comp) + '" alt="Comprovante"><span class="muted sm">Comprovante anexado</span></div>' : '')
-    + '<div class="cta">' + (f.pago ? '<button class="lbtn" data-b="desfazF" data-id="' + esc(f.id) + '">↺ Desfazer</button>' : '<button class="lbtn okb" data-b="pagarF" data-id="' + esc(f.id) + '">✓ Pago</button>')
-    + (ASSETS ? '<button class="lbtn" data-b="compF" data-id="' + esc(f.id) + '">📎 Comprovante</button>' : '') + '<button class="lbtn" data-b="editF" data-id="' + esc(f.id) + '">✏️</button><button class="lbtn" data-b="delF" data-id="' + esc(f.id) + '">🗑</button></div></div>';
+  var e = finEstado(f), tg = tagFin(f), fo = folhaInfo(folhaDe(f)), ent = tipoDe(f) === "entrada", anx = f.anexos || [];
+  var acaoOk = f.exec ? (f.execSt === "resolvido" ? '<button class="lbtn" data-b="execSt" data-v="resolver" data-id="' + esc(f.id) + '">↺ Reabrir</button>' : '<button class="lbtn" data-b="execSt" data-v="' + (f.execSt === "andamento" ? "resolvido" : "andamento") + '" data-id="' + esc(f.id) + '">' + (f.execSt === "andamento" ? "✓ Resolvido" : "▶ Iniciar") + '</button>')
+    : (f.pago ? '<button class="lbtn" data-b="desfazF" data-id="' + esc(f.id) + '">↺ Desfazer</button>' : '<button class="lbtn okb" data-b="pagarF" data-id="' + esc(f.id) + '">✓ ' + (ent ? "Recebido" : "Pago") + '</button>');
+  return '<div class="ct' + (e === "atrasado" || e === "hoje" ? " finq" : "") + '"><div class="ctc"><span class="fnum tnum">#' + f.num + '</span><div class="ctt"><b>' + esc(f.demanda) + '</b><small>' + fo.i + ' ' + esc(fo.n) + (f.recebedor ? ' · ' + (ent ? "de " : "para ") + '<b>' + esc(f.recebedor) + '</b>' : '') + (f.mensal ? " · 🔁 mensal" : "") + (f.espaco ? ' · 📍 ' + esc(f.espaco) : '') + '</small></div><span class="valor tnum" style="color:' + (ent ? "var(--green)" : "inherit") + '">' + (ent ? "+" : "") + brl(f.valor) + '</span></div>'
+    + '<div class="fctl"><span class="st" style="--c:' + tg[0] + '">● ' + tg[1] + '</span><span class="muted sm tnum">' + (f.venc ? fmtDT(f.venc) : "sem data") + (f.pago && f.pagoEm ? " · " + (ent ? "recebido " : "pago ") + fmtD(f.pagoEm.slice(0,10)) : "") + '</span></div>'
+    + (f.pix ? '<div class="obj">🏦 ' + esc(f.pix) + '</div>' : '') + (f.obs ? '<div class="obj">📝 ' + esc(f.obs) + '</div>' : '')
+    + ((f.comp || anx.length) ? '<div class="fanx">' + [f.comp].concat(anx).filter(Boolean).map(function(u){ return '<a href="' + fotoSrc(u) + '" target="_blank" rel="noopener"><img src="' + fotoSrc(u) + '" alt="Anexo"></a>'; }).join("") + '</div>' : '')
+    + '<div class="cta">' + acaoOk + (ASSETS ? '<button class="lbtn" data-b="anxF" data-id="' + esc(f.id) + '">📎 Anexo/foto</button>' : '') + '<button class="lbtn" data-b="editF" data-id="' + esc(f.id) + '">✏️ Editar</button><button class="lbtn" data-b="delF" data-id="' + esc(f.id) + '">🗑</button></div></div>';
 }
 function proxMes(dt){ var y = +dt.slice(0,4), m = +dt.slice(5,7) + 1, d = +dt.slice(8,10); if (m > 12){ m = 1; y++; } var ult = new Date(Date.UTC(y, m, 0)).getUTCDate(); return y + "-" + String(m).padStart(2,"0") + "-" + String(Math.min(d, ult)).padStart(2,"0") + dt.slice(10); }
+function isoAdd(iso, d){ var t = new Date(iso + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0,10); }
+function periodo(){
+  var tipo = S.finPer || "semanal", off = S.finOff || 0, h = hojeISO(), a, b, rot;
+  if (tipo === "semanal"){ var dw = (new Date(h + "T12:00:00Z").getUTCDay() + 6) % 7; a = isoAdd(h, -dw + 7 * off); b = isoAdd(a, 6); }
+  else if (tipo === "quinzenal"){ var y = +h.slice(0,4), m = +h.slice(5,7), q = +h.slice(8,10) <= 15 ? 0 : 1; var k = (y * 12 + m - 1) * 2 + q + off; y = Math.floor(k / 24); m = Math.floor((k % 24) / 2) + 1; q = k % 2; var mm = y + "-" + String(m).padStart(2,"0"); a = mm + (q ? "-16" : "-01"); b = q ? mm + "-" + String(new Date(Date.UTC(y, m, 0)).getUTCDate()).padStart(2,"0") : mm + "-15"; }
+  else { var y2 = +h.slice(0,4), m2 = +h.slice(5,7) + off; while (m2 < 1){ m2 += 12; y2--; } while (m2 > 12){ m2 -= 12; y2++; } var mm2 = y2 + "-" + String(m2).padStart(2,"0"); a = mm2 + "-01"; b = mm2 + "-" + String(new Date(Date.UTC(y2, m2, 0)).getUTCDate()).padStart(2,"0"); }
+  rot = fmtD(a) + " a " + fmtD(b);
+  return {a:a, b:b, rot:rot};
+}
+function finFormHtml(){
+  var e = S.editF || {}, tipoSel = e.exec ? "exec" : (e.tipo || (e.folha ? folhaInfo(e.folha).t : "saida")), fk = e.exec ? "" : (e.folha || folhaDe(e.demanda ? e : {cat:"ONG"}) );
+  if (!e.id && S.finFolhaSel) fk = S.finFolhaSel;
+  var h = '<div class="card form"><h2 class="u" style="align-self:flex-start">' + (e.id ? "✏️ Editar #" + (e.num || "") : "➕ Adicionar") + '</h2>'
+    + '<div class="fseg" role="radiogroup">' + [["saida","💸 Pagamento"],["entrada","💵 Receita"],["exec","🛠️ Demanda de execução"]].map(function(o){ return '<button class="' + (tipoSel === o[0] ? "on" : "") + '" data-b="fTipo" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join("") + '</div>'
+    + '<input id="fDem" maxlength="120" placeholder="' + (tipoSel === "exec" ? "Demanda (o que precisa ser feito) *" : "Descrição (o que é) *") + '" value="' + esc(e.demanda || "") + '">'
+    + '<div class="grid2"><input id="fValor" inputmode="decimal" placeholder="Valor (R$)" value="' + esc(e.valor ? String(e.valor).replace(".", ",") : "") + '"><input id="fRec" maxlength="80" placeholder="' + (tipoSel === "entrada" ? "De quem vem" : tipoSel === "exec" ? "Responsável" : "Recebedor") + '" value="' + esc(e.recebedor || "") + '"></div>'
+    + '<div class="grid2"><label class="muted sm">' + (tipoSel === "exec" ? "Prazo" : "Vencimento / data") + '<input type="datetime-local" id="fVenc" value="' + esc(e.venc || hojeISO() + "T09:00") + '"></label>'
+    + (tipoSel === "exec" ? '<label class="muted sm">Situação<select id="fExecSt">' + Object.keys(EXEC_ST).map(function(k){ return '<option value="' + k + '"' + ((e.execSt || "resolver") === k ? " selected" : "") + '>' + EXEC_ST[k][1] + '</option>'; }).join("") + '</select></label>'
+      : '<label class="muted sm">Folha<select id="fFolha">' + FOLHAS.filter(function(x){ return tipoSel === "entrada" ? (x.t === "entrada" || x.k === "projecoes") : x.k !== "receitas"; }).map(function(x){ return '<option value="' + x.k + '"' + (fk === x.k ? " selected" : "") + '>' + x.i + ' ' + x.n + '</option>'; }).join("") + '</select></label>') + '</div>'
+    + '<div class="grid2"><input id="fPix" maxlength="120" placeholder="Pix / conta" value="' + esc(e.pix || "") + '"><input id="fEsp" maxlength="80" placeholder="Local / espaço" value="' + esc(e.espaco || "") + '"></div>'
+    + '<textarea id="fObs" rows="2" maxlength="400" placeholder="Observações">' + esc(e.obs || "") + '</textarea>'
+    + (tipoSel !== "exec" ? '<label class="chk"><input type="checkbox" id="fRep"' + (e.mensal ? " checked" : "") + '> 🔁 Repete todo mês (ao marcar ' + (tipoSel === "entrada" ? "recebido" : "pago") + ', já agenda o próximo)</label>' : '')
+    + '<div class="grid2"><button class="bprim" data-b="salvaF" data-t="' + tipoSel + '">' + (e.id ? "Salvar" : "+ Adicionar") + '</button>' + (e.id || e.demanda ? '<button class="lbtn" data-b="cancelaF">Cancelar</button>' : '<span></span>') + '</div></div>';
+  return h;
+}
+function finFiltrar(L){
+  var q = (S.finQ || "").toLowerCase(), fl = S.finFil || "abertos";
+  return L.filter(function(f){
+    if (q && (f.demanda + " " + (f.recebedor || "") + " " + (f.obs || "") + " #" + f.num).toLowerCase().indexOf(q) < 0) return false;
+    var e = finEstado(f), ent = tipoDe(f) === "entrada";
+    if (fl === "abertos") return !f.exec && e !== "pago";
+    if (fl === "atrasados") return !f.exec && e === "atrasado";
+    if (fl === "programados") return !f.exec && !ent && e !== "pago" && e !== "atrasado";
+    if (fl === "pagos") return !f.exec && e === "pago";
+    if (fl === "receitas") return ent;
+    return true;
+  });
+}
+function finListaHtml(L){
+  var ord = {atrasado:0, hoje:1, breve:2, aberto:3, pago:4};
+  L = L.slice().sort(function(a, b){ return ord[finEstado(a)] - ord[finEstado(b)] || String(a.venc || "9").localeCompare(String(b.venc || "9")); });
+  var sai = L.filter(function(f){ return tipoDe(f) !== "entrada"; }), ent = L.filter(function(f){ return tipoDe(f) === "entrada"; });
+  return '<div class="ftot"><span><b class="tnum">' + L.length + '</b> itens</span><span>Saídas <b class="tnum">' + brl(soma(sai)) + '</b></span>' + (ent.length ? '<span>Entradas <b class="tnum" style="color:var(--green)">' + brl(soma(ent)) + '</b></span>' : '') + '</div>'
+    + '<div class="contatos">' + (L.length ? L.map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nada por aqui.</p>') + '</div>';
+}
+function renderFin(){
+  var L = finLista(), aba = S.finAba || "resumo";
+  var fin = L.filter(function(f){ return !f.exec; }), sai = fin.filter(function(f){ return tipoDe(f) === "saida"; }), ent = fin.filter(function(f){ return tipoDe(f) === "entrada"; });
+  var ab = sai.filter(function(f){ return !f.pago; }), atr = ab.filter(function(f){ return finEstado(f) === "atrasado"; }), mes = hojeISO().slice(0,7);
+  var pagoMes = sai.filter(function(f){ return f.pago && String(f.pagoEm || "").slice(0,7) === mes; });
+  var prevRec = ent.filter(function(f){ return !f.pago; });
+  var h = '<div class="fabas">' + [["resumo","📊 Resumo"],["add","➕ Adicionar"],["lista","📋 Lista"],["folhas","🗂️ Folhas"],["periodo","📅 Período"],["exec","🛠️ Execução"]].map(function(t){ return '<button class="' + (aba === t[0] ? "on" : "") + '" data-b="finAba" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</div>';
+  if (aba === "resumo"){
+    h += '<div class="fgrid"><div class="chipc nao"><b class="tnum">' + atr.length + '</b><span>atrasados · ' + brl(soma(atr)) + '</span></div><div class="chipc pend"><b class="tnum">' + brl(soma(ab)) + '</b><span>a pagar (' + ab.length + ')</span></div><div class="chipc feito"><b class="tnum">' + brl(soma(pagoMes)) + '</b><span>pago no mês</span></div><div class="chipc"><b class="tnum" style="color:var(--green)">' + brl(soma(prevRec)) + '</b><span>receitas previstas</span></div></div>';
+    var saldo = soma(prevRec) - soma(ab);
+    h += '<div class="card"><h2>⚖️ Previsão de saldo</h2><p class="tnum" style="font-size:22px;font-weight:800;color:' + (saldo >= 0 ? "var(--green)" : "var(--red)") + '">' + brl(saldo) + '</p><p class="muted sm">Receitas previstas menos pagamentos em aberto.</p></div>';
+    h += '<div class="card"><h2>🗂️ Por folha (em aberto)</h2><div class="flist">' + FOLHAS.map(function(fo){ var it = fin.filter(function(f){ return folhaDe(f) === fo.k && !f.pago; }); return '<button class="frow" data-b="abrirFolha" data-v="' + fo.k + '"><span>' + fo.i + ' ' + fo.n + '</span><span class="muted sm">' + it.length + '</span><b class="tnum" style="color:' + (fo.t === "entrada" ? "var(--green)" : "inherit") + '">' + brl(soma(it)) + '</b></button>'; }).join("") + '</div></div>';
+    if (atr.length) h += '<div class="card"><h2>🚨 Atrasados</h2><div class="contatos">' + atr.map(cardFin).join("") + '</div></div>';
+    var ex = L.filter(function(f){ return f.exec && f.execSt !== "resolvido"; });
+    h += '<button class="finalert" data-b="finAba" data-v="exec"><span>🛠️</span><span><b>' + ex.length + ' demanda(s) de execução em aberto</b><small>' + brl(soma(ex)) + ' · toque para ver</small></span></button>';
+  }
+  if (aba === "add") h += finFormHtml();
+  if (aba === "lista"){
+    h += '<input id="finBusca" type="search" placeholder="🔎 Buscar por descrição, nome ou #número" value="' + esc(S.finQ || "") + '">'
+      + '<div class="fchips">' + [["abertos","Em aberto"],["atrasados","Atrasados"],["programados","Programados"],["pagos","Pagos"],["receitas","Receitas"],["todos","Todos"]].map(function(c){ return '<button class="' + ((S.finFil || "abertos") === c[0] ? "on" : "") + '" data-b="finFil" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join("") + '</div>'
+      + '<div id="finListaBox">' + finListaHtml(finFiltrar(fin)) + '</div>';
+  }
+  if (aba === "folhas"){
+    var fsel = S.finFolhaSel || "ong", fo = folhaInfo(fsel), it = fin.filter(function(f){ return folhaDe(f) === fsel; });
+    var abt = it.filter(function(f){ return !f.pago; }), pg = it.filter(function(f){ return f.pago; });
+    h += '<div class="fchips">' + FOLHAS.map(function(x){ return '<button class="' + (fsel === x.k ? "on" : "") + '" data-b="abrirFolha" data-v="' + x.k + '">' + x.i + ' ' + x.n + '</button>'; }).join("") + '</div>';
+    h += '<div class="card"><h2>' + fo.i + ' ' + fo.n + '</h2><div class="fgrid"><div class="chipc pend"><b class="tnum">' + brl(soma(abt)) + '</b><span>' + (fo.t === "entrada" ? "a receber" : "em aberto") + ' (' + abt.length + ')</span></div><div class="chipc feito"><b class="tnum">' + brl(soma(pg)) + '</b><span>' + (fo.t === "entrada" ? "recebido" : "pago") + ' (' + pg.length + ')</span></div></div>'
+      + '<button class="bprim" data-b="novoNaFolha" data-v="' + fsel + '">+ Adicionar em ' + esc(fo.n) + '</button></div>';
+    h += '<div class="contatos">' + (abt.length ? abt.map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nada em aberto nesta folha.</p>') + '</div>';
+    if (pg.length) h += '<details class="card"><summary class="muted" style="cursor:pointer;font-weight:700">✅ ' + (fo.t === "entrada" ? "Recebidos" : "Pagos") + ' (' + pg.length + ')</summary><div class="contatos">' + pg.map(cardFin).join("") + '</div></details>';
+  }
+  if (aba === "periodo"){
+    var p = periodo(), noP = fin.filter(function(f){ var d = String(f.venc || "").slice(0,10); return d >= p.a && d <= p.b; });
+    var s2 = noP.filter(function(f){ return tipoDe(f) === "saida"; }), e2 = noP.filter(function(f){ return tipoDe(f) === "entrada"; });
+    h += '<div class="fchips">' + [["semanal","Semanal"],["quinzenal","Quinzenal"],["mensal","Mensal"]].map(function(c){ return '<button class="' + ((S.finPer || "semanal") === c[0] ? "on" : "") + '" data-b="finPer" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join("") + '</div>'
+      + '<div class="fnav"><button class="lbtn" data-b="finOff" data-v="-1">‹</button><b>' + p.rot + '</b><button class="lbtn" data-b="finOff" data-v="1">›</button></div>'
+      + '<div class="fgrid"><div class="chipc pend"><b class="tnum">' + brl(soma(s2)) + '</b><span>gastos no período</span></div><div class="chipc feito"><b class="tnum">' + brl(soma(s2.filter(function(f){ return f.pago; }))) + '</b><span>já pagos</span></div><div class="chipc nao"><b class="tnum">' + brl(soma(s2.filter(function(f){ return !f.pago; }))) + '</b><span>falta pagar</span></div><div class="chipc"><b class="tnum" style="color:var(--green)">' + brl(soma(e2)) + '</b><span>receitas</span></div></div>'
+      + '<div class="card"><h2>Por folha no período</h2><div class="flist">' + FOLHAS.map(function(fo){ var x = noP.filter(function(f){ return folhaDe(f) === fo.k; }); return x.length ? '<div class="frow"><span>' + fo.i + ' ' + fo.n + '</span><span class="muted sm">' + x.length + '</span><b class="tnum">' + brl(soma(x)) + '</b></div>' : ''; }).join("") + '</div></div>'
+      + finListaHtml(noP);
+  }
+  if (aba === "exec"){
+    var EX = L.filter(function(f){ return f.exec; }), ef = S.finExecFil || "abertas";
+    var vis = EX.filter(function(f){ return ef === "todas" ? true : ef === "resolvidas" ? f.execSt === "resolvido" : ef === "anexos" ? (f.anexos || []).length || f.comp : f.execSt !== "resolvido"; });
+    h += '<div class="fgrid"><div class="chipc nao"><b class="tnum">' + EX.filter(function(f){ return (f.execSt || "resolver") === "resolver"; }).length + '</b><span>a resolver</span></div><div class="chipc pend"><b class="tnum">' + EX.filter(function(f){ return f.execSt === "andamento"; }).length + '</b><span>em andamento</span></div><div class="chipc feito"><b class="tnum">' + EX.filter(function(f){ return f.execSt === "resolvido"; }).length + '</b><span>resolvidas</span></div><div class="chipc"><b class="tnum">' + brl(soma(EX.filter(function(f){ return f.execSt !== "resolvido"; }))) + '</b><span>valor em aberto</span></div></div>'
+      + '<button class="bprim" data-b="novaExec">+ Nova demanda de execução</button>'
+      + '<div class="fchips">' + [["abertas","A resolver"],["resolvidas","Resolvidas"],["anexos","📎 Com anexos e fotos"],["todas","Todas"]].map(function(c){ return '<button class="' + (ef === c[0] ? "on" : "") + '" data-b="finExecFil" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join("") + '</div>';
+    if (ef === "anexos"){
+      var fotos = []; EX.forEach(function(f){ [f.comp].concat(f.anexos || []).filter(Boolean).forEach(function(u){ fotos.push([u, f]); }); });
+      h += fotos.length ? '<div class="fgal">' + fotos.map(function(x){ return '<a href="' + fotoSrc(x[0]) + '" target="_blank" rel="noopener"><img src="' + fotoSrc(x[0]) + '" alt=""><small>#' + x[1].num + ' ' + esc(x[1].demanda) + '</small></a>'; }).join("") + '</div>' : '<p class="vazio" style="text-align:center">Nenhum anexo ainda. Use 📎 em uma demanda.</p>';
+    } else h += '<div class="ftot"><span><b class="tnum">' + vis.length + '</b> demandas</span><span>Total <b class="tnum">' + brl(soma(vis)) + '</b></span></div><div class="contatos">' + (vis.length ? vis.sort(function(a, b){ return String(a.venc || "9").localeCompare(String(b.venc || "9")); }).map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nenhuma demanda aqui.</p>') + '</div>';
+  }
+  return h;
+}
+$("view").addEventListener("input", function(e){
+  if (e.target.id !== "finBusca") return; S.finQ = e.target.value; var bx = $("finListaBox"); if (bx) bx.innerHTML = finListaHtml(finFiltrar(finLista().filter(function(f){ return !f.exec; })));
+});
 $("view").addEventListener("click", function(e){
   var b = e.target.closest("[data-b]"); if (!b) return;
-  var a = b.dataset.b, id = b.dataset.id;
-  if (a === "irFin"){ S.sub = "fin"; irPara("mais"); return; }
-  if (a === "editF"){ S.editF = Object.assign({id:id}, S.fin[id]); render(); window.scrollTo({top:0, behavior:"smooth"}); return; }
-  if (a === "cancelaF"){ S.editF = null; render(); return; }
+  var a = b.dataset.b, id = b.dataset.id, v = b.dataset.v;
+  if (a === "irFin"){ S.sub = "fin"; S.finAba = "resumo"; irPara("mais"); return; }
+  if (a === "finAba"){ S.finAba = v; if (v === "add" && !S.editF) S.editF = null; SOM.play("aba"); render(); return; }
+  if (a === "finFil"){ S.finFil = v; render(); return; }
+  if (a === "finPer"){ S.finPer = v; S.finOff = 0; render(); return; }
+  if (a === "finOff"){ S.finOff = (S.finOff || 0) + Number(v); render(); return; }
+  if (a === "finExecFil"){ S.finExecFil = v; render(); return; }
+  if (a === "abrirFolha"){ S.finFolhaSel = v; S.finAba = "folhas"; render(); return; }
+  if (a === "novoNaFolha"){ S.finFolhaSel = v; S.editF = {folha:v, tipo:folhaInfo(v).t}; S.finAba = "add"; render(); window.scrollTo({top:0, behavior:"smooth"}); return; }
+  if (a === "novaExec"){ S.editF = {exec:true, execSt:"resolver"}; S.finAba = "add"; render(); window.scrollTo({top:0, behavior:"smooth"}); return; }
+  if (a === "fTipo"){ var cur = S.editF || {}; var keep = {demanda:$("fDem") ? $("fDem").value : "", valor:$("fValor") ? parseFloat(String($("fValor").value).replace(/\./g, "").replace(",", ".")) || "" : "", recebedor:$("fRec") ? $("fRec").value : "", venc:$("fVenc") ? $("fVenc").value : "", obs:$("fObs") ? $("fObs").value : ""};
+    S.editF = Object.assign({}, cur, keep, {exec:v === "exec", tipo:v === "exec" ? "" : v, folha:v === "entrada" ? "receitas" : (v === "saida" && cur.folha === "receitas" ? "ong" : cur.folha)}); render(); return; }
+  if (a === "editF"){ S.editF = Object.assign({id:id}, S.fin[id]); S.finAba = "add"; render(); window.scrollTo({top:0, behavior:"smooth"}); return; }
+  if (a === "cancelaF"){ S.editF = null; S.finAba = "lista"; render(); return; }
   if (a === "salvaF"){
-    var dem = $("fDem").value.trim(), rec = $("fRec").value.trim();
-    if (!dem || !rec){ SOM.play("erro"); toast("Preencha a demanda e o recebedor."); return; }
-    var val = parseFloat(String($("fValor").value).replace(/\./g, "").replace(",", ".")) || 0;
+    var dem = $("fDem").value.trim(); if (!dem){ SOM.play("erro"); toast("Escreva a descrição."); $("fDem").focus(); return; }
+    var t = b.dataset.t, val = parseFloat(String($("fValor").value).replace(/\./g, "").replace(",", ".")) || 0;
     var fid = (S.editF && S.editF.id) || "f" + Date.now().toString(36), ant = S.fin[fid] || {};
-    S.fin[fid] = Object.assign({}, ant, {demanda:dem, recebedor:rec, valor:val, venc:$("fVenc").value.slice(0,16), cat:$("fCat").value, pix:$("fPix").value.trim(), mensal:$("fRep").checked, pago:ant.pago || false, criado:ant.criado || agoraStamp()});
-    gravar("financeiro", fid, S.fin[fid]); S.editF = null; SOM.play("feito"); toast("💰 Pagamento programado"); render(); return;
+    var o = {demanda:dem, recebedor:$("fRec").value.trim(), valor:val, venc:$("fVenc").value.slice(0,16), pix:$("fPix").value.trim(), espaco:$("fEsp").value.trim(), obs:$("fObs").value.trim(), num:ant.num || finProxNum(), criado:ant.criado || agoraStamp()};
+    if (t === "exec") Object.assign(o, {exec:true, execSt:$("fExecSt").value, tipo:"", folha:"", mensal:false});
+    else Object.assign(o, {exec:false, tipo:t, folha:$("fFolha").value, mensal:$("fRep").checked, pago:ant.pago || false, cat:ant.cat || ""});
+    S.fin[fid] = Object.assign({}, ant, o); gravar("financeiro", fid, S.fin[fid]);
+    S.editF = null; SOM.play("feito"); toast(t === "exec" ? "🛠️ Demanda #" + o.num + " salva" : (t === "entrada" ? "💵 Receita" : "💰 Pagamento") + " #" + o.num + " salvo");
+    S.finAba = t === "exec" ? "exec" : "lista"; render(); return;
   }
   if (a === "pagarF"){
     var f = S.fin[id]; S.fin[id] = Object.assign({}, f, {pago:true, pagoEm:agoraStamp()}); gravar("financeiro", id, S.fin[id]);
-    if (f.mensal && f.venc){ var nid = "f" + Date.now().toString(36); S.fin[nid] = Object.assign({}, f, {venc:proxMes(f.venc), pago:false, pagoEm:"", comp:"", criado:agoraStamp()}); gravar("financeiro", nid, S.fin[nid]); toast("✅ Pago. Próximo já agendado para " + fmtD(proxMes(f.venc).slice(0,10))); }
-    else toast("✅ Pagamento registrado");
+    if (f.mensal && f.venc){ var nid = "f" + Date.now().toString(36); S.fin[nid] = Object.assign({}, f, {venc:proxMes(f.venc), pago:false, pagoEm:"", comp:"", anexos:[], num:finProxNum(), criado:agoraStamp()}); gravar("financeiro", nid, S.fin[nid]); toast("✅ Feito. Próximo já agendado para " + fmtD(proxMes(f.venc).slice(0,10))); }
+    else toast(tipoDe(f) === "entrada" ? "✅ Receita recebida" : "✅ Pagamento registrado");
     SOM.play("meta"); render(); return;
   }
   if (a === "desfazF"){ S.fin[id] = Object.assign({}, S.fin[id], {pago:false, pagoEm:""}); gravar("financeiro", id, S.fin[id]); render(); return; }
+  if (a === "execSt"){ S.fin[id] = Object.assign({}, S.fin[id], {execSt:v, resolvidoEm:v === "resolvido" ? agoraStamp() : ""}); gravar("financeiro", id, S.fin[id]); SOM.play(v === "resolvido" ? "meta" : "feito"); render(); return; }
   if (a === "delF"){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Excluir?"; return; } delete S.fin[id]; gravar("financeiro", id, null); render(); return; }
-  if (a === "compF"){ fotoAlvo = "fin:" + id; $("refIn").click(); return; }
+  if (a === "anxF" || a === "compF"){ fotoAlvo = "fin:" + id; $("refIn").click(); return; }
 });
 
 $("view").addEventListener("click", function(e){ var b = e.target.closest('[data-b="verTudo"]'); if (b){ S.verTudo = !S.verTudo; render(); } });
