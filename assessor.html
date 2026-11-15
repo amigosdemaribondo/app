@@ -328,6 +328,37 @@ body:not(.v9hoje) .aba9{display:none}
 .mwb.v11{grid-template-columns:48px 1fr 48px 48px}
 .mt9 .r button.ed{background:transparent;color:inherit;font-size:13px;opacity:.8;padding:4px 2px}
 
+
+/* v12 · micro metas */
+.mc12{display:flex;flex-direction:column;gap:8px;border:1px solid var(--line);background:var(--navy);border-radius:18px;padding:12px}
+.mc12h{display:flex;align-items:center;gap:8px}
+.mc12h b{flex:1;font-size:15px}
+.mc12h em{font-style:normal;font-weight:800;color:var(--gold);font-size:14px}
+.mc12h button{border:1px solid var(--line);background:var(--navy2);border-radius:10px;padding:7px 10px;font-weight:700;font-size:12.5px;color:inherit}
+.mc12g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mc12i{position:relative}
+.mc12b{width:100%;display:flex;align-items:center;gap:9px;text-align:left;border:1.5px solid var(--line);background:var(--navy2);border-radius:14px;padding:9px;color:inherit;font:inherit;transition:transform .12s}
+.mc12b:active{transform:scale(.96)}
+.mc12i.ok .mc12b{border-color:rgba(47,208,122,.55);background:rgba(47,208,122,.08)}
+.mc12r{flex:none;width:44px;height:44px;border-radius:50%;background:conic-gradient(var(--gold) calc(var(--p)*1%),var(--navy3) 0);display:grid;place-items:center}
+.mc12i.ag .mc12r{background:conic-gradient(#38BDF8 calc(var(--p)*1%),var(--navy3) 0)}
+.mc12i.ok .mc12r{background:conic-gradient(var(--green) 100%,var(--navy3) 0)}
+.mc12r i{width:35px;height:35px;border-radius:50%;background:var(--navy2);display:grid;place-items:center;font-style:normal;font-size:18px}
+.mc12i.ok .mc12r i{color:var(--green);font-weight:900}
+.mc12t{min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.mc12t b{font-size:13.5px}
+.mc12t small{font-size:11.5px;color:var(--muted)}
+.mc12m{position:absolute;top:-6px;right:-4px;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--navy3);color:var(--muted);font-weight:900;font-size:14px;line-height:1;padding:0}
+.mf12{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:8px}
+.mf12r{display:flex;gap:6px;align-items:center}
+.mf12r input{flex:1;min-width:0}
+.mf12ico{width:44px;height:44px;border-radius:12px;border:1.5px solid var(--gold);background:var(--navy2);font-size:20px;flex:none}
+.mf12x{width:40px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--navy2);flex:none}
+.mf12g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mf12g input{width:100%;margin-top:4px}
+.mf12p input{width:20px;height:20px;flex:none;margin:1px 0 0;padding:0}
+.mf12p{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted)}
+
 /* capa */
 .capa{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
 .capa img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;max-width:none}
@@ -1349,7 +1380,7 @@ function sugestoesHtml(compacto){
     return '<div class="sg" style="--ec:' + e.c + '"><b>' + esc(s.t) + '</b><p>' + esc(s.d) + '</p><button data-m5="sugAcao" data-i="' + i + '">⚡ Virar ação de hoje</button></div>'; }).join("") + '</details>';
 }
 /* ================= SAÚDE: água e alimentação ================= */
-function aguaMeta(){ return Number(cfg().aguaMeta) || 2500; }
+function aguaMeta(){ return Number(cfg().aguaMeta) || 2000; }
 var REFEICOES = [["cafe","☕ Café"],["lanche1","🍎 Lanche"],["almoco","🍽️ Almoço"],["lanche2","🥜 Lanche"],["jantar","🥗 Jantar"]];
 function saudeHoje(){ return S.saude[hojeISO()] || {agua:0, ref:{}}; }
 function aguaHtml(compacto){
@@ -2314,6 +2345,7 @@ function metasSemana9(){
 function acoesAbertas9(){ return Object.keys(S.acoes).filter(function(id){ var a = S.acoes[id]; return a && !a.feito && !a.descartada; }).length; }
 function renderHoje(){
   if (S.dia !== hojeISO() && !S.painel9) S.dia = hojeISO();
+  try { aguaProg12(); } catch(e){}
   var hoje = hojeISO(), c = contagem(hoje), pct = c.total ? Math.round(100 * c.feito / c.total) : 0, ms = metasSemana9(), nA = acoesAbertas9();
   var prox = proximosComp(1)[0];
   var h = '<section class="h9">';
@@ -2321,6 +2353,7 @@ function renderHoje(){
     + '<div class="h9ring">' + ring(pct, "var(--gold)") + '<b class="tnum">' + pct + '%</b></div></div>';
   h += '<div class="h9btns"><button class="h9b acoes" data-h9="acoes"><i>⚡</i><b>Ações</b><span class="tnum">' + (nA ? nA + ' em aberto' : 'Nada pendente') + '</span></button>'
     + '<button class="h9b metas" data-h9="metas"><i>🎯</i><b>Metas</b><span class="tnum">' + (ms.metas.length ? ms.pct + '% da semana · ' + ms.batidas + '/' + ms.metas.length : 'Definir metas') + '</span></button></div>';
+  h += microHtml12();
   if (prox){
     var x = prox.it, key = x.tipo === "acao" ? "acao:" + x.id : x.dia + ":" + x.k, hj = prox.d === hoje && x.tipo !== "reag";
     h += '<div class="h9agora ' + prox.e + '"><span class="ic">' + x.ico + '</span><div class="tx"><small class="tnum">' + (prox.e === "agora" ? "AGORA" : quandoTxt(prox.d) + ' · ' + hh(x.ini) + ' · ' + faltaTxt(prox.d, x.ini)) + '</small><b>' + esc(x.t) + '</b></div>'
@@ -2500,6 +2533,73 @@ APP9.addEventListener("click", function(e){
     var sm = JSON.parse(JSON.stringify(semanaDoc(seg))), m = sm.metas[+b.dataset.i]; if (!m) return;
     Object.assign(m, {t:t, ico:d.ico, alvo:Math.max(1, Math.min(99, Math.round(+d.alvo || 1))), pts:Math.max(0, Math.round(+d.pts || 0)), bonus:Math.max(0, Math.round(+d.bonus || 0))});
     sm.semana = seg; S.semanas[seg] = sm; gravar("semanas", seg, sm); S.edS11 = null; S.drS11 = null; SOM.play("feito"); toast("✏️ Meta salva"); render(); return; }
+});
+
+/* ================= v12 · micro metas do dia (água, fruta, leitura, verdura…) ================= */
+var MICRO_PADRAO = [{id:"agua", t:"Beber água", ico:"💧", alvo:2000, passo:250, un:"ml"}, {id:"fruta", t:"Comer uma fruta", ico:"🍎", alvo:1, passo:1, un:"fruta"}, {id:"ler", t:"Ler uma página", ico:"📖", alvo:1, passo:1, un:"página"}, {id:"verdura", t:"Comer verdura", ico:"🥦", alvo:1, passo:1, un:"porção"}];
+var ICOS12 = ["💧","🍎","🍌","📖","🥦","🥗","🚶","🏋️","🙏","🧘","😴","💊","☀️","📵","✍️","🦷"];
+function micro12(){ var L = cfg().micro; return (L && L.length ? L : MICRO_PADRAO).map(function(m){ return m.id === "agua" ? Object.assign({}, m, {alvo:aguaMeta()}) : m; }); }
+function microVal12(m, iso){ var sd = S.saude[iso || hojeISO()] || {}; return m.id === "agua" ? (sd.agua || 0) : ((sd.micro || {})[m.id] || 0); }
+function microTxt12(m, v){ return m.id === "agua" ? (v / 1000).toFixed(v % 1000 ? 2 : 1).replace(".", ",") + "/" + (m.alvo / 1000).toFixed(1).replace(".", ",") + " L" : v + "/" + m.alvo + (m.alvo > 1 && m.un ? " " + m.un + (/[aeiouã]$/.test(m.un) ? "s" : "") : ""); }
+function microBatidas12(iso){ return micro12().filter(function(m){ return microVal12(m, iso) >= m.alvo; }).length; }
+function microHtml12(){
+  if (S.edMicro12) return '<div class="mc12 card">' + microForm12() + '</div>';
+  var L = micro12(), ok = microBatidas12();
+  return '<div class="mc12"><div class="mc12h"><b>🌱 Micro metas de hoje</b><em class="tnum">' + ok + '/' + L.length + '</em><button data-m12="editar" aria-label="Editar micro metas">✏️ Editar</button></div><div class="mc12g">'
+    + L.map(function(m){ var v = microVal12(m), pc = Math.min(100, Math.round(100 * v / (m.alvo || 1))), done = v >= m.alvo;
+      return '<div class="mc12i' + (m.id === "agua" ? ' ag' : '') + (done ? ' ok' : '') + '"><button class="mc12b" data-m12="mais" data-id="' + esc(m.id) + '" aria-label="' + esc(m.t) + ': marcar"><span class="mc12r" style="--p:' + pc + '"><i>' + (done ? '✓' : m.ico) + '</i></span><span class="mc12t"><b>' + esc(m.t) + '</b><small class="tnum">' + microTxt12(m, v) + (done ? ' · feito!' : m.id === "agua" ? ' · +' + m.passo + ' ml' : '') + '</small></span></button>'
+        + (v > 0 ? '<button class="mc12m" data-m12="menos" data-id="' + esc(m.id) + '" aria-label="Desfazer">−</button>' : '') + '</div>'; }).join("") + '</div></div>';
+}
+function microForm12(){
+  var L = S.drMicro12 || micro12().map(function(m){ return Object.assign({}, m); });
+  return '<div class="mc12h"><b>✏️ Editar micro metas</b></div>'
+    + L.map(function(m, i){ var ag = m.id === "agua";
+      return '<div class="mf12"><div class="mf12r"><button class="mf12ico" data-m12="icoAbre" data-i="' + i + '">' + m.ico + '</button><input data-mf="t" data-i="' + i + '" maxlength="40" value="' + esc(m.t) + '" aria-label="Nome">'
+        + '<button class="mf12x" data-m12="del" data-i="' + i + '" aria-label="Remover">🗑</button></div>'
+        + (S.icoMicro12 === i ? '<div class="icopick">' + ICOS12.map(function(x){ return '<button data-m12="ico" data-i="' + i + '" data-v="' + x + '" aria-pressed="' + (m.ico === x) + '">' + x + '</button>'; }).join("") + '</div>' : '')
+        + '<div class="mf12g"><label class="muted sm">' + (ag ? 'Meta por dia (ml)' : 'Meta por dia') + '<input type="number" data-mf="alvo" data-i="' + i + '" min="1" step="' + (ag ? 250 : 1) + '" value="' + esc(m.alvo) + '"></label>'
+        + (ag ? '<label class="muted sm">Cada toque (ml)<input type="number" data-mf="passo" data-i="' + i + '" min="50" step="50" value="' + esc(m.passo || 250) + '"></label>'
+              : '<label class="muted sm">Unidade<input data-mf="un" data-i="' + i + '" maxlength="14" value="' + esc(m.un || "") + '" placeholder="vez"></label>') + '</div>'
+        + (ag ? '<label class="mf12p"><input type="checkbox" data-mf="prog" data-i="' + i + '"' + (m.prog ? ' checked' : '') + '> Subir a meta de água aos poucos: +250 ml a cada semana em que eu bater 5 dias (até ' + ((m.teto || 3000) / 1000).toFixed(1).replace(".", ",") + ' L)</label>' : '')
+        + '</div>'; }).join("")
+    + '<button class="lbtn" data-m12="add">＋ Adicionar micro meta</button>'
+    + '<div class="f11b"><button class="bprim" data-m12="salvar">Salvar</button><button class="desfazer" data-m12="cancelar">Cancelar</button></div>'
+    + '<button class="del11" data-m12="padrao">↺ Voltar ao padrão (água, fruta, leitura, verdura)</button>';
+}
+function lerForm12(){ var L = S.drMicro12; if (!L) return; Array.prototype.forEach.call(document.querySelectorAll("[data-mf]"), function(el){ var m = L[+el.dataset.i]; if (!m) return; var k = el.dataset.mf; m[k] = k === "prog" ? el.checked : (k === "alvo" || k === "passo") ? Math.max(1, Math.round(+el.value || 1)) : el.value; }); }
+/* meta de água progressiva: verificada uma vez por semana */
+function aguaProg12(){
+  var L = cfg().micro, ag = L && L.filter(function(m){ return m.id === "agua"; })[0]; if (!ag || !ag.prog) return;
+  var seg = segundaDe(hojeISO()), ant = addDias(seg, -7); if (cfg().aguaProgSem === seg) return;
+  var dias = 0; for (var i = 0; i < 7; i++){ var sd = S.saude[addDias(ant, i)]; if (sd && (sd.agua || 0) >= aguaMeta()) dias++; }
+  var velha = aguaMeta(), nova = velha; if (dias >= 5 && nova < (ag.teto || 3000)) nova = Math.min(ag.teto || 3000, nova + 250);
+  salvaCfg({aguaProgSem:seg, aguaMeta:nova}); if (nova > velha) toast("💧 Você bateu a água 5 dias: meta sobe para " + (nova / 1000).toFixed(2).replace(".", ",") + " L");
+}
+APP9.addEventListener("click", function(e){
+  var b = e.target.closest("[data-m12]"); if (!b) return; var a = b.dataset.m12;
+  if (a === "mais" || a === "menos"){
+    var m = micro12().filter(function(x){ return x.id === b.dataset.id; })[0]; if (!m) return;
+    var h0 = hojeISO(), sd = Object.assign({agua:0, ref:{}}, S.saude[h0]); sd.micro = Object.assign({}, sd.micro);
+    var antes = microVal12(m), passo = (a === "mais" ? 1 : -1) * (m.id === "agua" ? (m.passo || 250) : (m.passo || 1));
+    if (m.id === "agua") sd.agua = Math.max(0, (sd.agua || 0) + passo); else sd.micro[m.id] = Math.max(0, (sd.micro[m.id] || 0) + passo);
+    S.saude[h0] = sd; gravar("saude", h0, sd);
+    var depois = m.id === "agua" ? sd.agua : sd.micro[m.id];
+    if (a === "mais" && antes < m.alvo && depois >= m.alvo){ SOM.play("meta"); toast(m.ico + " " + m.t + ": feito! +5 pts" + (microBatidas12() === micro12().length ? " · todas as micro metas de hoje 🏆" : "")); }
+    else SOM.play(a === "mais" ? (m.id === "agua" ? "agua" : "feito") : "prazo");
+    render(); return; }
+  if (a === "editar"){ S.edMicro12 = true; S.drMicro12 = micro12().map(function(m){ return Object.assign({}, m); }); S.icoMicro12 = null; render(); return; }
+  lerForm12();
+  if (a === "icoAbre"){ S.icoMicro12 = S.icoMicro12 === +b.dataset.i ? null : +b.dataset.i; render(); return; }
+  if (a === "ico"){ S.drMicro12[+b.dataset.i].ico = b.dataset.v; S.icoMicro12 = null; render(); return; }
+  if (a === "del"){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "?"; return; } S.drMicro12.splice(+b.dataset.i, 1); render(); return; }
+  if (a === "add"){ S.drMicro12.push({id:"m" + Date.now().toString(36), t:"", ico:"✅", alvo:1, passo:1, un:""}); S.icoMicro12 = null; render(); setTimeout(function(){ var ins = document.querySelectorAll('[data-mf="t"]'); if (ins.length) ins[ins.length - 1].focus(); }, 30); return; }
+  if (a === "padrao"){ S.drMicro12 = MICRO_PADRAO.map(function(m){ return Object.assign({}, m); }); render(); return; }
+  if (a === "cancelar"){ S.edMicro12 = false; S.drMicro12 = null; render(); return; }
+  if (a === "salvar"){
+    var L = S.drMicro12.filter(function(m){ return (m.t || "").trim(); }).map(function(m){ var o = {id:m.id, t:m.t.trim(), ico:m.ico || "✅", alvo:m.alvo || 1, passo:m.passo || 1, un:(m.un || "").trim()}; if (m.id === "agua"){ o.prog = !!m.prog; o.teto = m.teto || 3000; o.passo = m.passo || 250; } return o; });
+    var ag = L.filter(function(m){ return m.id === "agua"; })[0], extra = ag ? {aguaMeta:Math.max(250, ag.alvo)} : {};
+    L.forEach(function(m){ if (m.id === "agua") delete m.alvo; });
+    salvaCfg(Object.assign({micro:L}, extra)); S.edMicro12 = false; S.drMicro12 = null; SOM.play("feito"); toast("🌱 Micro metas salvas"); render(); return; }
 });
 function barra9(q){ document.body.classList.remove("b9A", "b9M"); if (q) document.body.classList.add(q); }
 APP9.addEventListener("click", function(e){
@@ -2868,6 +2968,7 @@ function pontosSemana(seg){
   Object.keys(S.acoes).forEach(function(id){ var a = S.acoes[id]; if (a && a.feito && a.feitoEm && a.feitoEm.slice(0,10) >= seg && a.feitoEm.slice(0,10) <= ate) pts += a.selo === "imediato" ? 25 : 15; });
   var sm = S.semanas[seg]; if (sm && sm.metas) sm.metas.forEach(function(m){ pts += (m.pts != null ? +m.pts : 5) * Math.min(m.feito || 0, m.alvo || 1); if ((m.feito||0) >= (m.alvo||1)) pts += (m.bonus != null ? +m.bonus : 20); });
   try { pts += pontosDes11(seg); } catch(e){}
+  try { for (var i12 = 0; i12 < 7; i12++) pts += 5 * microBatidas12(addDias(seg, i12)); } catch(e){}
   Object.keys(S.notas).forEach(function(id){ var n = S.notas[id]; if (n && n.criado && n.criado.slice(0,10) >= seg && n.criado.slice(0,10) <= ate) pts += 5; });
   Object.keys(S.contatos).forEach(function(id){ var c = S.contatos[id]; if (c && c.ultimo && c.ultimo >= seg && c.ultimo <= ate) pts += 5; });
   return pts;
