@@ -388,6 +388,9 @@ body:not(.v9hoje) .aba9{display:none}
 .g14i.ok .g14r{background:conic-gradient(var(--green) calc(var(--p)*1%),var(--navy3) 0)}
 .g14i.pronto .g14r{background:conic-gradient(var(--gold) 100%,var(--navy3) 0);animation:pulse8 1.6s ease-in-out infinite}
 .g14i.add .g14r i{color:var(--gold);font-size:30px;border:1.5px dashed var(--gold)}
+.g14n{display:-webkit-box!important;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;height:31px;min-height:0!important}
+.g14i.simples .g14r{background:var(--navy3)}
+.g14i.simples .g14r i{border:1.5px solid var(--line)}
 .g14i small{font-size:11.5px;color:var(--muted);font-weight:700}
 .g14i.ok small{color:var(--green)}
 .g14i.pronto small{color:var(--gold)}
@@ -2670,7 +2673,7 @@ function meta13(x, i, j){
   var ij = ' data-i="' + i + '" data-j="' + j + '"';
   if (S.ed13 === i + ":" + j) return '<div class="m13 ed">' + form13(i, j) + '</div>';
   if (!ehProg13(x)) return '<div class="meta' + (x.ok ? " ok" : "") + '"><button class="mk" data-a="ckMeta"' + ij + ' aria-label="Concluir meta">✓</button><span>' + (x.ico ? x.ico + ' ' : '') + esc(x.t) + (x.pontos != null || x.ico ? ' <small class="muted">· 🏅 ' + pontosMeta13(x) + '</small>' : '') + '</span>'
-    + '<button class="x e13" data-o13="editar"' + ij + ' aria-label="Editar meta">✏️</button><button class="x" data-a="delMeta"' + ij + ' aria-label="Remover meta">✕</button></div>';
+    + '<button class="x e13" data-o13="editar"' + ij + ' aria-label="Editar meta (pode virar meta com progresso)" title="Editar · pode virar meta com progresso">✏️</button><button class="x" data-a="delMeta"' + ij + ' aria-label="Remover meta">✕</button></div>';
   var a = x.alvo || 1, p = prog13(x), pc = x.ok ? 100 : Math.min(100, Math.round(100 * p / a)), pronto = p >= a, hojeOk = fezHoje11(x), qb = quebrou11(Object.assign({}, x, {concluida:x.ok}));
   var h = '<div class="m13' + (x.ok ? ' fim' : pronto ? ' pronto' : '') + '"><div class="d11c"><span class="mwi">' + (x.ok ? '🏆' : x.ico || '🎯') + '</span><b>' + esc(x.t) + '<small>' + a + ' ' + TIPO11[x.tipo] + ' · 🏅 ' + pontosMeta13(x) + ' pts</small></b><span class="mwn tnum">' + Math.min(p, a) + '/' + a + '</span>'
     + '<button class="ed11" data-o13="editar"' + ij + ' aria-label="Editar meta">✏️</button></div><div class="trk"><i style="width:' + pc + '%"></i></div>';
@@ -2714,27 +2717,32 @@ APP9.addEventListener("click", function(e){
 function mesAnt13(m){ var y = +m.slice(0,4), mo = +m.slice(5) - 1; if (!mo){ mo = 12; y--; } return y + "-" + String(mo).padStart(2, "0"); }
 
 /* ================= v14 · Metas de progresso em grade de ícones (atalho das metas dos tópicos) ================= */
-function progLista14(){ var o = objMes(S.mes), L = []; o.eixos.forEach(function(e, i){ (e.metas || []).forEach(function(x, j){ if (ehProg13(x) && !x.ok) L.push({x:x, i:i, j:j, eixo:e.nome}); }); }); return L; }
+function progLista14(){ var o = objMes(S.mes), L = []; o.eixos.forEach(function(e, i){ (e.metas || []).forEach(function(x, j){ if (!x.ok) L.push({x:x, i:i, j:j, eixo:e.nome}); }); }); return L; }
 function grade14(){
   var L = progLista14(), o = objMes(S.mes);
-  var h = '<div class="card g14"><div class="h11"><h2 class="u" style="align-self:flex-start">📈 Metas de progresso</h2><small class="muted sm">toque no ícone para marcar</small></div>';
+  var h = '<div class="card g14"><div class="h11"><h2 class="u" style="align-self:flex-start">🎯 Minhas metas</h2><small class="muted sm">todas as metas dos tópicos · toque no ícone</small></div>';
   if (S.ed13 === "g:novo"){
     var d = S.dr13 || {};
     h += '<div class="m13 ed"><div class="muted sm" style="font-weight:700">Em qual tópico?</div><div class="seg13">' + o.eixos.map(function(e, i){ return '<button data-g14="eixo" data-i="' + i + '" aria-pressed="' + (d.eixo === i) + '">' + esc(e.nome) + '</button>'; }).join("") + '</div>'
       + (d.eixo != null ? form13(d.eixo, null).replace('data-o13="salvar" data-i="' + d.eixo + '"', 'data-o13="salvar" data-i="' + d.eixo + '" data-g="1"') : '<p class="muted sm" style="margin:0">Escolha o tópico para continuar.</p><button class="desfazer" data-o13="cancelar">Cancelar</button>') + '</div>';
   }
-  h += '<div class="g14g">' + L.map(function(q){ var x = q.x, a = x.alvo || 1, p = prog13(x), pc = Math.min(100, Math.round(100 * p / a)), pronto = p >= a, ok = fezHoje11(x), ij = ' data-i="' + q.i + '" data-j="' + q.j + '"', k = q.i + ":" + q.j;
+  h += '<div class="g14g">' + L.map(function(q){ if (!ehProg13(q.x)){ var xs = q.x, ks = q.i + ":" + q.j, ijs = ' data-i="' + q.i + '" data-j="' + q.j + '"', sure = S.conf14 === ks;
+      return '<div class="g14i simples' + (sure ? ' pronto' : '') + '"><b class="g14n">' + esc(xs.t) + '</b><button class="g14b" data-g14="simples"' + ijs + ' aria-label="' + esc(xs.t) + '"><span class="g14r" style="--p:0"><i>' + (sure ? '✅' : xs.ico || '☑️') + '</i></span></button>'
+        + '<small>' + (sure ? 'Toque de novo p/ concluir' : 'toque p/ marcar') + '</small><span class="g14a"><button data-o13="editar"' + ijs + ' aria-label="Editar">✏️</button></span></div>'; }
+      var x = q.x, a = x.alvo || 1, p = prog13(x), pc = Math.min(100, Math.round(100 * p / a)), pronto = p >= a, ok = fezHoje11(x), ij = ' data-i="' + q.i + '" data-j="' + q.j + '"', k = q.i + ":" + q.j;
       var acao = pronto ? (S.conf13 === k ? 'concluir' : 'preConc') : (ok ? '' : 'mais');
       return '<div class="g14i' + (pronto ? ' pronto' : ok ? ' ok' : '') + '"><b class="g14n">' + esc(x.t) + '</b>'
         + '<button class="g14b"' + (acao ? ' data-o13="' + acao + '"' + ij : ' disabled') + ' aria-label="' + esc(x.t) + '"><span class="g14r" style="--p:' + pc + '"><i>' + (pronto ? '🏆' : x.ico || '🎯') + '</i></span></button>'
         + '<small class="tnum">' + (S.conf13 === k ? 'Toque de novo p/ confirmar' : pronto ? 'Concluir' : Math.min(p, a) + '/' + a + (ok ? ' · ✓ hoje' : '')) + '</small>'
         + '<span class="g14a"><button data-o13="editar"' + ij + ' aria-label="Editar">✏️</button>' + ((x.tipo === "vezes" && x.n) || ok ? '<button data-o13="menos"' + ij + ' aria-label="Desfazer">↩️</button>' : '') + '</span></div>'; }).join("")
     + (S.ed13 === "g:novo" ? '' : '<div class="g14i add"><b class="g14n">Nova meta</b><button class="g14b" data-g14="novo" aria-label="Nova meta de progresso"><span class="g14r" style="--p:0"><i>＋</i></span></button><small>com progresso</small></div>') + '</div>';
-  if (!L.length && S.ed13 !== "g:novo") h += '<p class="muted sm" style="margin:0">Nenhuma meta com progresso ainda. Toque em ＋ e escolha o tópico (ex.: Corpo e saúde → Academia, 11 dias seguidos).</p>';
+  if (!L.length && S.ed13 !== "g:novo") h += '<p class="muted sm" style="margin:0">Nenhuma meta em aberto. Toque em ＋ e escolha o tópico (ex.: Corpo e saúde → Academia, 11 dias seguidos).</p>';
   return h + '</div>';
 }
 APP9.addEventListener("click", function(e){
   var b = e.target.closest("[data-g14]"); if (!b) return; var a = b.dataset.g14;
+  if (a === "simples"){ var k14 = b.dataset.i + ":" + b.dataset.j; if (S.conf14 !== k14){ S.conf14 = k14; render(); return; }
+    S.conf14 = null; var o14 = JSON.parse(JSON.stringify(objMes(S.mes))), m14 = o14.eixos[+b.dataset.i].metas[+b.dataset.j]; m14.ok = true; m14.okEm = agoraStamp(); SOM.play("meta"); salvaObj13(o14, "✅ Meta concluída: " + m14.t + " (+" + pontosMeta13(m14) + " pts)"); return; }
   if (a === "novo"){ S.ed13 = "g:novo"; S.dr13 = {t:"", ico:"🎯", tipo:"seguidos", alvo:11, pontos:100, eixo:null}; render(); return; }
   if (a === "eixo"){ if (typeof rasc13 === "function" && $("o13T")) rasc13(); S.dr13 = Object.assign({t:"", ico:"🎯", tipo:"seguidos", alvo:11, pontos:100}, S.dr13 || {}, {eixo:+b.dataset.i}); render(); setTimeout(function(){ var el = $("o13T"); if (el) el.focus(); }, 30); return; }
 }, true);
