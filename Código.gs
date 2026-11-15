@@ -1366,11 +1366,12 @@ function importarPresenca(pessoa, pin, prog, dia, presentes, novos, fotoB64) {
 /* ------------------------------------------------------------------ */
 const MA_DONO = 'victor';
 /* Senha própria do Meu Assessor (diferente do PIN da ONG; nenhum gestor vê). */
-const MA_SENHA = '13931393';
+/* Fica nas Propriedades do Script (Configurações do projeto → Propriedades do script → MA_SENHA), nunca no código. */
+function maSenha_() { return String(PropertiesService.getScriptProperties().getProperty('MA_SENHA') || '').trim(); }
 const MA_COLECOES = ['dias', 'acoes', 'objetivos', 'refs', 'contatos', 'viagens', 'notas', 'semanas', 'financeiro',
   'projetos', 'galeria', 'mapas', 'perfis', 'posts', 'listas', 'msgs', 'saude', 'config', 'livros', 'icones', 'time'];
 function maCheck_(pessoa, pin) {
-  if (pessoa !== MA_DONO || String(pin || '').trim() !== MA_SENHA) {
+  if (pessoa !== MA_DONO || !maSenha_() || String(pin || '').trim() !== maSenha_()) {
     Utilities.sleep(800);
     throw new Error('PIN incorreto.');
   }
@@ -3183,7 +3184,7 @@ function mkPub_(r) { return { id: r.id, nome: r.nome, gestor: r.gestor === 'sim'
 function mkCheck_(pessoa, pin) {
   pessoa = String(pessoa || '').trim().toLowerCase(); pin = String(pin || '').trim();
   const r = mkEquipe_().find(x => x.id === pessoa && x.ativo !== 'nao');
-  const ok = r && pin && ((pessoa === MA_DONO && pin === MA_SENHA) || (r.pin && r.pin === pin));
+  const ok = r && pin && ((pessoa === MA_DONO && maSenha_() && pin === maSenha_()) || (r.pin && r.pin === pin));
   if (!ok) { Utilities.sleep(700); throw new Error('Senha incorreta.'); }
   return mkPub_(r);
 }
