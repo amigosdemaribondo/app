@@ -3495,7 +3495,8 @@ function ctLinha(x, n){
   var h = '<div class="ctl g-' + x.g + (feito ? ' ok' : '') + (x.g === "hoje" && x.e === "nao" ? ' late' : '') + '" data-k="' + esc(x.key) + '"><span class="ctn tnum">' + n + '</span>'
     + '<button class="ctck" data-ct="ck" data-key="' + esc(x.key) + '" aria-label="' + (feito ? 'Desfazer' : 'Concluir') + ': ' + esc(x.t) + '">' + (feito ? '✓' : '') + '</button>'
     + '<button class="ctt" data-ct="abrir" data-key="' + esc(x.key) + '"><b>' + esc(x.ico) + ' ' + esc(x.t) + '</b><small>' + esc(ctQuando(x)) + ' · ' + esc(x.org) + '</small></button>';
-  if (!feito) h += '<span class="ctac"><button data-ct="pz" data-key="' + esc(x.key) + '" aria-label="Novo prazo" aria-pressed="' + (CT.pz === x.key) + '">⏱</button><button data-ct="dlg" data-key="' + esc(x.key) + '" aria-label="Delegar" aria-pressed="' + (CT.dlg === x.key) + '">👥</button><button data-ct="desc" data-key="' + esc(x.key) + '" aria-label="Descartar">🗑</button></span>';
+  if (!feito || x.tipo === "acao") h += '<span class="ctac">' + (x.tipo === "acao" ? '<button data-ct="ed" data-id="' + esc(x.id) + '" aria-label="Editar">✏️</button>' : '') + (feito ? '</span>' : '');
+  if (!feito) h += '<button data-ct="pz" data-key="' + esc(x.key) + '" aria-label="Novo prazo" aria-pressed="' + (CT.pz === x.key) + '">⏱</button><button data-ct="dlg" data-key="' + esc(x.key) + '" aria-label="Delegar" aria-pressed="' + (CT.dlg === x.key) + '">👥</button><button data-ct="desc" data-key="' + esc(x.key) + '" aria-label="Descartar">🗑</button></span>';
   h += '</div>';
   if (CT.pz === x.key) h += ctPzHtml(x.key);
   if (CT.dlg === x.key) h += ctDlgHtml(x.key);
@@ -3607,6 +3608,11 @@ document.addEventListener("click", function(e){
   var b = e.target.closest("[data-ct]"); if (!b) return; var a = b.dataset.ct, key = b.dataset.key;
   if (a === "toggle") return ctAbrir(!CT.aberta);
   if (a === "fechar") return ctAbrir(false);
+  if (a === "ed"){ var ae = S.acoes[b.dataset.id]; if (!ae) return; CT.pz = CT.dlg = null;
+    S.editAcao10 = b.dataset.id; S.edDraft10 = {titulo:ae.titulo, quando:ae.quando || "", selo:ae.selo};
+    S.abaAcao = "todos"; S.acTab = ae.feito ? (atrasoAcao(Object.assign({id:b.dataset.id}, ae)) > 0 ? "ca" : "np") : "aberto";
+    if (window.innerWidth < 1100) ctAbrir(false); irPara("acao");
+    return setTimeout(function(){ var el = $("edTit10"); if (el){ el.scrollIntoView({block:"center"}); el.focus(); } }, 60); }
   if (a === "add") return ctAdd();
   if (a === "f"){ CT.f = b.dataset.v; CT.alg = false; return renderCentral(); }
   if (a === "alg"){ CT.alg = !CT.alg; CT.algI = 0; CT.pz = CT.dlg = null; SOM.play("abre"); return renderCentral(); }
