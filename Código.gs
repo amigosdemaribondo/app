@@ -297,9 +297,27 @@ function nomeDia_(iso) {
   return DIAS_SEMANA[new Date(Date.UTC(y, m - 1, d, 12)).getUTCDay()];
 }
 
+/* Proteção contra adivinhar PIN: 5 erros seguidos travam aquele nome por 30 min e avisam a coordenação por e-mail. */
+const PIN_MAX_ERROS = 5, PIN_TRAVA_MIN = 30;
+function travaPin_(app, pessoa) {
+  const c = CacheService.getScriptCache(), k = 'erropin_' + app + '_' + String(pessoa || '').slice(0, 40);
+  return {
+    checar() { if (Number(c.get(k) || 0) >= PIN_MAX_ERROS) throw new Error('Muitas tentativas com PIN errado. Espere ' + PIN_TRAVA_MIN + ' minutos e tente de novo.'); },
+    errou() {
+      const n = Number(c.get(k) || 0) + 1;
+      c.put(k, String(n), PIN_TRAVA_MIN * 60);
+      if (n === PIN_MAX_ERROS) avisarGestor_('⚠️ Acesso travado: ' + pessoa + ' (' + app + ')', PIN_MAX_ERROS + ' tentativas com PIN/senha errados para "' + pessoa + '" às ' + agora_() + '. O acesso desse nome ficou travado por ' + PIN_TRAVA_MIN + ' min. Se não foi a própria pessoa, alguém pode estar tentando adivinhar o PIN.');
+      Utilities.sleep(1200);
+    },
+    acertou() { if (c.get(k)) c.remove(k); },
+    liberar() { c.remove(k); }
+  };
+}
 function checkPin_(pessoa, pin) {
+  const trava = travaPin_('ong', pessoa); trava.checar();
   const p = rows_('Equipe').find(r => r.id === pessoa);
-  if (!p || String(p.pin).trim() !== String(pin).trim()) throw new Error('PIN incorreto.');
+  if (!p || String(p.pin).trim() !== String(pin).trim()) { trava.errou(); throw new Error('PIN incorreto.'); }
+  trava.acertou();
   if (GESTORES.indexOf(pessoa) >= 0 || liberadoGeral_()) { marcarOnline_(pessoa); return p; }  // até sexta: só o PIN basta
   if (!DEVICE_) throw new Error('Abra o app pelo link ' + APP_URL);
   if (!p.aparelho) {
@@ -389,6 +407,7 @@ function novoPinColaborador(pessoa, pin, alvo, pinEscolhido) {
   else do { novo = String(1000 + Math.floor(Math.random() * 9000)); } while (pins.indexOf(novo) >= 0);
   sh.getRange(i + 1, HEAD.Equipe.indexOf('pin') + 1).setNumberFormat('@').setValue(novo);
   sh.getRange(i + 1, HEAD.Equipe.indexOf('aparelho') + 1).setValue('');
+  travaPin_('ong', alvo).liberar();
   return { pin: novo, nome: v[i][1] };
 }
 /* Passa as atividades (de hoje em diante) de um cadastro para outro. Opções: horário de trabalho à tarde e
@@ -448,6 +467,7 @@ function liberarAparelho(pessoa, pin, alvo) {
   const i = ids.indexOf(alvo);
   if (i < 1) throw new Error('Pessoa não encontrada.');
   sh.getRange(i + 1, HEAD.Equipe.indexOf('aparelho') + 1).setValue('');
+  travaPin_('ong', alvo).liberar();
   return { ok: true };
 }
 
@@ -592,6 +612,11 @@ function setStatus(pessoa, pin, dia, bloco, acao, texto, loc, fotoB64) {
       evento_('tarefa', pessoa, '📷 ' + quem.nome + ' enviou a foto de "' + tar.titulo + '".', 'gestao', bloco);
     }
     else if (acao === 'undo') {
+      if (!gestor && !livreTeste) {
+        const quando = mins_(cur.estado === 'concluida' ? cur.fim : cur.inicio);
+        if (dia !== hoje || quando == null || agoraMin - quando > 10 || agoraMin < quando)
+          throw new Error('Só dá para desfazer até 10 minutos depois de marcar. Se precisar, peça à coordenação.');
+      }
       if (cur.estado === 'concluida') { o.estado = 'andamento'; o.fim = ''; } else { o.estado = 'pendente'; o.inicio = ''; }
     }
     else if (acao === 'lista') { if (!gestor) exigeNaOng_(pessoa, 'marcar a lista'); o.lista = cur.lista === 'sim' ? 'não' : 'sim'; }
@@ -1371,10 +1396,12 @@ function maSenha_() { return String(PropertiesService.getScriptProperties().getP
 const MA_COLECOES = ['dias', 'acoes', 'objetivos', 'refs', 'contatos', 'viagens', 'notas', 'semanas', 'financeiro',
   'projetos', 'galeria', 'mapas', 'perfis', 'posts', 'listas', 'msgs', 'saude', 'config', 'livros', 'icones', 'time'];
 function maCheck_(pessoa, pin) {
+  const trava = travaPin_('assessor', MA_DONO); trava.checar();
   if (pessoa !== MA_DONO || !maSenha_() || String(pin || '').trim() !== maSenha_()) {
-    Utilities.sleep(800);
+    trava.errou();
     throw new Error('PIN incorreto.');
   }
+  trava.acertou();
 }
 function maPlanilha_() {
   const pr = PropertiesService.getScriptProperties();
@@ -1969,6 +1996,26 @@ function wa_(tel) {
   return d.length >= 12 ? d : '';
 }
 
+/* Apaga, uma vez por dia, os controles de alerta com mais de 7 dias (as Propriedades do Script têm limite de ~500 KB;
+   cheias, param alertas, carteirinhas e o MKT). Também pode ser rodada à mão no editor: limparPropriedades. */
+function limparPropriedades() { PropertiesService.getScriptProperties().deleteProperty('LIMPEZA_DIA'); return limparPropriedades_(); }
+function limparPropriedades_() {
+  try {
+    const pr = PropertiesService.getScriptProperties(), hoje = hoje_();
+    if (pr.getProperty('LIMPEZA_DIA') === hoje) return 0;
+    const corte = isoAdd_(hoje, -7), corteMs = Date.now() - 7 * 24 * 3600 * 1000;
+    let n = 0;
+    pr.getKeys().forEach(k => {
+      let velho = false, m;
+      if ((m = k.match(/^(pend_|alertados_)(\d{4}-\d{2}-\d{2})$/))) velho = m[2] < corte;
+      else if ((m = k.match(/^fora_.+_(\d{10,})$/))) velho = Number(m[1]) < corteMs;
+      if (velho) { pr.deleteProperty(k); n++; }
+    });
+    pr.setProperty('LIMPEZA_DIA', hoje);
+    return n;
+  } catch (e) { Logger.log(e); return 0; }
+}
+
 /* Confere atrasos de início, prazos vencidos e suporte sem resposta. Roda pelo alerta automático e ao abrir o app. */
 function verificarPendencias_(forcar) {
   try {
@@ -1976,6 +2023,7 @@ function verificarPendencias_(forcar) {
     if (!forcar && Date.now() - Number(pr.getProperty('VERIF_MS') || 0) < 2 * 60 * 1000) return;
     garantirAutomacoes_();
     pr.setProperty('VERIF_MS', String(Date.now()));
+    limparPropriedades_();
     const hoje = hoje_(), hora = agora_(), agoraMin = mins_(hora), agoraDT = hoje + ' ' + hora;
     const chave = 'pend_' + hoje;
     const feitos = (pr.getProperty(chave) || '').split(',').filter(Boolean);
@@ -2017,10 +2065,13 @@ function verificarPendencias_(forcar) {
       }
     });
     const agoraMs = Date.now();
+    const demAbertas = {}, demAvisadas = (pr.getProperty('DEM5H_AVISADAS') || '').split(',').filter(Boolean);
     rows_('Demandas').forEach(dm => {
       if (dm.item === 'ideia' || dm.estado === 'atendida' || dm.estado === 'validada' || dm.dia < INICIO_GERAL) return;
       const kd = 'dem5h:' + dm.id;
-      if (situacaoDemanda_(dm, agoraMs).sit !== 'nao_respondida' || feitos.indexOf(kd) >= 0) return;
+      demAbertas[dm.id] = 1;
+      if (situacaoDemanda_(dm, agoraMs).sit !== 'nao_respondida' || feitos.indexOf(kd) >= 0 || demAvisadas.indexOf(dm.id) >= 0) return;
+      demAvisadas.push(dm.id);
       const def = DEMANDAS.find(x => x.k === dm.item) || { t: dm.item };
       const tx = '📦 Demanda sem resposta há mais de ' + DEMANDA_PRAZO_H + 'h: ' + def.t + (dm.detalhe ? ' — ' + dm.detalhe : '') + ' (pedido de ' + ((equipe[dm.pessoa] || {}).nome || dm.pessoa) + ', ' + dm.hora + '). Foi para "Não respondidas".';
       evento_('demanda', dm.pessoa, tx, 'gestao'); novos.push(kd); paraGestor.push(tx);
@@ -2037,6 +2088,7 @@ function verificarPendencias_(forcar) {
       }
     });
     if (novos.length) pr.setProperty(chave, feitos.concat(novos).join(','));
+    pr.setProperty('DEM5H_AVISADAS', demAvisadas.filter(id => demAbertas[id]).join(','));  // guarda só as que ainda estão abertas
     if (paraGestor.length) avisarGestor_('Gestão do Dia: ' + paraGestor.length + ' alerta(s) de tarefa', paraGestor.join('\n\n'));
   } catch (e) { Logger.log(e); }
 }
@@ -3183,9 +3235,11 @@ function mkEquipe_() {
 function mkPub_(r) { return { id: r.id, nome: r.nome, gestor: r.gestor === 'sim', funcoes: r.funcoes, zap: r.zap, foto: r.foto, ativo: r.ativo !== 'nao', cor: r.cor || '#111111', temPin: !!r.pin || r.id === MA_DONO }; }
 function mkCheck_(pessoa, pin) {
   pessoa = String(pessoa || '').trim().toLowerCase(); pin = String(pin || '').trim();
+  const trava = travaPin_('mkt', pessoa); trava.checar();
   const r = mkEquipe_().find(x => x.id === pessoa && x.ativo !== 'nao');
   const ok = r && pin && ((pessoa === MA_DONO && maSenha_() && pin === maSenha_()) || (r.pin && r.pin === pin));
-  if (!ok) { Utilities.sleep(700); throw new Error('Senha incorreta.'); }
+  if (!ok) { trava.errou(); throw new Error('Senha incorreta.'); }
+  trava.acertou();
   return mkPub_(r);
 }
 function mkGestor_(pessoa, pin) { const eu = mkCheck_(pessoa, pin); if (!eu.gestor) throw new Error('Só a gestão pode fazer isso.'); return eu; }
