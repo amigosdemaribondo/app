@@ -262,6 +262,7 @@ body.b9A .bar9.esq,body.b9M .bar9.dir{transform:none}
 .mt9.done .trk i{background:var(--green)}
 .bar9go{border:0;border-radius:12px;padding:12px;font-weight:800;background:var(--gold);color:#140F00}
 .bar9.dir .bar9go{background:var(--blue);color:#fff}
+.bar9sub{font-size:11.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);margin:10px 2px 2px}
 .bar9vz{color:var(--muted);font-size:13.5px;text-align:center;padding:18px 6px}
 .fundo9{position:fixed;inset:0;z-index:55;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .22s}
 body.b9A .fundo9,body.b9M .fundo9{opacity:1;pointer-events:auto}
@@ -292,6 +293,40 @@ body:not(.v9hoje) .aba9{display:none}
 .ed10 textarea,.ed10 input{width:100%;margin-top:4px}
 .ed10b{display:grid;grid-template-columns:2fr 1fr;gap:8px}
 .ag9 .ed{width:30px;height:30px;border:0;background:transparent;font-size:13px;opacity:.75}
+
+
+/* v11 · metas de progresso */
+.h11{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.n11{padding:9px 14px;font-size:14px}
+.d11{background:var(--navy2);border:1px solid var(--line);border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.d11.pronto{border-color:var(--gold)}
+.d11.fim{border-color:rgba(47,208,122,.5);opacity:.9}
+.d11.ed{border-style:dashed;border-color:var(--gold)}
+.d11c{display:flex;align-items:center;gap:10px}
+.d11c b{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.25}
+.d11c b small{font-size:12px;font-weight:600;color:var(--muted)}
+.ed11{width:36px;height:36px;border:1px solid var(--line);background:var(--navy);border-radius:10px;font-size:15px;flex:none}
+.d11.fim .mwn{color:var(--green)}
+.b11{display:flex;gap:6px}
+.b11 button{border:1.5px solid var(--line);background:var(--navy);border-radius:11px;padding:11px 12px;font-weight:800;font-size:14px;color:inherit}
+.b11 .mais11{flex:1;background:var(--gold);border-color:var(--gold);color:#140F00;font-size:15px}
+.b11 .mais11.ok{background:rgba(47,208,122,.18);border-color:rgba(47,208,122,.5);color:var(--green)}
+.b11 .conc11{flex:1;background:var(--green);border-color:var(--green);color:#04210f;font-size:15px}
+.b11 .conc11.sure{animation:pop5 .4s ease;font-size:14px}
+.qb11{margin:0;font-size:13px;font-weight:700;color:var(--amber);background:rgba(245,158,11,.12);border-radius:10px;padding:7px 10px}
+.ok11{margin:0;font-size:13px;font-weight:700;color:var(--green)}
+.fe11{margin-top:10px}.fe11 summary{cursor:pointer;font-weight:800;color:var(--muted)}
+.f11{display:flex;flex-direction:column;gap:8px}
+.f11 input{width:100%;margin-top:4px}
+.f11g{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.f11g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.f11b{display:grid;grid-template-columns:2fr 1fr;gap:8px}
+.seg11{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg11 button{border:1.5px solid var(--line);background:var(--navy);border-radius:11px;padding:9px 4px;font-weight:700;font-size:12.5px;color:inherit}
+.seg11 button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#140F00}
+.del11{border:0;background:none;color:var(--red);font-weight:700;padding:6px;align-self:flex-start}
+.mwb.v11{grid-template-columns:48px 1fr 48px 48px}
+.mt9 .r button.ed{background:transparent;color:inherit;font-size:13px;opacity:.8;padding:4px 2px}
 
 /* capa */
 .capa{position:fixed;inset:0;z-index:100;background:#000;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden}
@@ -2308,8 +2343,12 @@ function renderBarras(){
   var M = '<div class="bar9h"><b>🎯 Metas da semana</b><small>' + ms.pct + '%</small><button data-h9="fechar" aria-label="Fechar">✕</button></div>'
     + '<div class="bar9trk"><i style="width:' + ms.pct + '%"></i></div><div class="bar9l">';
   M += ms.metas.length ? ms.metas.map(function(m, i){ var a = m.alvo || 1, f = m.feito || 0, done = f >= a;
-    return '<div class="mt9' + (done ? ' done' : '') + '"><div class="r"><span>' + (m.ico || "🎯") + '</span><b>' + esc(m.t) + '</b><em>' + f + '/' + a + '</em><button data-b="metaMais" data-i="' + i + '">' + (done ? '✓' : '+1') + '</button></div><div class="trk"><i style="width:' + Math.min(100, Math.round(100 * f / a)) + '%"></i></div></div>'; }).join("")
+    return '<div class="mt9' + (done ? ' done' : '') + '"><div class="r"><span>' + (m.ico || "🎯") + '</span><b>' + esc(m.t) + '</b><em>' + f + '/' + a + '</em><button class="ed" data-h9="metas" aria-label="Editar nas Metas">✏️</button><button data-b="metaMais" data-i="' + i + '">' + (done ? '✓' : '+1') + '</button></div><div class="trk"><i style="width:' + Math.min(100, Math.round(100 * f / a)) + '%"></i></div></div>'; }).join("")
     : '<p class="bar9vz">Nenhuma meta nesta semana.<br>Toque abaixo para definir de 3 a 5 metas.</p>';
+  var D11 = des11(), ab11 = Object.keys(D11).filter(function(id){ return D11[id] && !D11[id].concluida; });
+  if (ab11.length) M += '<div class="bar9sub">🏁 Metas de progresso</div>' + ab11.map(function(id){ var m = D11[id], a = m.alvo || 1, p = prog11(m), ok = fezHoje11(m), pr = p >= a;
+    return '<div class="mt9' + (pr ? ' done' : '') + '"><div class="r"><span>' + (m.ico || "🎯") + '</span><b>' + esc(m.t) + '</b><em>' + p + '/' + a + '</em><button class="ed" data-g11="editar" data-id="' + esc(id) + '" aria-label="Editar">✏️</button>'
+      + (pr ? '<button data-h9="metas">🏆</button>' : ok ? '<button disabled>✓</button>' : '<button data-g11="mais" data-id="' + esc(id) + '">' + (m.tipo === "vezes" ? '+1' : '✓') + '</button>') + '</div><div class="trk"><i style="width:' + Math.min(100, Math.round(100 * p / a)) + '%"></i></div></div>'; }).join("");
   M += '</div><button class="bar9go" data-h9="metas">🎯 Abrir Metas</button>';
   if ($("bar9A")) $("bar9A").innerHTML = A;
   if ($("bar9M")) $("bar9M").innerHTML = M;
@@ -2361,6 +2400,107 @@ function faltaTxt(d, ini){
   return "em " + Math.floor(min / 1440) + "d " + Math.floor((min % 1440) / 60) + "h";
 }
 function quandoTxt(d){ var hoje = hojeISO(); return d === hoje ? "Hoje" : d === addDias(hoje, 1) ? "Amanhã" : DIAS[dow(d)] + " " + fmtD(d); }
+
+/* ================= v11 · metas de progresso (desafios), pontos e edição ================= */
+var ICOS11 = ["🏋️","🚶","🙏","📞","📻","🏢","💼","📚","💰","🎯","🥗","💧","🏃","📖","🎥","🤝"];
+var TIPO11 = {seguidos:"dias seguidos", dias:"dias no total", vezes:"vezes"};
+function des11(){ return (S.cfgs.desafios && S.cfgs.desafios.itens) || {}; }
+function salvaDes11(itens){ S.cfgs.desafios = {itens:itens, em:agoraStamp()}; gravar("config", "desafios", S.cfgs.desafios); }
+function seq11(log){ var set = {}; (log || []).forEach(function(d){ set[d] = 1; }); var d = hojeISO(); if (!set[d]) d = addDias(d, -1); var n = 0; while (set[d]){ n++; d = addDias(d, -1); } return n; }
+function prog11(m){ var log = m.log || []; return m.tipo === "seguidos" ? seq11(log) : m.tipo === "vezes" ? (m.n || 0) : log.length; }
+function quebrou11(m){ if (m.tipo !== "seguidos" || !(m.log || []).length || m.concluida) return false; var h = hojeISO(); return m.log.indexOf(h) < 0 && m.log.indexOf(addDias(h, -1)) < 0; }
+function fezHoje11(m){ return m.tipo !== "vezes" && (m.log || []).indexOf(hojeISO()) >= 0; }
+function pontosDes11(seg){ var ate = addDias(seg, 6), pts = 0, D = des11();
+  Object.keys(D).forEach(function(id){ var m = D[id]; if (!m) return;
+    (m.log || []).forEach(function(d){ if (d >= seg && d <= ate) pts += 5; });
+    (m.vz || []).forEach(function(d){ if (d >= seg && d <= ate) pts += 5; });
+    if (m.concluida && m.concluidaEm && m.concluidaEm.slice(0,10) >= seg && m.concluidaEm.slice(0,10) <= ate) pts += +m.pontos || 0; });
+  return pts; }
+function form11(id){
+  var m = id ? des11()[id] || {} : {}, d = S.dr11 || {t:m.t || "", ico:m.ico || "🎯", alvo:m.alvo || 11, tipo:m.tipo || "seguidos", pontos:m.pontos != null ? m.pontos : 100};
+  return '<div class="f11" data-fid="' + esc(id || "") + '"><label class="muted sm">Meta<input id="d11T" maxlength="80" value="' + esc(d.t) + '" placeholder="Ex.: Academia"></label>'
+    + '<div class="f11g"><label class="muted sm">Alvo<input id="d11A" type="number" min="1" max="999" value="' + esc(d.alvo) + '"></label>'
+    + '<label class="muted sm">Pontos ao concluir<input id="d11P" type="number" min="0" max="9999" step="5" value="' + esc(d.pontos) + '"></label></div>'
+    + '<div class="seg11">' + Object.keys(TIPO11).map(function(k){ return '<button data-g11="tipo" data-v="' + k + '" aria-pressed="' + (d.tipo === k) + '">' + (k === "seguidos" ? "🔥 " : k === "dias" ? "📅 " : "➕ ") + TIPO11[k] + '</button>'; }).join("") + '</div>'
+    + '<div class="icopick">' + ICOS11.map(function(x){ return '<button data-g11="ico" data-v="' + x + '" aria-pressed="' + (d.ico === x) + '">' + x + '</button>'; }).join("") + '</div>'
+    + '<p class="muted sm" style="margin:0">Cada toque no progresso vale <b>+5 pts</b>. Ao concluir você ganha os pontos acima.</p>'
+    + '<div class="f11b"><button class="bprim" data-g11="salvar">' + (id ? "Salvar alterações" : "+ Criar meta") + '</button><button class="desfazer" data-g11="cancelar">Cancelar</button></div>'
+    + (id ? '<button class="del11" data-g11="excluir" data-id="' + esc(id) + '">🗑 Excluir esta meta</button>' : '') + '</div>';
+}
+function card11(id, m){
+  var a = m.alvo || 1, p = prog11(m), pc = Math.min(100, Math.round(100 * p / a)), pronto = p >= a, hojeOk = fezHoje11(m), qb = quebrou11(m);
+  if (S.ed11 === id) return '<div class="d11 ed">' + form11(id) + '</div>';
+  var h = '<div class="d11' + (pronto ? ' pronto' : '') + (m.concluida ? ' fim' : '') + '"><div class="d11c"><span class="mwi">' + (m.ico || "🎯") + '</span><b>' + esc(m.t) + '<small>' + a + ' ' + TIPO11[m.tipo || "dias"] + ' · 🏅 ' + (+m.pontos || 0) + ' pts</small></b><span class="mwn tnum">' + p + '/' + a + '</span>'
+    + (m.concluida ? '' : '<button class="ed11" data-g11="editar" data-id="' + esc(id) + '" aria-label="Editar meta">✏️</button>') + '</div>'
+    + '<div class="trk"><i style="width:' + pc + '%"></i></div>';
+  if (m.concluida) return h + '<p class="ok11">🏆 Concluída em ' + fmtD(m.concluidaEm.slice(0,10)) + ' · +' + (+m.pontos || 0) + ' pts</p><div class="b11"><button data-g11="reabrir" data-id="' + esc(id) + '">↩️ Reabrir</button><button data-g11="excluir" data-id="' + esc(id) + '">🗑 Excluir</button></div></div>';
+  if (qb) h += '<p class="qb11">⚠️ A sequência quebrou: ontem não foi marcado. Marque hoje para recomeçar a contagem.</p>';
+  else if (m.tipo === "seguidos" && p) h += '<p class="muted sm" style="margin:0">🔥 ' + p + (p === 1 ? ' dia seguido' : ' dias seguidos') + (pronto ? ' · alvo batido!' : ' · faltam ' + (a - p)) + '</p>';
+  h += '<div class="b11">';
+  if (pronto){ h += S.conf11 === id ? '<button class="conc11 sure" data-g11="concluir" data-id="' + esc(id) + '">✅ Confirmar conclusão (+' + (+m.pontos || 0) + ' pts)</button><button data-g11="naoConc">Ainda não</button>'
+                                     : '<button class="conc11" data-g11="preConc" data-id="' + esc(id) + '">🏆 Concluir meta</button>'; }
+  else if (m.tipo === "vezes") h += '<button class="mais11" data-g11="mais" data-id="' + esc(id) + '">+1 feito</button>';
+  else h += hojeOk ? '<button class="mais11 ok" disabled>✓ Feito hoje</button>' : '<button class="mais11" data-g11="mais" data-id="' + esc(id) + '">✓ Feito hoje (+5)</button>';
+  if (!pronto && ((m.tipo === "vezes" && m.n) || hojeOk)) h += '<button data-g11="menos" data-id="' + esc(id) + '" aria-label="Desfazer o último">↩️</button>';
+  return h + '</div></div>';
+}
+function renderDes11(){
+  var D = des11(), ids = Object.keys(D).filter(function(id){ return D[id]; });
+  var ab = ids.filter(function(id){ return !D[id].concluida; }).sort(function(a, b){ return String(D[a].criado).localeCompare(String(D[b].criado)); });
+  var fe = ids.filter(function(id){ return D[id].concluida; }).sort(function(a, b){ return String(D[b].concluidaEm).localeCompare(String(D[a].concluidaEm)); });
+  var h = '<div class="card"><div class="h11"><h2 class="u" style="align-self:flex-start">🏁 Metas de progresso</h2>' + (S.ed11 === "novo" ? '' : '<button class="bprim n11" data-g11="novo">＋ Nova meta</button>') + '</div>';
+  if (S.ed11 === "novo") h += '<div class="d11 ed">' + form11(null) + '</div>';
+  if (!ab.length && S.ed11 !== "novo") h += '<p class="vazio">Crie uma meta com alvo e pontos. Ex.: "Academia" 11 dias seguidos, 150 pontos. A cada dia toque em ✓ Feito hoje; quando bater o alvo, confirme a conclusão.</p>';
+  h += ab.map(function(id){ return card11(id, D[id]); }).join("");
+  if (fe.length) h += '<details class="fe11"><summary>🏆 Concluídas (' + fe.length + ')</summary>' + fe.map(function(id){ return card11(id, D[id]); }).join("") + '</details>';
+  return h + '</div>';
+}
+function rascunho11(){ if (!$("d11T")) return; S.dr11 = {t:$("d11T").value, alvo:$("d11A").value, pontos:$("d11P").value, tipo:(S.dr11 && S.dr11.tipo) || "seguidos", ico:(S.dr11 && S.dr11.ico) || "🎯"}; }
+APP9.addEventListener("click", function(e){
+  var b = e.target.closest("[data-g11]"); if (!b) return;
+  var a = b.dataset.g11, id = b.dataset.id, D = JSON.parse(JSON.stringify(des11())), m = id ? D[id] : null;
+  if (a === "novo"){ S.ed11 = "novo"; S.dr11 = {t:"", ico:"🎯", alvo:11, tipo:"seguidos", pontos:100}; render(); setTimeout(function(){ var el = $("d11T"); if (el) el.focus(); }, 30); return; }
+  if (a === "editar"){ S.ed11 = id; S.dr11 = {t:m.t, ico:m.ico || "🎯", alvo:m.alvo, tipo:m.tipo || "dias", pontos:m.pontos != null ? m.pontos : 100}; if (S.view !== "metas"){ barra9(""); irPara("metas"); } else render(); setTimeout(function(){ var el = $("d11T"); if (el){ el.scrollIntoView({block:"center"}); el.focus(); } }, 40); return; }
+  if (a === "tipo" || a === "ico"){ rascunho11(); S.dr11[a] = b.dataset.v; render(); return; }
+  if (a === "cancelar"){ S.ed11 = null; S.dr11 = null; render(); return; }
+  if (a === "salvar"){ rascunho11(); var d = S.dr11, t = (d.t || "").trim(), al = Math.max(1, Math.min(999, Math.round(+d.alvo || 1))), pt = Math.max(0, Math.min(9999, Math.round(+d.pontos || 0)));
+    if (t.length < 2){ SOM.play("erro"); toast("Escreva o nome da meta."); return; }
+    var fid = S.ed11 === "novo" ? "d" + Date.now().toString(36) : S.ed11;
+    D[fid] = Object.assign({log:[], n:0, vz:[], criado:agoraStamp()}, D[fid] || {}, {t:t, ico:d.ico, alvo:al, tipo:d.tipo, pontos:pt, editadoEm:agoraStamp()});
+    var eraNovo = S.ed11 === "novo"; salvaDes11(D); S.ed11 = null; S.dr11 = null; SOM.play("feito"); toast(eraNovo ? "🏁 Meta criada" : "✏️ Meta salva"); render(); return; }
+  if (a === "excluir"){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Toque de novo para excluir"; return; } delete D[id]; salvaDes11(D); S.ed11 = null; S.dr11 = null; render(); return; }
+  if (a === "mais"){ var hj = hojeISO();
+    if (m.tipo === "vezes"){ m.n = (m.n || 0) + 1; m.vz = (m.vz || []).concat([hj]); }
+    else { if ((m.log || []).indexOf(hj) >= 0) return; m.log = (m.log || []).concat([hj]).sort(); }
+    salvaDes11(D); var p = prog11(m);
+    if (p >= (m.alvo || 1)){ SOM.play("meta"); toast("🎯 Alvo batido! Toque em Concluir meta para confirmar."); } else { SOM.play("feito"); toast("+5 pts · " + m.t + " " + p + "/" + m.alvo); }
+    render(); return; }
+  if (a === "menos"){ if (m.tipo === "vezes"){ m.n = Math.max(0, (m.n || 0) - 1); (m.vz || []).pop(); } else m.log = (m.log || []).filter(function(x){ return x !== hojeISO(); }); salvaDes11(D); SOM.play("prazo"); render(); return; }
+  if (a === "preConc"){ S.conf11 = id; render(); return; }
+  if (a === "naoConc"){ S.conf11 = null; render(); return; }
+  if (a === "concluir"){ m.concluida = true; m.concluidaEm = agoraStamp(); salvaDes11(D); S.conf11 = null; SOM.play("conquista"); toast("🏆 Meta concluída: " + m.t + " (+" + (+m.pontos || 0) + " pts)"); render(); return; }
+  if (a === "reabrir"){ m.concluida = false; delete m.concluidaEm; salvaDes11(D); render(); return; }
+});
+/* edição das metas da semana */
+function formSem11(i, m){
+  var d = S.drS11 || {t:m.t, alvo:m.alvo || 1, ico:m.ico || "🎯", pts:m.pts != null ? m.pts : 5, bonus:m.bonus != null ? m.bonus : 20};
+  return '<div class="f11"><label class="muted sm">Meta<input id="s11T" maxlength="80" value="' + esc(d.t) + '"></label>'
+    + '<div class="f11g3"><label class="muted sm">Vezes<input id="s11A" type="number" min="1" max="99" value="' + esc(d.alvo) + '"></label><label class="muted sm">Pts por +1<input id="s11P" type="number" min="0" max="999" value="' + esc(d.pts) + '"></label><label class="muted sm">Bônus ao bater<input id="s11B" type="number" min="0" max="9999" step="5" value="' + esc(d.bonus) + '"></label></div>'
+    + '<div class="icopick">' + ICOS11.map(function(x){ return '<button data-s11="ico" data-v="' + x + '" aria-pressed="' + (d.ico === x) + '">' + x + '</button>'; }).join("") + '</div>'
+    + '<div class="f11b"><button class="bprim" data-s11="salvar" data-i="' + i + '">Salvar alterações</button><button class="desfazer" data-s11="cancelar">Cancelar</button></div></div>';
+}
+function rascS11(){ if (!$("s11T")) return; S.drS11 = {t:$("s11T").value, alvo:$("s11A").value, pts:$("s11P").value, bonus:$("s11B").value, ico:(S.drS11 && S.drS11.ico) || "🎯"}; }
+APP9.addEventListener("click", function(e){
+  var b = e.target.closest("[data-s11]"); if (!b) return; var a = b.dataset.s11;
+  var seg = segundaDe(S.semRef || hojeISO());
+  if (a === "editar"){ var m0 = semanaDoc(seg).metas[+b.dataset.i]; if (!m0) return; S.edS11 = +b.dataset.i; S.drS11 = {t:m0.t, alvo:m0.alvo || 1, ico:m0.ico || "🎯", pts:m0.pts != null ? m0.pts : 5, bonus:m0.bonus != null ? m0.bonus : 20}; render(); return; }
+  if (a === "ico"){ rascS11(); S.drS11.ico = b.dataset.v; render(); return; }
+  if (a === "cancelar"){ S.edS11 = null; S.drS11 = null; render(); return; }
+  if (a === "salvar"){ rascS11(); var d = S.drS11, t = (d.t || "").trim(); if (t.length < 2){ SOM.play("erro"); toast("Escreva a meta."); return; }
+    var sm = JSON.parse(JSON.stringify(semanaDoc(seg))), m = sm.metas[+b.dataset.i]; if (!m) return;
+    Object.assign(m, {t:t, ico:d.ico, alvo:Math.max(1, Math.min(99, Math.round(+d.alvo || 1))), pts:Math.max(0, Math.round(+d.pts || 0)), bonus:Math.max(0, Math.round(+d.bonus || 0))});
+    sm.semana = seg; S.semanas[seg] = sm; gravar("semanas", seg, sm); S.edS11 = null; S.drS11 = null; SOM.play("feito"); toast("✏️ Meta salva"); render(); return; }
+});
 function barra9(q){ document.body.classList.remove("b9A", "b9M"); if (q) document.body.classList.add(q); }
 APP9.addEventListener("click", function(e){
   var b = e.target.closest("[data-h9]"); if (!b) return;
@@ -2726,7 +2866,8 @@ function pontosSemana(seg){
   var pts = 0, ate = addDias(seg, 6);
   for (var i = 0; i < 7; i++){ var d = addDias(seg, i), st = (S.dias[d] || {}).st || {}; Object.keys(st).forEach(function(k){ if (st[k] && st[k].s === "feito") pts += st[k].foto ? 15 : 10; }); pts += 5 * Object.keys((S.dias[d] || {}).ct || {}).length; }
   Object.keys(S.acoes).forEach(function(id){ var a = S.acoes[id]; if (a && a.feito && a.feitoEm && a.feitoEm.slice(0,10) >= seg && a.feitoEm.slice(0,10) <= ate) pts += a.selo === "imediato" ? 25 : 15; });
-  var sm = S.semanas[seg]; if (sm && sm.metas) sm.metas.forEach(function(m){ pts += 5 * Math.min(m.feito || 0, m.alvo || 1); if ((m.feito||0) >= (m.alvo||1)) pts += 20; });
+  var sm = S.semanas[seg]; if (sm && sm.metas) sm.metas.forEach(function(m){ pts += (m.pts != null ? +m.pts : 5) * Math.min(m.feito || 0, m.alvo || 1); if ((m.feito||0) >= (m.alvo||1)) pts += (m.bonus != null ? +m.bonus : 20); });
+  try { pts += pontosDes11(seg); } catch(e){}
   Object.keys(S.notas).forEach(function(id){ var n = S.notas[id]; if (n && n.criado && n.criado.slice(0,10) >= seg && n.criado.slice(0,10) <= ate) pts += 5; });
   Object.keys(S.contatos).forEach(function(id){ var c = S.contatos[id]; if (c && c.ultimo && c.ultimo >= seg && c.ultimo <= ate) pts += 5; });
   return pts;
@@ -2830,15 +2971,18 @@ function renderMetas(){
   var h = (seg === segundaDe(hojeISO()) ? xpBar() : '') + '<div class="card"><div class="dianav"><button data-b="semAnt" aria-label="Semana anterior">‹</button><h2>Semana ' + fmtD(seg) + ' – ' + fmtD(addDias(seg, 6)) + '<small>metas claras · progresso por toque</small></h2><button data-b="semProx" aria-label="Próxima semana">›</button></div>'
     + '<div class="placar" style="background:var(--navy2)"><div class="ring">' + ring(pct, "var(--gold)") + '<b class="tnum">' + pct + '%</b><small>da semana</small></div>'
     + '<div class="chips4"><div class="chipc pend"><b class="tnum">' + p + '</b><span>pontos</span></div><div class="chipc"><b>' + nv.n.i + '</b><span>' + nv.n.t + '</span></div><div class="chipc feito"><b class="tnum">' + sm.metas.filter(function(m){ return (m.feito||0) >= (m.alvo||1); }).length + '/' + sm.metas.length + '</b><span>metas batidas</span></div><div class="chipc"><b class="tnum">🔥' + sequencia() + '</b><span>dias seguidos</span></div></div></div></div>';
+  h += renderDes11();
   h += '<div class="card"><h2 class="u" style="align-self:flex-start">Metas da semana</h2>';
   if (!sm.metas.length) h += '<p class="vazio">Defina de 3 a 5 metas. Ex.: "Academia" 5 vezes, "Ligar para 10 empresários" 10 vezes.</p>';
   h += sm.metas.map(function(m, i){ var a = m.alvo || 1, f = m.feito || 0, pc = Math.min(100, Math.round(100 * f / a)), done = f >= a;
+    if (S.edS11 === i) return '<div class="mw">' + formSem11(i, m) + '</div>';
     return '<div class="mw' + (done ? " done" : "") + '"><div class="mwc"><span class="mwi">' + (m.ico || "🎯") + '</span><b>' + esc(m.t) + '</b><span class="mwn tnum">' + f + '/' + a + '</span></div><div class="trk"><i style="width:' + pc + '%"></i></div>'
-      + '<div class="mwb"><button data-b="metaMenos" data-i="' + i + '" aria-label="Diminuir">−</button><button class="mais" data-b="metaMais" data-i="' + i + '">+1 feito</button><button data-b="metaDel" data-i="' + i + '" aria-label="Remover meta">🗑</button></div></div>'; }).join("");
+      + '<small class="muted sm">+' + (m.pts != null ? m.pts : 5) + ' pts por toque · bônus ' + (m.bonus != null ? m.bonus : 20) + ' ao bater</small>'
+      + '<div class="mwb v11"><button data-b="metaMenos" data-i="' + i + '" aria-label="Diminuir">−</button><button class="mais" data-b="metaMais" data-i="' + i + '">+1 feito</button><button data-s11="editar" data-i="' + i + '" aria-label="Editar meta">✏️</button><button data-b="metaDel" data-i="' + i + '" aria-label="Remover meta">🗑</button></div></div>'; }).join("");
   h += '<div class="grid3"><input id="mtT" maxlength="80" placeholder="Nova meta"><input id="mtA" type="number" min="1" max="99" value="5" aria-label="Quantas vezes"><button class="bprim" data-b="metaAdd">+</button></div>'
     + '<div class="icopick">' + ["🏋️","🚶","🙏","📞","📻","🏢","💼","📚","💰","🎯"].map(function(x){ return '<button data-b="metaIco" data-ico="' + x + '" aria-pressed="' + (S.metaIco === x) + '">' + x + '</button>'; }).join("") + '</div>'
     + (S.semanas[addDias(seg, -7)] && S.semanas[addDias(seg, -7)].metas.length && !sm.metas.length ? '<button class="lbtn" data-b="copiarSem">↻ Repetir metas da semana passada</button>' : '') + '</div>';
-  h += '<div class="card"><h2>Como ganhar pontos</h2><div class="regras"><span>💎 Meta: <b>1.100 pts</b> na semana (agenda completa + fotos, conteúdo e metas)</span><span>✅ Atividade feita <b>+10</b></span><span>🎥 Grave a rotina, cada item <b>+5</b></span><span>📷 Feita com foto <b>+15</b></span><span>⚡ Tarefa do plano <b>+15</b> (imediata +25)</span><span>🎯 Cada +1 de meta <b>+5</b> · meta batida <b>+20</b></span><span>📞 Contato registrado <b>+5</b></span><span>🎙️ Ideia gravada <b>+5</b></span></div></div>';
+  h += '<div class="card"><h2>Como ganhar pontos</h2><div class="regras"><span>💎 Meta: <b>1.100 pts</b> na semana (agenda completa + fotos, conteúdo e metas)</span><span>✅ Atividade feita <b>+10</b></span><span>🎥 Grave a rotina, cada item <b>+5</b></span><span>📷 Feita com foto <b>+15</b></span><span>⚡ Tarefa do plano <b>+15</b> (imediata +25)</span><span>🎯 Meta da semana: pontos por toque e bônus definidos em ✏️ (padrão +5 / +20)</span><span>🏁 Meta de progresso: <b>+5</b> por dia marcado + pontos ao concluir</span><span>📞 Contato registrado <b>+5</b></span><span>🎙️ Ideia gravada <b>+5</b></span></div></div>';
   h += '<h2 class="sec">🗓 Objetivos do mês · 5 eixos</h2>' + renderObj();
   return h;
 }
@@ -3019,7 +3163,7 @@ APP9.addEventListener("click", function(e){
     var seg = segundaDe(S.semRef || hojeISO()), sm = JSON.parse(JSON.stringify(semanaDoc(seg))), i = +b.dataset.i;
     if (a === "metaAdd"){ var t = $("mtT").value.trim(), al = Math.max(1, Math.min(99, +$("mtA").value || 1)); if (!t){ SOM.play("erro"); toast("Escreva a meta."); return; } sm.metas.push({t:t, alvo:al, feito:0, ico:S.metaIco || "🎯"}); SOM.play("feito"); }
     if (a === "copiarSem"){ sm.metas = semanaDoc(addDias(seg, -7)).metas.map(function(m){ return {t:m.t, alvo:m.alvo, feito:0, ico:m.ico}; }); SOM.play("feito"); }
-    if (a === "metaMais"){ var m = sm.metas[i]; var antes = (m.feito || 0) >= (m.alvo || 1); m.feito = (m.feito || 0) + 1; if (!antes && m.feito >= (m.alvo || 1)){ SOM.play("meta"); toast("🎯 Meta batida: " + m.t + " (+20 pts)"); } else SOM.play("feito"); }
+    if (a === "metaMais"){ var m = sm.metas[i]; var antes = (m.feito || 0) >= (m.alvo || 1); m.feito = (m.feito || 0) + 1; if (!antes && m.feito >= (m.alvo || 1)){ SOM.play("meta"); toast("🎯 Meta batida: " + m.t + " (+" + (m.bonus != null ? m.bonus : 20) + " pts)"); } else SOM.play("feito"); }
     if (a === "metaMenos"){ var m2 = sm.metas[i]; m2.feito = Math.max(0, (m2.feito || 0) - 1); SOM.play("prazo"); }
     if (a === "metaDel"){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "?"; return; } sm.metas.splice(i, 1); }
     sm.semana = seg; S.semanas[seg] = sm; gravar("semanas", seg, sm); render(); return;
