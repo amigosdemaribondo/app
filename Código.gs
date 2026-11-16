@@ -73,7 +73,7 @@ function liberadoGeral_() { return (hoje_() + ' ' + agora_()) < LIBERADO_ATE; }
 function locLivrePrimeiro_(pessoa) {
   if (pessoa && liberadoGeral_()) return true;
   if (!pessoa || mins_(agora_()) >= LOC_LIVRE_ATE) return false;
-  const hoje = hoje_(), v = sheet_('Registros').getDataRange().getDisplayValues();
+  const hoje = hoje_(), v = valores_('Registros');
   for (let i = 1; i < v.length; i++) if (v[i][1] === pessoa && v[i][0] && v[i][0] < hoje && v[i][0] >= INICIO_GERAL) return false;
   return true;
 }
@@ -250,10 +250,16 @@ const SHEETS_ = {};
 function ss_() { return SS_ || (SS_ = SpreadsheetApp.openById(PropertiesService.getScriptProperties().getProperty('SHEET_ID'))); }
 function comLeituraRapida_(fn) { RC_ = {}; try { return fn(); } finally { RC_ = null; } }
 
+/* Velocidade: a lista de abas é lida uma vez por chamada (não uma consulta por aba), e a conferência do cabeçalho
+   fica guardada por 6 h (antes eram ~15 leituras extras da planilha a cada atualização da tela). */
+let ABAS_ = null;
 function sheet_(name) {
   if (SHEETS_[name]) return SHEETS_[name];
   const ss = ss_();
-  let sh = ss.getSheetByName(name);
+  if (!ABAS_) { ABAS_ = {}; ss.getSheets().forEach(x => ABAS_[x.getName()] = x); }
+  let sh = ABAS_[name] || null;
+  const ckH = HEAD[name] ? 'hdr_' + name + '_' + HEAD[name].length : '';
+  if (sh && ckH) { try { if (CacheService.getScriptCache().get(ckH) === HEAD[name].join('|')) { SHEETS_[name] = sh; return sh; } } catch (e) {} }
   if (!sh && HEAD[name]) {
     sh = ss.insertSheet(name);
     sh.getRange(1, 1, 1000, HEAD[name].length).setNumberFormat('@');
@@ -264,13 +270,19 @@ function sheet_(name) {
     const atual = sh.getRange(1, 1, 1, HEAD[name].length).getDisplayValues()[0];
     if (atual.join('|') !== HEAD[name].join('|')) sh.getRange(1, 1, 1, HEAD[name].length).setValues([HEAD[name]]).setFontWeight('bold').setBackground('#E9EDF4');
   }
-  if (sh) SHEETS_[name] = sh;
+  if (sh && ckH) { try { CacheService.getScriptCache().put(ckH, HEAD[name].join('|'), 21600); } catch (e) {} }
+  if (sh) { SHEETS_[name] = sh; ABAS_[name] = sh; }
   return sh;
 }
 
-function rows_(name) {
+/* Valores da aba, lidos uma vez só por atualização da tela (reaproveitados por todas as consultas da mesma chamada). */
+function valores_(name) {
   let v = RC_ && RC_[name];
   if (!v) { v = sheet_(name).getDataRange().getDisplayValues(); if (RC_) RC_[name] = v; }
+  return v;
+}
+function rows_(name) {
+  const v = valores_(name);
   const h = v[0];
   return v.slice(1).filter(r => r.join('') !== '').map(r => { const o = {}; h.forEach((k, i) => o[k] = r[i]); return o; });
 }
@@ -745,7 +757,7 @@ function punch(pessoa, pin, fotoBase64, desfazer, extra) {
     const ultimo = regs[regs.length - 1];
     if (desfazer) {
       if (!ultimo || Date.now() - ultimo.ms > 5 * 60 * 1000) throw new Error('Só dá para desfazer até 5 minutos depois.');
-      sheet_('Registros').deleteRow(ultimo.row);
+      sheet_('Registros').deleteRow(ultimo.row); if (RC_) delete RC_['Registros'];
       msg = (ultimo.tipo === 'entrada' ? 'Entrada' : 'Saída') + ' das ' + ultimo.hora + ' desfeita.';
     } else {
       if (ultimo && Date.now() - ultimo.ms < 60 * 1000) throw new Error('Você acabou de registrar. Espere 1 minuto para registrar de novo.');
@@ -775,7 +787,7 @@ function punch(pessoa, pin, fotoBase64, desfazer, extra) {
       const nomeArq = dia + ' ' + hora.replace(':', 'h') + ' ' + p.nome + ' (' + tipo + ').jpg';
       if (selfie) { foto = selfie.url; upsert_('Selfies', selfie.id, { usada: tipo + ' ' + hora }); }
       else foto = pasta.createFile(Utilities.newBlob(Utilities.base64Decode(fotoBase64), 'image/jpeg', nomeArq)).getUrl();
-      const sh = sheet_('Registros');
+      const sh = sheet_('Registros'); if (RC_) delete RC_['Registros'];
       sh.getRange(sh.getLastRow() + 1, 1, 1, HEAD.Registros.length).setNumberFormat('@').setValues([[
         dia, pessoa, tipo, hora, String(Date.now()), foto, motivo, obs,
         temLoc ? lat.toFixed(6) : '', temLoc ? lng.toFixed(6) : '', temLoc && extra.acc ? String(Math.round(extra.acc)) : '',
@@ -888,7 +900,7 @@ function esperados_(dia, tarefasAll, horAll) {
 
 /* Entradas e saídas de um dia, por pessoa, em ordem. */
 function registrosDia_(dia) {
-  const v = sheet_('Registros').getDataRange().getDisplayValues();
+  const v = valores_('Registros');
   const out = {};
   for (let i = 1; i < v.length; i++) {
     const r = v[i];
@@ -905,7 +917,7 @@ function reg_(r, row) {
 }
 
 function registrosPeriodo_(de, ate) {
-  const v = sheet_('Registros').getDataRange().getDisplayValues();
+  const v = valores_('Registros');
   const out = {};
   for (let i = 1; i < v.length; i++) {
     const r = v[i];
@@ -2020,7 +2032,7 @@ function limparPropriedades_() {
 function verificarPendencias_(forcar) {
   try {
     const pr = PropertiesService.getScriptProperties();
-    if (!forcar && Date.now() - Number(pr.getProperty('VERIF_MS') || 0) < 2 * 60 * 1000) return;
+    if (!forcar && Date.now() - Number(pr.getProperty('VERIF_MS') || 0) < 5 * 60 * 1000) return;
     garantirAutomacoes_();
     pr.setProperty('VERIF_MS', String(Date.now()));
     limparPropriedades_();
