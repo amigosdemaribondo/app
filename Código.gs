@@ -67,8 +67,8 @@ const MSG_PADRAO = [
 const MSG_DOACAO = 'Oi! Tudo bem? 💙 Eu faço parte da ONG Amigos de Maribondo, que está reescrevendo histórias aqui na nossa comunidade com crianças, idosos e famílias. Quer ser padrinho ou madrinha da ONG? Com qualquer valor por mês você ajuda a manter as atividades. Posso te mandar como contribuir? Instagram: https://www.instagram.com/amigosdemaribondoal/';
 // Primeiro acesso: no 1º dia de uso de cada pessoa, até 12h, ponto e atividades valem sem localização.
 const LOC_LIVRE_ATE = 12 * 60;
-// Até sexta 13/11 (inclusive): entrada só com PIN (sem trava de celular) e ponto/atividades sem localização.
-const LIBERADO_ATE = '2026-11-13 08:00'; // até sexta 08h: entra só com PIN/selfie e confirma "Estou na ONG"
+// Até quarta 18/11 (inclusive): entrada só com PIN (sem trava de celular) e ponto/atividades sem localização.
+const LIBERADO_ATE = '2026-11-19 00:00'; // até quarta 18/11 (o dia todo): entra só com PIN/selfie e confirma "Estou na ONG", sem exigir localização
 function liberadoGeral_() { return (hoje_() + ' ' + agora_()) < LIBERADO_ATE; }
 function locLivrePrimeiro_(pessoa) {
   if (pessoa && liberadoGeral_()) return true;
