@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="assessor-icone.png">
 <link rel="icon" href="assessor-icone.png">
 <link rel="manifest" href="assessor.webmanifest">
-<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.fabas{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.fabas::-webkit-scrollbar{display:none}.fabas button,.fchips button,.fseg button{flex:none;border:1px solid var(--line);background:var(--navy);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;color:inherit}.fabas button.on,.fchips button.on,.fseg button.on{background:var(--gold);color:#0b1020;border-color:var(--gold)}.fchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.fseg{display:flex;gap:6px;flex-wrap:wrap}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.fgrid .chipc b{font-size:16px}.flist{display:flex;flex-direction:column;gap:4px}.frow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;padding:9px 2px;font-size:14px}.ftot{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:8px 2px;color:var(--muted,#9aa)}.ftot b{color:var(--text,#fff)}.fnum{flex:none;min-width:36px;height:36px;border-radius:12px;background:var(--gold-soft);color:var(--gold);font-weight:800;font-size:13px;display:grid;place-items:center}.fanx{display:flex;gap:6px;overflow-x:auto}.fanx img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.fgal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.fgal a{display:flex;flex-direction:column;gap:3px;color:inherit;text-decoration:none}.fgal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}.fgal small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fctl{display:flex;justify-content:space-between;align-items:center;gap:8px}.fnav{display:flex;justify-content:space-between;align-items:center;margin:6px 0}#finBusca,#fObs{width:100%}
+<style>.finline{display:flex;flex-direction:column;gap:8px;margin:8px 0;padding:10px;border-radius:12px;background:rgba(127,127,127,.10)}.finline input{width:100%}.fmeses button{white-space:nowrap}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.fabas{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.fabas::-webkit-scrollbar{display:none}.fabas button,.fchips button,.fseg button{flex:none;border:1px solid var(--line);background:var(--navy);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;color:inherit}.fabas button.on,.fchips button.on,.fseg button.on{background:var(--gold);color:#0b1020;border-color:var(--gold)}.fchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.fseg{display:flex;gap:6px;flex-wrap:wrap}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.fgrid .chipc b{font-size:16px}.flist{display:flex;flex-direction:column;gap:4px}.frow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;padding:9px 2px;font-size:14px}.ftot{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:8px 2px;color:var(--muted,#9aa)}.ftot b{color:var(--text,#fff)}.fnum{flex:none;min-width:36px;height:36px;border-radius:12px;background:var(--gold-soft);color:var(--gold);font-weight:800;font-size:13px;display:grid;place-items:center}.fanx{display:flex;gap:6px;overflow-x:auto}.fanx img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.fgal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.fgal a{display:flex;flex-direction:column;gap:3px;color:inherit;text-decoration:none}.fgal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}.fgal small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fctl{display:flex;justify-content:space-between;align-items:center;gap:8px}.fnav{display:flex;justify-content:space-between;align-items:center;margin:6px 0}#finBusca,#fObs{width:100%}
 </style>
 </head><body>
 <title>PLANO 2028</title>
@@ -3527,6 +3527,14 @@ function finEstado(f){
 }
 function brl(v){ var n = Number(v) || 0; return n.toLocaleString("pt-BR", {style:"currency", currency:"BRL"}); }
 function soma(L){ return L.reduce(function(s, f){ return s + (Number(f.valor) || 0); }, 0); }
+var MESES_PT = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+function parcSoma(f){ return (f.parciais || []).reduce(function(s, p){ return s + (Number(p.v) || 0); }, 0); }
+function pagoTotal(f){ return (f.pago ? (Number(f.valor) || 0) : 0) + parcSoma(f); }
+function somaPago(L){ return L.reduce(function(s, f){ return s + pagoTotal(f); }, 0); }
+function mesDe(f){ return String(f.venc || "").slice(0,7); }
+function mesAdd(ym, d){ var y = +ym.slice(0,4), m = +ym.slice(5,7) + d; while (m < 1){ m += 12; y--; } while (m > 12){ m -= 12; y++; } return y + "-" + String(m).padStart(2,"0"); }
+function mesRot(ym){ return MESES_PT[+ym.slice(5,7) - 1] + (ym.slice(0,4) !== hojeISO().slice(0,4) ? " " + ym.slice(0,4) : ""); }
+function lerValor(v){ return parseFloat(String(v || "").replace(/[^\d,.-]/g, "").replace(/\./g, "").replace(",", ".")) || 0; }
 function finAlertaHoje(){
   var L = finLista().filter(function(f){ if (f.exec || tipoDe(f) === "entrada") return false; var e = finEstado(f); return e === "atrasado" || e === "hoje" || e === "breve"; });
   if (!L.length) return "";
@@ -3544,9 +3552,12 @@ function cardFin(f){
     : (f.pago ? '<button class="lbtn" data-b="desfazF" data-id="' + esc(f.id) + '">↺ Desfazer</button>' : '<button class="lbtn okb" data-b="pagarF" data-id="' + esc(f.id) + '">✓ ' + (ent ? "Recebido" : "Pago") + '</button>');
   return '<div class="ct' + (e === "atrasado" || e === "hoje" ? " finq" : "") + '"><div class="ctc"><span class="fnum tnum">#' + f.num + '</span><div class="ctt"><b>' + esc(f.demanda) + '</b><small>' + fo.i + ' ' + esc(fo.n) + (f.recebedor ? ' · ' + (ent ? "de " : "para ") + '<b>' + esc(f.recebedor) + '</b>' : '') + (f.mensal ? " · 🔁 mensal" : "") + (f.espaco ? ' · 📍 ' + esc(f.espaco) : '') + '</small></div><span class="valor tnum" style="color:' + (ent ? "var(--green)" : "inherit") + '">' + (ent ? "+" : "") + brl(f.valor) + '</span></div>'
     + '<div class="fctl"><span class="st" style="--c:' + tg[0] + '">● ' + tg[1] + '</span><span class="muted sm tnum">' + (f.venc ? fmtDT(f.venc) : "sem data") + (f.pago && f.pagoEm ? " · " + (ent ? "recebido " : "pago ") + fmtD(f.pagoEm.slice(0,10)) : "") + '</span></div>'
+    + ((f.parciais || []).length ? '<div class="obj">💳 Já ' + (ent ? "recebido" : "pago") + ' em parcial: <b class="tnum">' + brl(parcSoma(f)) + '</b> (' + f.parciais.length + 'x)' + (f.pago ? '' : ' · falta <b class="tnum">' + brl(f.valor) + '</b>') + (f.valorOriginal ? ' · total ' + brl(f.valorOriginal) : '') + '</div>' : '')
     + (f.pix ? '<div class="obj">🏦 ' + esc(f.pix) + '</div>' : '') + (f.obs ? '<div class="obj">📝 ' + esc(f.obs) + '</div>' : '')
+    + (!f.exec && !f.pago && S.finPrazoId === f.id ? '<div class="finline"><label class="muted sm">Novo prazo<input type="datetime-local" id="przIn" value="' + esc(f.venc || hojeISO() + "T09:00") + '"></label><div class="grid2"><button class="bprim" data-b="prazoOk" data-id="' + esc(f.id) + '">Salvar prazo</button><button class="lbtn" data-b="finInlX">Cancelar</button></div></div>' : '')
+    + (!f.exec && !f.pago && S.finParcId === f.id ? '<div class="finline"><label class="muted sm">Quanto foi ' + (ent ? "recebido" : "pago") + ' agora? (falta ' + brl(f.valor) + ')<input id="parcIn" inputmode="decimal" placeholder="R$ 0,00"></label><div class="grid2"><button class="bprim" data-b="parcOk" data-id="' + esc(f.id) + '">Descontar</button><button class="lbtn" data-b="finInlX">Cancelar</button></div></div>' : '')
     + ((f.comp || anx.length) ? '<div class="fanx">' + [f.comp].concat(anx).filter(Boolean).map(function(u){ return '<a href="' + fotoSrc(u) + '" target="_blank" rel="noopener"><img src="' + fotoSrc(u) + '" alt="Anexo"></a>'; }).join("") + '</div>' : '')
-    + '<div class="cta">' + acaoOk + (ASSETS ? '<button class="lbtn" data-b="anxF" data-id="' + esc(f.id) + '">📎 Anexo/foto</button>' : '') + '<button class="lbtn" data-b="editF" data-id="' + esc(f.id) + '">✏️ Editar</button><button class="lbtn" data-b="delF" data-id="' + esc(f.id) + '">🗑</button></div></div>';
+    + '<div class="cta">' + acaoOk + (!f.exec && !f.pago ? '<button class="lbtn" data-b="prazoF" data-id="' + esc(f.id) + '">📅 Mudar prazo</button><button class="lbtn" data-b="parcF" data-id="' + esc(f.id) + '">💳 Parcial</button>' : '') + (ASSETS ? '<button class="lbtn" data-b="anxF" data-id="' + esc(f.id) + '">📎 Anexo/foto</button>' : '') + '<button class="lbtn" data-b="editF" data-id="' + esc(f.id) + '">✏️ Editar</button><button class="lbtn" data-b="delF" data-id="' + esc(f.id) + '">🗑</button></div></div>';
 }
 function proxMes(dt){ var y = +dt.slice(0,4), m = +dt.slice(5,7) + 1, d = +dt.slice(8,10); if (m > 12){ m = 1; y++; } var ult = new Date(Date.UTC(y, m, 0)).getUTCDate(); return y + "-" + String(m).padStart(2,"0") + "-" + String(Math.min(d, ult)).padStart(2,"0") + dt.slice(10); }
 function isoAdd(iso, d){ var t = new Date(iso + "T12:00:00Z"); t.setUTCDate(t.getUTCDate() + d); return t.toISOString().slice(0,10); }
@@ -3602,7 +3613,7 @@ function renderFin(){
   var prevRec = ent.filter(function(f){ return !f.pago; });
   var h = '<div class="fabas">' + [["resumo","📊 Resumo"],["add","➕ Adicionar"],["lista","📋 Lista"],["folhas","🗂️ Folhas"],["periodo","📅 Período"],["exec","🛠️ Execução"]].map(function(t){ return '<button class="' + (aba === t[0] ? "on" : "") + '" data-b="finAba" data-v="' + t[0] + '">' + t[1] + '</button>'; }).join("") + '</div>';
   if (aba === "resumo"){
-    h += '<div class="fgrid"><div class="chipc nao"><b class="tnum">' + atr.length + '</b><span>atrasados · ' + brl(soma(atr)) + '</span></div><div class="chipc pend"><b class="tnum">' + brl(soma(ab)) + '</b><span>a pagar (' + ab.length + ')</span></div><div class="chipc feito"><b class="tnum">' + brl(soma(pagoMes)) + '</b><span>pago no mês</span></div><div class="chipc"><b class="tnum" style="color:var(--green)">' + brl(soma(prevRec)) + '</b><span>receitas previstas</span></div></div>';
+    h += '<div class="fgrid"><div class="chipc nao"><b class="tnum">' + atr.length + '</b><span>atrasados · ' + brl(soma(atr)) + '</span></div><div class="chipc pend"><b class="tnum">' + brl(soma(ab)) + '</b><span>a pagar (' + ab.length + ')</span></div><div class="chipc feito"><b class="tnum">' + brl(somaPago(pagoMes)) + '</b><span>pago no mês</span></div><div class="chipc"><b class="tnum" style="color:var(--green)">' + brl(soma(prevRec)) + '</b><span>receitas previstas</span></div></div>';
     var saldo = soma(prevRec) - soma(ab);
     h += '<div class="card"><h2>⚖️ Previsão de saldo</h2><p class="tnum" style="font-size:22px;font-weight:800;color:' + (saldo >= 0 ? "var(--green)" : "var(--red)") + '">' + brl(saldo) + '</p><p class="muted sm">Receitas previstas menos pagamentos em aberto.</p></div>';
     h += '<div class="card"><h2>🗂️ Por folha (em aberto)</h2><div class="flist">' + FOLHAS.map(function(fo){ var it = fin.filter(function(f){ return folhaDe(f) === fo.k && !f.pago; }); return '<button class="frow" data-b="abrirFolha" data-v="' + fo.k + '"><span>' + fo.i + ' ' + fo.n + '</span><span class="muted sm">' + it.length + '</span><b class="tnum" style="color:' + (fo.t === "entrada" ? "var(--green)" : "inherit") + '">' + brl(soma(it)) + '</b></button>'; }).join("") + '</div></div>';
@@ -3618,20 +3629,35 @@ function renderFin(){
   }
   if (aba === "folhas"){
     var fsel = S.finFolhaSel || "ong", fo = folhaInfo(fsel), it = fin.filter(function(f){ return folhaDe(f) === fsel; });
-    var abt = it.filter(function(f){ return !f.pago; }), pg = it.filter(function(f){ return f.pago; });
+    var mAt = hojeISO().slice(0,7), msel = S.finMes || mAt, sub = S.finFolhaSub || "aberto", todos = msel === "todos";
+    var fixos = [mesAdd(mAt, -2), mesAdd(mAt, -1), mAt, mesAdd(mAt, 1)];
+    var outros = []; for (var oi = -12; oi <= 12; oi++){ var om = mesAdd(mAt, oi); if (fixos.indexOf(om) < 0) outros.push(om); }
     h += '<div class="fchips">' + FOLHAS.map(function(x){ return '<button class="' + (fsel === x.k ? "on" : "") + '" data-b="abrirFolha" data-v="' + x.k + '">' + x.i + ' ' + x.n + '</button>'; }).join("") + '</div>';
-    h += '<div class="card"><h2>' + fo.i + ' ' + fo.n + '</h2><div class="fgrid"><div class="chipc pend"><b class="tnum">' + brl(soma(abt)) + '</b><span>' + (fo.t === "entrada" ? "a receber" : "em aberto") + ' (' + abt.length + ')</span></div><div class="chipc feito"><b class="tnum">' + brl(soma(pg)) + '</b><span>' + (fo.t === "entrada" ? "recebido" : "pago") + ' (' + pg.length + ')</span></div></div>'
+    h += '<div class="fabas fmeses">' + fixos.map(function(m){ return '<button class="' + (msel === m ? "on" : "") + '" data-b="finMes" data-v="' + m + '">' + mesRot(m) + '</button>'; }).join("")
+      + (outros.indexOf(msel) >= 0 ? '<button class="on" data-b="finMes" data-v="' + msel + '">' + mesRot(msel) + '</button>' : '')
+      + '<button class="' + (todos ? "on" : "") + '" data-b="finMes" data-v="todos">Todos</button></div>'
+      + '<label class="muted sm">Outros meses<select id="finMesSel"><option value="">Escolher mês…</option>' + outros.map(function(m){ return '<option value="' + m + '"' + (msel === m ? " selected" : "") + '>' + mesRot(m) + (m.slice(0,4) === mAt.slice(0,4) ? " " + m.slice(0,4) : "") + '</option>'; }).join("") + '</select></label>';
+    var abt = it.filter(function(f){ if (f.pago) return false; if (todos) return true; var mv = mesDe(f); return mv === msel || (msel === mAt && mv && mv < mAt); });
+    var pg = it.filter(function(f){ return f.pago && (todos || String(f.pagoEm || f.venc || "").slice(0,7) === msel); });
+    var parc = []; it.forEach(function(f){ (f.parciais || []).forEach(function(p, i){ if (todos || String(p.em || "").slice(0,7) === msel) parc.push({f:f, p:p, i:i}); }); });
+    var somaParc = parc.reduce(function(s, x){ return s + (Number(x.p.v) || 0); }, 0), ent2 = fo.t === "entrada";
+    h += '<div class="card"><h2>' + fo.i + ' ' + fo.n + ' · ' + (todos ? "todos os meses" : mesRot(msel)) + '</h2><div class="fgrid"><div class="chipc pend"><b class="tnum">' + brl(soma(abt)) + '</b><span>' + (ent2 ? "a receber" : "em aberto") + ' (' + abt.length + ')</span></div><div class="chipc"><b class="tnum">' + brl(somaParc) + '</b><span>' + (ent2 ? "recebido" : "pago") + ' em parcial (' + parc.length + ')</span></div><div class="chipc feito"><b class="tnum">' + brl(somaPago(pg)) + '</b><span>' + (ent2 ? "recebidos" : "pagos") + ' (' + pg.length + ')</span></div></div>'
       + '<button class="bprim" data-b="novoNaFolha" data-v="' + fsel + '">+ Adicionar em ' + esc(fo.n) + '</button></div>';
-    h += '<div class="contatos">' + (abt.length ? abt.map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nada em aberto nesta folha.</p>') + '</div>';
-    if (pg.length) h += '<details class="card"><summary class="muted" style="cursor:pointer;font-weight:700">✅ ' + (fo.t === "entrada" ? "Recebidos" : "Pagos") + ' (' + pg.length + ')</summary><div class="contatos">' + pg.map(cardFin).join("") + '</div></details>';
+    h += '<div class="fchips">' + [["aberto", "📋 Em aberto"], ["parcial", "💳 Pagos parciais"], ["pagos", "✅ Pagos no período"]].map(function(c){ return '<button class="' + (sub === c[0] ? "on" : "") + '" data-b="finFolhaSub" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join("") + '</div>';
+    if (sub === "aberto") h += '<div class="contatos">' + (abt.length ? abt.sort(function(a, b){ return String(a.venc || "9").localeCompare(String(b.venc || "9")); }).map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nada em aberto ' + (todos ? "nesta folha." : "em " + mesRot(msel) + ".") + '</p>') + '</div>';
+    if (sub === "parcial") h += parc.length ? '<div class="card"><div class="flist">' + parc.sort(function(a, b){ return String(b.p.em).localeCompare(String(a.p.em)); }).map(function(x){ return '<div class="frow"><span>#' + x.f.num + ' ' + esc(x.f.demanda) + '<br><small class="muted">' + fmtD(String(x.p.em).slice(0,10)) + (x.f.pago ? " · quitado" : " · falta " + brl(x.f.valor)) + '</small></span><b class="tnum">' + brl(x.p.v) + '</b><button class="lbtn" data-b="parcDel" data-id="' + esc(x.f.id) + '" data-v="' + x.i + '" title="Desfazer parcial">↺</button></div>'; }).join("") + '</div></div>' : '<p class="vazio" style="text-align:center">Nenhum pagamento parcial ' + (todos ? "nesta folha." : "em " + mesRot(msel) + ".") + '</p>';
+    if (sub === "pagos") h += '<div class="contatos">' + (pg.length ? pg.map(cardFin).join("") : '<p class="vazio" style="text-align:center">Nada ' + (ent2 ? "recebido" : "pago") + ' ' + (todos ? "nesta folha." : "em " + mesRot(msel) + ".") + '</p>') + '</div>';
   }
   if (aba === "periodo"){
     var p = periodo(), noP = fin.filter(function(f){ var d = String(f.venc || "").slice(0,10); return d >= p.a && d <= p.b; });
     var s2 = noP.filter(function(f){ return tipoDe(f) === "saida"; }), e2 = noP.filter(function(f){ return tipoDe(f) === "entrada"; });
+    var parcP = []; fin.forEach(function(f){ if (tipoDe(f) !== "saida") return; (f.parciais || []).forEach(function(pp){ var d = String(pp.em || "").slice(0,10); if (d >= p.a && d <= p.b) parcP.push({f:f, p:pp}); }); });
+    var somaParcP = parcP.reduce(function(s, x){ return s + (Number(x.p.v) || 0); }, 0);
     h += '<div class="fchips">' + [["semanal","Semanal"],["quinzenal","Quinzenal"],["mensal","Mensal"]].map(function(c){ return '<button class="' + ((S.finPer || "semanal") === c[0] ? "on" : "") + '" data-b="finPer" data-v="' + c[0] + '">' + c[1] + '</button>'; }).join("") + '</div>'
       + '<div class="fnav"><button class="lbtn" data-b="finOff" data-v="-1">‹</button><b>' + p.rot + '</b><button class="lbtn" data-b="finOff" data-v="1">›</button></div>'
-      + '<div class="fgrid"><div class="chipc pend"><b class="tnum">' + brl(soma(s2)) + '</b><span>gastos no período</span></div><div class="chipc feito"><b class="tnum">' + brl(soma(s2.filter(function(f){ return f.pago; }))) + '</b><span>já pagos</span></div><div class="chipc nao"><b class="tnum">' + brl(soma(s2.filter(function(f){ return !f.pago; }))) + '</b><span>falta pagar</span></div><div class="chipc"><b class="tnum" style="color:var(--green)">' + brl(soma(e2)) + '</b><span>receitas</span></div></div>'
+      + '<div class="fgrid"><div class="chipc pend"><b class="tnum">' + brl(soma(s2)) + '</b><span>gastos no período</span></div><div class="chipc feito"><b class="tnum">' + brl(somaPago(s2.filter(function(f){ return f.pago; }))) + '</b><span>já pagos</span></div><div class="chipc"><b class="tnum">' + brl(somaParcP) + '</b><span>pagos parciais (' + parcP.length + ')</span></div><div class="chipc nao"><b class="tnum">' + brl(soma(s2.filter(function(f){ return !f.pago; }))) + '</b><span>falta pagar</span></div><div class="chipc"><b class="tnum" style="color:var(--green)">' + brl(soma(e2)) + '</b><span>receitas</span></div></div>'
       + '<div class="card"><h2>Por folha no período</h2><div class="flist">' + FOLHAS.map(function(fo){ var x = noP.filter(function(f){ return folhaDe(f) === fo.k; }); return x.length ? '<div class="frow"><span>' + fo.i + ' ' + fo.n + '</span><span class="muted sm">' + x.length + '</span><b class="tnum">' + brl(soma(x)) + '</b></div>' : ''; }).join("") + '</div></div>'
+      + (parcP.length ? '<div class="card"><h2>💳 Pagos parciais no período</h2><div class="flist">' + parcP.map(function(x){ return '<div class="frow"><span>#' + x.f.num + ' ' + esc(x.f.demanda) + '<br><small class="muted">' + fmtD(String(x.p.em).slice(0,10)) + '</small></span><span></span><b class="tnum">' + brl(x.p.v) + '</b></div>'; }).join("") + '</div></div>' : '')
       + finListaHtml(noP);
   }
   if (aba === "exec"){
@@ -3647,6 +3673,7 @@ function renderFin(){
   }
   return h;
 }
+$("view").addEventListener("change", function(e){ if (e.target.id === "finMesSel" && e.target.value){ S.finMes = e.target.value; render(); } });
 $("view").addEventListener("input", function(e){
   if (e.target.id !== "finBusca") return; S.finQ = e.target.value; var bx = $("finListaBox"); if (bx) bx.innerHTML = finListaHtml(finFiltrar(finLista().filter(function(f){ return !f.exec; })));
 });
@@ -3660,6 +3687,36 @@ APP9.addEventListener("click", function(e){
   if (a === "finOff"){ S.finOff = (S.finOff || 0) + Number(v); render(); return; }
   if (a === "finExecFil"){ S.finExecFil = v; render(); return; }
   if (a === "abrirFolha"){ S.finFolhaSel = v; S.finAba = "folhas"; render(); return; }
+  if (a === "finMes"){ S.finMes = v; SOM.play("aba"); render(); return; }
+  if (a === "finFolhaSub"){ S.finFolhaSub = v; render(); return; }
+  if (a === "prazoF"){ S.finPrazoId = id; S.finParcId = null; render(); setTimeout(function(){ var x = $("przIn"); if (x) x.focus(); }, 50); return; }
+  if (a === "parcF"){ S.finParcId = id; S.finPrazoId = null; render(); setTimeout(function(){ var x = $("parcIn"); if (x) x.focus(); }, 50); return; }
+  if (a === "finInlX"){ S.finPrazoId = null; S.finParcId = null; render(); return; }
+  if (a === "prazoOk"){
+    var nv = ($("przIn") && $("przIn").value || "").slice(0,16); if (!nv){ SOM.play("erro"); toast("Escolha a nova data."); return; }
+    S.fin[id] = Object.assign({}, S.fin[id], {venc:nv}); gravar("financeiro", id, S.fin[id]); S.finPrazoId = null;
+    SOM.play("feito"); toast("📅 Prazo mudado para " + fmtDT(nv)); render(); return;
+  }
+  if (a === "parcOk"){
+    var fp = S.fin[id], vp = lerValor($("parcIn") && $("parcIn").value), resto = Number(fp.valor) || 0;
+    if (vp <= 0){ SOM.play("erro"); toast("Digite quanto foi pago."); return; }
+    if (vp > resto + 0.001){ SOM.play("erro"); toast("Valor maior do que falta (" + brl(resto) + ")."); return; }
+    var novo = Object.assign({}, fp, {valorOriginal:fp.valorOriginal || resto, parciais:(fp.parciais || []).concat([{v:vp, em:agoraStamp()}])});
+    var quitou = resto - vp < 0.005;
+    novo.valor = quitou ? 0 : Math.round((resto - vp) * 100) / 100;
+    if (quitou){ novo.pago = true; novo.pagoEm = agoraStamp(); }
+    S.fin[id] = novo; gravar("financeiro", id, novo); S.finParcId = null;
+    if (quitou && fp.mensal && fp.venc){ var nid2 = "f" + Date.now().toString(36); S.fin[nid2] = Object.assign({}, fp, {valor:novo.valorOriginal, valorOriginal:"", parciais:[], venc:proxMes(fp.venc), pago:false, pagoEm:"", comp:"", anexos:[], num:finProxNum(), criado:agoraStamp()}); gravar("financeiro", nid2, S.fin[nid2]); }
+    SOM.play(quitou ? "meta" : "feito"); toast(quitou ? "✅ Quitado com o parcial de " + brl(vp) : "💳 Parcial de " + brl(vp) + " registrado. Falta " + brl(novo.valor)); render(); return;
+  }
+  if (a === "parcDel"){
+    var fd = S.fin[id], ix = Number(v), lp = (fd.parciais || []).slice(), pr = lp[ix]; if (!pr) return;
+    if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Desfazer?"; return; }
+    lp.splice(ix, 1);
+    var vb = fd.pago ? (Number(pr.v) || 0) : (Number(fd.valor) || 0) + (Number(pr.v) || 0);
+    S.fin[id] = Object.assign({}, fd, {parciais:lp, valor:Math.round(vb * 100) / 100, pago:false, pagoEm:"", valorOriginal:lp.length ? fd.valorOriginal : ""});
+    gravar("financeiro", id, S.fin[id]); toast("↺ Parcial desfeito"); render(); return;
+  }
   if (a === "novoNaFolha"){ S.finFolhaSel = v; S.editF = {folha:v, tipo:folhaInfo(v).t}; S.finAba = "add"; render(); window.scrollTo(0, 0); return; }
   if (a === "novaExec"){ S.editF = {exec:true, execSt:"resolver"}; S.finAba = "add"; render(); window.scrollTo(0, 0); return; }
   if (a === "fTipo"){ var cur = S.editF || {}; var keep = {demanda:$("fDem") ? $("fDem").value : "", valor:$("fValor") ? parseFloat(String($("fValor").value).replace(/\./g, "").replace(",", ".")) || "" : "", recebedor:$("fRec") ? $("fRec").value : "", venc:$("fVenc") ? $("fVenc").value : "", obs:$("fObs") ? $("fObs").value : ""};
@@ -3679,7 +3736,7 @@ APP9.addEventListener("click", function(e){
   }
   if (a === "pagarF"){
     var f = S.fin[id]; S.fin[id] = Object.assign({}, f, {pago:true, pagoEm:agoraStamp()}); gravar("financeiro", id, S.fin[id]);
-    if (f.mensal && f.venc){ var nid = "f" + Date.now().toString(36); S.fin[nid] = Object.assign({}, f, {venc:proxMes(f.venc), pago:false, pagoEm:"", comp:"", anexos:[], num:finProxNum(), criado:agoraStamp()}); gravar("financeiro", nid, S.fin[nid]); toast("✅ Feito. Próximo já agendado para " + fmtD(proxMes(f.venc).slice(0,10))); }
+    if (f.mensal && f.venc){ var nid = "f" + Date.now().toString(36); S.fin[nid] = Object.assign({}, f, {valor:f.valorOriginal || f.valor, valorOriginal:"", parciais:[], venc:proxMes(f.venc), pago:false, pagoEm:"", comp:"", anexos:[], num:finProxNum(), criado:agoraStamp()}); gravar("financeiro", nid, S.fin[nid]); toast("✅ Feito. Próximo já agendado para " + fmtD(proxMes(f.venc).slice(0,10))); }
     else toast(tipoDe(f) === "entrada" ? "✅ Receita recebida" : "✅ Pagamento registrado");
     SOM.play("meta"); render(); return;
   }
