@@ -1874,6 +1874,7 @@ function tilesMais5(){
     ["saude","💧","Água e alimentação","Base do desempenho","", "sub"],
     ["fin","💰","Financeiro","Pagamentos e datas", nf, "sub"],
     ["viagens","✈️","Viagens","Programar e checklist","", "sub"],
+    ["seguranca","🔒","Segurança","Face ID, bloqueio, sessões","", "sub"],
     ["iphone","📱","iPhone e Siri","Atalhos, calendário, ícone","", "sub"],
     ["ia","✨","Assessor IA","Pergunte sobre o dia","", "sub"]
   ];
@@ -3369,6 +3370,7 @@ function perguntarIA(q){
 /* ---------- MAIS ---------- */
 function renderMais(){
   if (S.sub === "iphone") return voltar() + renderIphone();
+  if (S.sub === "seguranca") return voltar() + SEG.cardHtml();
   if (S.sub === "ideias") return voltar() + renderIdeias();
   if (S.sub === "engaj") return voltar() + renderEngaj();
   if (S.sub === "fluxo") return voltar() + renderFluxo();
