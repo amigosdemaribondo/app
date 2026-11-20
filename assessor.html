@@ -4231,7 +4231,9 @@ var SEG = (function(){
   function guardarSenhaLocal(senha){ try { if (!crypto.subtle) return; var sal = aleat(16); derivar(senha, sal).then(function(h){ LS("ma_lks", b64(sal)); LS("ma_lkh", h); }); } catch(e){} }
   function conferirSenha(senha){
     var h = LS("ma_lkh"), sal = LS("ma_lks");
-    if (h && sal && crypto.subtle) return derivar(senha, deB64(sal)).then(function(x){ if (x !== h) throw new Error("PIN incorreto."); });
+    var servidor = function(){ var old = PIN; PIN = senha; return apiRun("maConferir").then(function(){ PIN = old; guardarSenhaLocal(senha); }, function(e){ PIN = old; throw e; }); };
+    /* confere no celular; se não bater (ex.: a senha foi trocada), confere no servidor */
+    if (h && sal && crypto.subtle) return derivar(senha, deB64(sal)).then(function(x){ if (x !== h) return servidor(); });
     var old = PIN; PIN = senha;
     return apiRun("maConferir").then(function(){ PIN = old; guardarSenhaLocal(senha); }, function(e){ PIN = old; throw e; });
   }
@@ -4255,7 +4257,7 @@ var SEG = (function(){
     document.body.appendChild(box);
     box.querySelector("#segFace").addEventListener("click", function(){ faceUsar().then(abrir, function(){ $("segMsg").textContent = "Não deu com o Face ID. Use a senha."; }); });
     var ok = function(){ var v = $("segIn").value; if (!v) return; $("segMsg").textContent = "Conferindo…";
-      conferirSenha(v).then(abrir, function(e){ $("segIn").value = ""; SOM.play("erro"); $("segMsg").textContent = /PIN/.test(e && e.message || "") ? "Senha incorreta." : (e && e.message) || "Sem internet: use o Face ID."; }); };
+      conferirSenha(v).then(abrir, function(e){ $("segIn").value = ""; SOM.play("erro"); var m = (e && e.message) || ""; $("segMsg").textContent = /PIN/.test(m) ? "Senha incorreta." : /travad/i.test(m) ? m : /conex|fetch|network|load failed/i.test(m) ? "Sem internet: use o Face ID." : "Erro: " + m; }); };
     box.querySelector("#segOk").addEventListener("click", ok);
     box.querySelector("#segIn").addEventListener("keydown", function(e){ if (e.key === "Enter") ok(); });
     return box;
@@ -4389,7 +4391,7 @@ $("pinOk").addEventListener("click", function(){
   $("pinMsg").textContent = "Conferindo…";
   PIN = p; apiRun("maLogin").then(function(r){ return r.token; }, function(e){ if (/desconhecida/i.test(e && e.message || "")) return apiRun("maCarregar").then(function(){ return p; }); throw e; })
     .then(function(tok){ PIN = tok; try { localStorage.setItem("ma_pin", tok); } catch(e){} SEG.guardarSenhaLocal(p); $("pinIn").value = ""; $("pinBox").hidden = true; window.__semPin = false; introMatrix(); carregarNuvem(); })
-    .catch(function(e){ PIN = ""; SOM.play("erro"); $("pinMsg").textContent = /PIN/.test(e.message) ? "Senha incorreta. Tente de novo." : "Sem internet. Tente de novo."; });
+    .catch(function(e){ PIN = ""; SOM.play("erro"); var m = (e && e.message) || ""; $("pinMsg").textContent = /PIN/.test(m) ? "Senha incorreta. Tente de novo." : /travad/i.test(m) ? m : /conex|fetch|network|load failed/i.test(m) ? "Sem internet. Tente de novo." : "Erro: " + m; });
 });
 $("pinPular").addEventListener("click", function(){ $("pinBox").hidden = true; $("estado").textContent = "Salvando só neste celular."; });
 window.__semPin = !PIN;
