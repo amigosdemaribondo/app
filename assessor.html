@@ -2,6 +2,9 @@
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta http-equiv="Cache-Control" content="no-cache">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="object-src 'none'; base-uri 'self'; form-action 'none'">
+<script>if (window.top !== window.self) { try { window.top.location = window.self.location; } catch(e) { document.documentElement.innerHTML = ""; } }</script>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -10,7 +13,7 @@
 <link rel="apple-touch-icon" href="assessor-icone.png">
 <link rel="icon" href="assessor-icone.png">
 <link rel="manifest" href="assessor.webmanifest">
-<style>.finline{display:flex;flex-direction:column;gap:8px;margin:8px 0;padding:10px;border-radius:12px;background:rgba(127,127,127,.10)}.finline input{width:100%}.fmeses button{white-space:nowrap}.cttab.pgtab{left:auto;right:0;top:62%;border-left:1px solid var(--line);border-right:0;border-radius:14px 0 0 14px;box-shadow:-4px 0 18px rgba(0,0,0,.35)}.cttab.pgtab span{transform:none}.ctpan.pgpan{left:auto;right:0;border-right:0;border-left:1px solid var(--line);transform:translateX(102%);padding-right:max(12px,env(safe-area-inset-right,0px))}body.pg-on .ctpan.pgpan{transform:none}body.pg-on .ctback.pgback{opacity:1;pointer-events:auto}body.pg-on .cttab.pgtab{opacity:0;pointer-events:none}.pgtot{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:0 4px}.pgtot b{color:var(--ink)}.pglista{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-bottom:8px}.pgmes{display:flex;justify-content:space-between;margin-top:8px;padding:4px 4px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line)}.pgrow{display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:center;padding:8px;border-radius:12px;background:var(--navy);border:1px solid var(--line)}.pgrow.atr{border-color:var(--red)}.pgrow.hj{border-color:var(--amber)}.pgd{font-size:13px;font-weight:800;color:var(--muted)}.pgrow.atr .pgd{color:var(--red)}.pgn{min-width:0}.pgn b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pgn small{display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pgv{font-size:14px}.pgab{border:0;border-radius:9px;padding:7px 10px;background:var(--gold);color:#140F00;font-weight:800;font-size:12px}.pgflash{outline:3px solid var(--gold);transition:outline .3s}.fmesd .frow{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:6px;align-items:center;text-align:right}.fmesd .frow>:first-child{text-align:left}.fmesd .fmesh{font-size:12px;opacity:.7;font-weight:700}.fmesd .frow.on{outline:2px solid var(--gold);border-radius:10px}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.fabas{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.fabas::-webkit-scrollbar{display:none}.fabas button,.fchips button,.fseg button{flex:none;border:1px solid var(--line);background:var(--navy);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;color:inherit}.fabas button.on,.fchips button.on,.fseg button.on{background:var(--gold);color:#0b1020;border-color:var(--gold)}.fchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.fseg{display:flex;gap:6px;flex-wrap:wrap}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.fgrid .chipc b{font-size:16px}.flist{display:flex;flex-direction:column;gap:4px}.frow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;padding:9px 2px;font-size:14px}.ftot{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:8px 2px;color:var(--muted,#9aa)}.ftot b{color:var(--text,#fff)}.fnum{flex:none;min-width:36px;height:36px;border-radius:12px;background:var(--gold-soft);color:var(--gold);font-weight:800;font-size:13px;display:grid;place-items:center}.fanx{display:flex;gap:6px;overflow-x:auto}.fanx img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.fgal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.fgal a{display:flex;flex-direction:column;gap:3px;color:inherit;text-decoration:none}.fgal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}.fgal small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fctl{display:flex;justify-content:space-between;align-items:center;gap:8px}.fnav{display:flex;justify-content:space-between;align-items:center;margin:6px 0}#finBusca,#fObs{width:100%}
+<style>.finline{display:flex;flex-direction:column;gap:8px;margin:8px 0;padding:10px;border-radius:12px;background:rgba(127,127,127,.10)}.finline input{width:100%}.fmeses button{white-space:nowrap}.seglock{position:fixed;inset:0;z-index:99999;background:#050B17;display:grid;place-items:center;padding:24px}.segc{width:min(92vw,360px);display:flex;flex-direction:column;gap:12px;text-align:center}.segc input{text-align:center}body.seg-on{overflow:hidden}.cttab.pgtab{left:auto;right:0;top:62%;border-left:1px solid var(--line);border-right:0;border-radius:14px 0 0 14px;box-shadow:-4px 0 18px rgba(0,0,0,.35)}.cttab.pgtab span{transform:none}.ctpan.pgpan{left:auto;right:0;border-right:0;border-left:1px solid var(--line);transform:translateX(102%);padding-right:max(12px,env(safe-area-inset-right,0px))}body.pg-on .ctpan.pgpan{transform:none}body.pg-on .ctback.pgback{opacity:1;pointer-events:auto}body.pg-on .cttab.pgtab{opacity:0;pointer-events:none}.pgtot{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);padding:0 4px}.pgtot b{color:var(--ink)}.pglista{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-bottom:8px}.pgmes{display:flex;justify-content:space-between;margin-top:8px;padding:4px 4px;font-size:12px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--gold);border-bottom:1px solid var(--line)}.pgrow{display:grid;grid-template-columns:44px 1fr auto auto;gap:8px;align-items:center;padding:8px;border-radius:12px;background:var(--navy);border:1px solid var(--line)}.pgrow.atr{border-color:var(--red)}.pgrow.hj{border-color:var(--amber)}.pgd{font-size:13px;font-weight:800;color:var(--muted)}.pgrow.atr .pgd{color:var(--red)}.pgn{min-width:0}.pgn b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pgn small{display:block;font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pgv{font-size:14px}.pgab{border:0;border-radius:9px;padding:7px 10px;background:var(--gold);color:#140F00;font-weight:800;font-size:12px}.pgflash{outline:3px solid var(--gold);transition:outline .3s}.fmesd .frow{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:6px;align-items:center;text-align:right}.fmesd .frow>:first-child{text-align:left}.fmesd .fmesh{font-size:12px;opacity:.7;font-weight:700}.fmesd .frow.on{outline:2px solid var(--gold);border-radius:10px}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}.fabas{display:flex;gap:6px;overflow-x:auto;padding:2px 0 8px;scrollbar-width:none}.fabas::-webkit-scrollbar{display:none}.fabas button,.fchips button,.fseg button{flex:none;border:1px solid var(--line);background:var(--navy);border-radius:999px;padding:8px 13px;font-size:13px;font-weight:700;color:inherit}.fabas button.on,.fchips button.on,.fseg button.on{background:var(--gold);color:#0b1020;border-color:var(--gold)}.fchips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}.fseg{display:flex;gap:6px;flex-wrap:wrap}.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}.fgrid .chipc b{font-size:16px}.flist{display:flex;flex-direction:column;gap:4px}.frow{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:inherit;padding:9px 2px;font-size:14px}.ftot{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;margin:8px 2px;color:var(--muted,#9aa)}.ftot b{color:var(--text,#fff)}.fnum{flex:none;min-width:36px;height:36px;border-radius:12px;background:var(--gold-soft);color:var(--gold);font-weight:800;font-size:13px;display:grid;place-items:center}.fanx{display:flex;gap:6px;overflow-x:auto}.fanx img{width:64px;height:64px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}.fgal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.fgal a{display:flex;flex-direction:column;gap:3px;color:inherit;text-decoration:none}.fgal img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:12px}.fgal small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fctl{display:flex;justify-content:space-between;align-items:center;gap:8px}.fnav{display:flex;justify-content:space-between;align-items:center;margin:6px 0}#finBusca,#fObs{width:100%}
 </style>
 </head><body>
 <title>PLANO 2028</title>
@@ -1064,7 +1067,7 @@ body.mapa-cheio .nav,body.mapa-cheio .fab,body.mapa-cheio .cttab{display:none}
   <button role="tab" data-v="time" aria-selected="false"><i>👥</i>Time</button>
   <button role="tab" data-v="mais" aria-selected="false"><i>☰</i>Mais</button>
 </div></nav>
-<div class="pinbox" id="pinBox" hidden><div class="pinc"><div class="logo" style="margin:0 auto">V</div><h2>Entrar</h2><p id="pinMsg" class="muted"></p><input id="pinIn" type="password" inputmode="numeric" maxlength="12" placeholder="Senha" autocomplete="current-password"><button class="bprim" id="pinOk">Entrar</button><button class="desfazer" id="pinPular" style="align-self:center">Agora não</button></div></div>
+<div class="pinbox" id="pinBox" hidden><div class="pinc"><div class="logo" style="margin:0 auto">V</div><h2>Entrar</h2><p id="pinMsg" class="muted"></p><input id="pinIn" type="password" maxlength="64" placeholder="Senha" autocomplete="current-password"><button class="bprim" id="pinOk">Entrar</button><button class="desfazer" id="pinPular" style="align-self:center">Agora não</button></div></div>
 <button class="fab" id="fab" aria-label="Gravar ideia por voz">🎙️</button>
 <div class="toast" id="toast" hidden></div>
 <input type="file" id="camIn" accept="image/*" capture="environment" hidden>
@@ -1778,7 +1781,7 @@ function renderFluxo(){
   h += '<div class="card"><h3 style="margin:0">＋ Registrar postagem</h3><div class="f5"><select id="poPerfil">' + Pf.map(function(p){ return '<option value="' + esc(p.id) + '">' + esc(p.nome) + '</option>'; }).join("") + '<option value="">Outro</option></select><input id="poLink" placeholder="Link do post" inputmode="url"><input id="poTit" placeholder="Do que se trata?" maxlength="120"><textarea id="poNota" rows="2" placeholder="O que eu posso aplicar?"></textarea><button class="bprim" data-m5="poNovo">Salvar no fluxo</button></div></div>';
   h += Po.length ? Po.slice(0, 60).map(function(p){ var pf = S.perfis[p.perfil] || {};
     return '<div class="post5' + (p.visto ? ' visto' : '') + '"><div class="ptop"><b>' + (REDES[pf.rede] || "🌐").split(" ")[0] + ' ' + esc(pf.nome || "Referência") + '</b><small>' + esc(String(p.data || "").slice(0, 10).split("-").reverse().join("/")) + '</small></div><p>' + esc(p.titulo || p.link) + '</p>' + (p.nota ? '<p class="muted sm">💭 ' + esc(p.nota) + '</p>' : '')
-      + '<div class="amini"><a class="lbtn" href="' + esc(p.link) + '" target="_blank" rel="noopener" data-m5="poVisto" data-id="' + esc(p.id) + '">Abrir</a><button data-m5="poIdeia" data-id="' + esc(p.id) + '">💡 Virar ideia</button><button data-m5="poDel" data-id="' + esc(p.id) + '">🗑</button></div></div>'; }).join("") : '<p class="vazio">O fluxo está vazio. Siga referências e registre posts que valem a pena.</p>';
+      + '<div class="amini"><a class="lbtn" href="' + esc(/^https?:\/\//i.test(String(p.link || "")) ? p.link : "#") + '" target="_blank" rel="noopener noreferrer" data-m5="poVisto" data-id="' + esc(p.id) + '">Abrir</a><button data-m5="poIdeia" data-id="' + esc(p.id) + '">💡 Virar ideia</button><button data-m5="poDel" data-id="' + esc(p.id) + '">🗑</button></div></div>'; }).join("") : '<p class="vazio">O fluxo está vazio. Siga referências e registre posts que valem a pena.</p>';
   return h;
 }
 /* ================= IDEIAS E INSIGHTS ================= */
@@ -2256,7 +2259,8 @@ function renderIphone(){
     + '</div><div class="card"><h2 style="margin:0">🗣️ Atalhos da Siri</h2><p class="muted sm" style="margin:0">No app <b>Atalhos</b>: <b>＋</b> → <b>Abrir URL</b> → cole o link → dê o nome (ex.: "Plano 2028"). Depois é só dizer "E aí, Siri, Plano 2028". Para ideia e ação, use antes "Pedir entrada" e junte o texto no fim do link.</p>'
     + ATALHOS.map(function(x){ var u = BASE_URL + x[1]; return '<div class="at6"><div><b>' + x[0] + '</b>' + (x[2] ? '<small>' + esc(x[2]) + '</small>' : '') + '<code>' + esc(u) + '</code></div><button class="lbtn" data-m5="copiaUrl" data-u="' + esc(u) + '">📋</button></div>'; }).join("") + '</div>'
     + '<div class="card"><h2 style="margin:0">🔗 Integrações</h2><ul class="dieta5"><li>📅 Projetos com agenda: botão <b>"Pôr no Calendário"</b> (repete toda semana e avisa antes)</li><li>📤 Projetos e ideias: <b>Compartilhar</b> abre a folha do iPhone (WhatsApp, Notas, Mail…)</li><li>📷 Fotos e arquivos usam a câmera e o app Arquivos</li><li>🔆 Durante o foco de 25 min a tela fica acesa</li><li>🔴 Número de pendências no ícone do app (iOS 16.4+)</li></ul>'
-    + '<button class="lbtn" data-m5="ics">📅 Pôr a agenda de hoje no Calendário</button></div>';
+    + '<button class="lbtn" data-m5="ics">📅 Pôr a agenda de hoje no Calendário</button></div>'
+    + SEG.cardHtml();
   return h;
 }
 document.addEventListener("click", function(e){ var b = e.target.closest('[data-m5="copiaUrl"]'); if (!b) return; try { navigator.clipboard.writeText(b.dataset.u); toast("📋 Link copiado. Cole no app Atalhos."); } catch(x){ toast(b.dataset.u); } });
@@ -4209,6 +4213,93 @@ render = function(){ renderBase2(); renderPagar(); };
   renderPagar();
 })();
 
+/* ===== SEGURANÇA: bloqueio do app (Face ID / senha), sessão, fotos privadas ===== */
+var SEG = (function(){
+  var LS = function(k, v){ try { if (v === undefined) return localStorage.getItem(k); if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch(e){ return null; } };
+  var TEMPO = 5 * 60 * 1000, saiu = 0, travado = false;
+  function ligado(){ return LS("ma_lock") !== "0"; }
+  function b64(buf){ var b = new Uint8Array(buf), s = ""; for (var i = 0; i < b.length; i++) s += String.fromCharCode(b[i]); return btoa(s); }
+  function deB64(t){ var s = atob(t), b = new Uint8Array(s.length); for (var i = 0; i < s.length; i++) b[i] = s.charCodeAt(i); return b; }
+  function aleat(n){ var a = new Uint8Array(n); crypto.getRandomValues(a); return a; }
+  function derivar(senha, sal){
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey("raw", enc.encode(senha), "PBKDF2", false, ["deriveBits"])
+      .then(function(k){ return crypto.subtle.deriveBits({name:"PBKDF2", salt:sal, iterations:200000, hash:"SHA-256"}, k, 256); }).then(b64);
+  }
+  function guardarSenhaLocal(senha){ try { if (!crypto.subtle) return; var sal = aleat(16); derivar(senha, sal).then(function(h){ LS("ma_lks", b64(sal)); LS("ma_lkh", h); }); } catch(e){} }
+  function conferirSenha(senha){
+    var h = LS("ma_lkh"), sal = LS("ma_lks");
+    if (h && sal && crypto.subtle) return derivar(senha, deB64(sal)).then(function(x){ if (x !== h) throw new Error("PIN incorreto."); });
+    var old = PIN; PIN = senha;
+    return apiRun("maConferir").then(function(){ PIN = old; guardarSenhaLocal(senha); }, function(e){ PIN = old; throw e; });
+  }
+  function temFace(){ return !!LS("ma_wa") && !!(window.PublicKeyCredential && navigator.credentials); }
+  function faceAtivar(){
+    if (!window.PublicKeyCredential || !navigator.credentials) return Promise.reject(new Error("Este aparelho não suporta."));
+    return navigator.credentials.create({publicKey:{challenge:aleat(32), rp:{name:"PLANO 2028"}, user:{id:aleat(16), name:"victor", displayName:"Victor"},
+      pubKeyCredParams:[{type:"public-key", alg:-7}, {type:"public-key", alg:-257}], authenticatorSelection:{authenticatorAttachment:"platform", userVerification:"required", residentKey:"discouraged"}, timeout:60000, attestation:"none"}})
+      .then(function(c){ LS("ma_wa", b64(c.rawId)); });
+  }
+  function faceUsar(){
+    return navigator.credentials.get({publicKey:{challenge:aleat(32), allowCredentials:[{type:"public-key", id:deB64(LS("ma_wa"))}], userVerification:"required", timeout:60000}});
+  }
+  var box = null;
+  function montar(){
+    if (box) return box;
+    box = document.createElement("div"); box.className = "seglock"; box.id = "segLock"; box.hidden = true;
+    box.innerHTML = '<div class="segc"><div class="logo" style="margin:0 auto">V</div><h2>🔒 App bloqueado</h2><p class="muted" id="segMsg">Confirme que é você.</p>'
+      + '<button class="bprim" id="segFace" hidden>🙂 Desbloquear com Face ID</button>'
+      + '<input id="segIn" type="password" maxlength="64" placeholder="Senha" autocomplete="current-password"><button class="lbtn" id="segOk">Entrar com a senha</button></div>';
+    document.body.appendChild(box);
+    box.querySelector("#segFace").addEventListener("click", function(){ faceUsar().then(abrir, function(){ $("segMsg").textContent = "Não deu com o Face ID. Use a senha."; }); });
+    var ok = function(){ var v = $("segIn").value; if (!v) return; $("segMsg").textContent = "Conferindo…";
+      conferirSenha(v).then(abrir, function(e){ $("segIn").value = ""; SOM.play("erro"); $("segMsg").textContent = /PIN/.test(e && e.message || "") ? "Senha incorreta." : (e && e.message) || "Sem internet: use o Face ID."; }); };
+    box.querySelector("#segOk").addEventListener("click", ok);
+    box.querySelector("#segIn").addEventListener("keydown", function(e){ if (e.key === "Enter") ok(); });
+    return box;
+  }
+  function travar(){
+    if (!PIN || !ligado()) return;
+    montar(); travado = true; document.body.classList.add("seg-on"); box.hidden = false; $("segIn").value = "";
+    $("segFace").hidden = !temFace(); $("segMsg").textContent = temFace() ? "Use o Face ID ou a senha." : "Digite a senha para abrir.";
+    if (temFace()) setTimeout(function(){ faceUsar().then(abrir, function(){}); }, 350);
+  }
+  function abrir(){ travado = false; if (box) box.hidden = true; document.body.classList.remove("seg-on"); $("segIn") && ($("segIn").value = ""); }
+  document.addEventListener("visibilitychange", function(){ if (document.hidden) saiu = Date.now(); else if (saiu && Date.now() - saiu > TEMPO) travar(); });
+  /* fotos privadas do Drive: busca pela API com a sessão e mostra direto (sem link público) */
+  var CACHE = {}, BUSCANDO = {};
+  var RE = /drive\.google\.com\/(?:thumbnail\?id=|file\/d\/|uc\?(?:[^"'&]*&)*id=)([\w-]{20,})/;
+  function verImg(img){
+    if (img.dataset.segv) return; var m = RE.exec(img.getAttribute("src") || ""); if (!m || !PIN) return;
+    var id = m[1]; img.dataset.segv = "1";
+    if (CACHE[id]){ img.src = CACHE[id]; return; }
+    img.style.opacity = ".35";
+    (BUSCANDO[id] = BUSCANDO[id] || apiRun("maVerArquivo", id).then(function(r){ var bl = new Blob([deB64(r.b64)], {type:r.mime || "image/jpeg"}); return CACHE[id] = URL.createObjectURL(bl); }))
+      .then(function(u){ document.querySelectorAll("img").forEach(function(x){ var mm = RE.exec(x.getAttribute("src") || ""); if (mm && mm[1] === id){ x.src = u; x.style.opacity = ""; } }); })
+      .catch(function(){ img.style.opacity = ""; delete BUSCANDO[id]; });
+  }
+  new MutationObserver(function(ms){ ms.forEach(function(m){ (m.addedNodes || []).forEach(function(n){ if (n.nodeType !== 1) return; if (n.tagName === "IMG") verImg(n); else if (n.querySelectorAll) n.querySelectorAll("img").forEach(verImg); }); }); })
+    .observe(document.documentElement, {childList:true, subtree:true});
+  function cardHtml(){
+    return '<div class="card"><h2 style="margin:0">🔒 Segurança</h2><ul class="dieta5">'
+      + '<li>' + (PIN ? (/^mat_/.test(PIN) ? '✅ Sessão segura (a senha não fica salva no celular)' : '⚠️ Sessão antiga: abra de novo para atualizar') : '⚠️ Sem senha: dados só neste celular') + '</li>'
+      + '<li>' + (ligado() ? '✅ Bloqueio automático depois de 5 min fora do app' : '⚠️ Bloqueio automático desligado') + '</li>'
+      + '<li>' + (temFace() ? '✅ Face ID ativado neste iPhone' : '⬜ Face ID não ativado') + '</li>'
+      + '<li>✅ Fotos e anexos privados no Drive (só o app abre)</li><li>✅ Trava contra tentativas de senha e aviso por e-mail</li></ul>'
+      + '<div class="grid2"><button class="lbtn" data-seg="face">' + (temFace() ? "🙂 Refazer Face ID" : "🙂 Ativar Face ID") + '</button><button class="lbtn" data-seg="lock">' + (ligado() ? "Desligar bloqueio" : "Ligar bloqueio") + '</button></div>'
+      + '<div class="grid2"><button class="lbtn" data-seg="agora">🔒 Bloquear agora</button><button class="lbtn" data-seg="todos">🚪 Sair de todos os aparelhos</button></div></div>';
+  }
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-seg]"); if (!b) return; var a = b.dataset.seg;
+    if (a === "face"){ faceAtivar().then(function(){ toast("🙂 Face ID ativado"); render(); }, function(err){ toast("Não foi possível ativar: " + ((err && err.message) || "tente de novo")); }); return; }
+    if (a === "lock"){ if (ligado()){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Desligar mesmo?"; return; } LS("ma_lock", "0"); } else LS("ma_lock", null); render(); return; }
+    if (a === "agora"){ travar(); return; }
+    if (a === "todos"){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Confirmar: sair de todos?"; return; }
+      apiRun("maSairTodos").then(function(){ PIN = ""; LS("ma_pin", null); LS("ma_lkh", null); LS("ma_lks", null); toast("🚪 Todas as sessões encerradas"); pedirPin("Entre de novo com a senha."); }, function(err){ toast((err && err.message) || "Sem internet."); }); }
+  });
+  return {travar:travar, guardarSenhaLocal:guardarSenhaLocal, cardHtml:cardHtml};
+})();
+
 /* ===== início ===== */
 lerLocal(); render(); somIcone();
 setInterval(checarAlertas, 30000);
@@ -4294,11 +4385,14 @@ function pedirPin(msg){
 $("pinOk").addEventListener("click", function(){
   var p = $("pinIn").value.trim(); if (!p) return;
   $("pinMsg").textContent = "Conferindo…";
-  PIN = p; apiRun("maCarregar").then(function(){ try { localStorage.setItem("ma_pin", p); } catch(e){} $("pinBox").hidden = true; window.__semPin = false; introMatrix(); carregarNuvem(); })
+  PIN = p; apiRun("maLogin").then(function(r){ return r.token; }, function(e){ if (/desconhecida/i.test(e && e.message || "")) return apiRun("maCarregar").then(function(){ return p; }); throw e; })
+    .then(function(tok){ PIN = tok; try { localStorage.setItem("ma_pin", tok); } catch(e){} SEG.guardarSenhaLocal(p); $("pinIn").value = ""; $("pinBox").hidden = true; window.__semPin = false; introMatrix(); carregarNuvem(); })
     .catch(function(e){ PIN = ""; SOM.play("erro"); $("pinMsg").textContent = /PIN/.test(e.message) ? "Senha incorreta. Tente de novo." : "Sem internet. Tente de novo."; });
 });
 $("pinPular").addEventListener("click", function(){ $("pinBox").hidden = true; $("estado").textContent = "Salvando só neste celular."; });
 window.__semPin = !PIN;
+if (PIN && !/^mat_/.test(PIN)){ var senhaAntiga = PIN; apiRun("maLogin").then(function(r){ PIN = r.token; try { localStorage.setItem("ma_pin", r.token); } catch(e){} SEG.guardarSenhaLocal(senhaAntiga); senhaAntiga = ""; }).catch(function(){}); }
+if (PIN) SEG.travar();
 $("bora").addEventListener("click", function(){ if (!PIN) setTimeout(function(){ pedirPin(); }, 500); });
 carregarNuvem();
 setInterval(function(){ if (!document.hidden && PIN && !Object.keys(gravando).some(function(k){ return gravando[k]; })) carregarNuvem(); }, 120000);
