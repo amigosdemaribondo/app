@@ -439,6 +439,21 @@ body:not(.v9hoje) .aba9{display:none}
 .actabs{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px;scrollbar-width:none}.actabs::-webkit-scrollbar{display:none}.actabs button{flex:0 0 auto;border:1px solid var(--line);background:var(--navy2);color:inherit;border-radius:999px;padding:8px 12px;font:inherit;font-size:13px;font-weight:700;white-space:nowrap}.actabs button[aria-pressed=true]{background:var(--gold);color:#031646;border-color:var(--gold)}.actabs b{margin-left:4px}
 .selfeito{display:inline-block;margin-top:4px;padding:4px 9px;border-radius:10px;line-height:1.35;font-size:12px;font-weight:800}.selfeito.ok{background:rgba(64,156,255,.18);color:#8fc3ff}.selfeito.tarde{background:rgba(255,210,0,.18);color:var(--gold)}
 .amini .breal{background:var(--gold);color:#031646;font-weight:800;border-color:var(--gold)}
+.amini .bini{border-color:#2FD07A;color:#2FD07A}.amini .bpzf{border-color:#FF9F1C;color:#FF9F1C}.amini .bst{border-color:var(--gold);color:var(--gold)}
+.tagi{display:block;margin-top:4px;font-size:12px;font-weight:800;color:#2FD07A}
+.prz{display:block;margin-top:3px;font-size:12px;font-weight:800;color:#FF9F1C}.prz.venc{color:var(--red)}
+.stbox{display:flex;flex-direction:column;gap:6px;background:var(--navy2);border:1px dashed var(--gold);border-radius:12px;padding:8px;margin-top:6px}
+.stbox textarea{width:100%;background:var(--navy);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:8px;font:inherit;font-size:16px}
+.stbt{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stbt button{border:0;border-radius:10px;padding:10px 6px;font-weight:800;font-size:13px}
+.stbt .b1{background:#2FD07A;color:#03140A}.stbt .b2{background:#FF9F1C;color:#1A0E00}.stbt .b3{grid-column:1/-1;background:transparent;border:1.5px solid var(--line);color:var(--ink)}
+.pzfin{display:flex;gap:6px;flex-wrap:wrap;align-items:center;background:var(--navy2);border:1px dashed #FF9F1C;border-radius:12px;padding:8px;margin-top:6px}
+.pzfin input{flex:1 1 170px;background:var(--navy);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:8px;font:inherit;font-size:16px;color-scheme:dark}
+.pzfin button{border:0;border-radius:10px;padding:9px 12px;font-weight:800;background:#FF9F1C;color:#1A0E00}
+.desc{margin-top:5px;font-size:13.5px;background:var(--navy2);border-left:3px solid var(--gold);border-radius:8px;padding:7px 9px;white-space:pre-wrap}
+.stpill{display:inline-block;margin-top:4px;margin-right:4px;padding:3px 9px;border-radius:999px;font-size:11.5px;font-weight:800}.stpill.parcial{background:#FF9F1C;color:#1A0E00}
+.gd10b{margin:10px 0 4px;font-weight:800;font-size:14px}
+.acao.parc{opacity:1}.acao.parc b,.acao.parc .tx b{text-decoration:none!important;opacity:1}
 .amini button{padding:6px 10px;font-size:12.5px}
 .acao.desc{opacity:.55}
 .acao.desc b{text-decoration:line-through}
@@ -2832,7 +2847,9 @@ function textoAgenda(iso){
 
 function minStamp(s){ return Date.parse(String(s).slice(0,16) + ":00Z") / 60000; }
 function acVencida(a){ return !a.feito && !a.descartada && a.quando && a.quando.length >= 16 && a.quando.slice(0,16) < agoraStamp(); }
-function atrasoAcao(a){ if (!a.feito || !a.quando || !a.feitoEm || a.quando.length < 16) return 0; var d = Math.round(minStamp(a.feitoEm) - minStamp(a.quando)); return d > 0 ? d : 0; }
+function atrasoAcao(a){ var ref = a.prazoFinal || a.quando; if (!a.feito || !ref || !a.feitoEm || ref.length < 16) return 0; var d = Math.round(minStamp(a.feitoEm) - minStamp(ref)); return d > 0 ? d : 0; }
+function faltaFin(dt){ var m = Math.round(minStamp(dt) - minStamp(agoraStamp())); if (m < 0) return "vencido"; if (m >= 1440) return "faltam " + Math.floor(m/1440) + "d " + Math.floor((m%1440)/60) + "h"; return "faltam " + Math.floor(m/60) + "h " + (m%60) + "min"; }
+function sugFin(a){ if (a.prazoFinal) return a.prazoFinal; if (a.quando && a.quando > agoraStamp()) return a.quando; return hojeISO() + "T" + hh(Math.min(Math.ceil((agoraMin()+120)/30)*30, 1410)); }
 function fmtAtraso(m){ var d = Math.floor(m/1440), h = Math.floor((m%1440)/60), n = m%60, p = []; if (d) p.push(d + " d"); if (h) p.push(h + " h"); if (n || !p.length) p.push(n + " min"); return p.join(" "); }
 var SELO10 = {imediato:{t:"Imediato", i:"🔴", c:"var(--red)"}, urgente:{t:"Urgente", i:"🟠", c:"var(--amber)"}, realizar:{t:"Realizar", i:"🔵", c:"var(--blue)"}};
 function ordSelo10(a){ return a.selo === "imediato" ? 0 : a.selo === "urgente" ? 1 : a.selo === "realizar" ? 2 : 9; }
@@ -2860,12 +2877,18 @@ function renderAcao(){
     + '<label class="muted sm">Data e horário<input type="datetime-local" id="acQuando" value="' + hojeISO() + 'T' + hh(Math.min(Math.ceil((agoraMin()+30)/30)*30, 1410)) + '"></label>'
     + '<div class="selos">' + ["imediato","urgente","realizar"].map(function(k){ return '<button class="selo ' + k + '" data-selo="' + k + '" aria-pressed="' + (selN === k) + '">' + SELO10[k].i + ' ' + SELO10[k].t + '</button>'; }).join("") + '</div>'
     + '<button class="bprim" data-a="addAcao">+ Adicionar ao plano</button><p class="muted sm" style="margin:0">Tópicos com data aparecem também na agenda do dia, com alerta na hora.</p></details>';
-  var TABS = [["aberto","Em aberto",ab,"Nenhum tópico em aberto.",1],["atr","⏰ Atrasados",at,"Nada atrasado agora. 👏",1],["np","✅ No prazo",np,"Nenhum tópico realizado no prazo ainda.",0],["ca","🕒 Com atraso",ca,"Nenhum tópico realizado com atraso.",0],["pz","⏱ Novo prazo",pz,"Nenhum pedido de novo prazo.",1],["ds","🗑 Descartados",ds,"Nada descartado.",0]];
+  var cc = fe.slice().sort(porFeito);
+  var TABS = [["aberto","Em aberto",ab,"Nenhum tópico em aberto.",1],["conc","📋 Concluídas",cc,"Nenhuma ação concluída ainda.",0],["atr","⏰ Atrasados",at,"Nada atrasado agora. 👏",1],["np","✅ No prazo",np,"Nenhum tópico realizado no prazo ainda.",0],["ca","🕒 Com atraso",ca,"Nenhum tópico realizado com atraso.",0],["pz","⏱ Novo prazo",pz,"Nenhum pedido de novo prazo.",1],["ds","🗑 Descartados",ds,"Nada descartado.",0]];
   var tab = S.acTab || "aberto", T = TABS.filter(function(t){ return t[0] === tab; })[0] || TABS[0];
   h += '<div class="actabs" role="tablist">' + TABS.map(function(t){ return '<button data-a="acTab" data-t="' + t[0] + '" aria-pressed="' + (t[0] === T[0]) + '">' + t[1] + '<b class="tnum">' + t[2].length + '</b></button>'; }).join("") + '</div>';
   h += '<div class="card"><h2>' + (aba !== "todos" ? SELO10[aba].i + ' ' + SELO10[aba].t + ' · ' : '') + T[1].replace(/^[^A-Za-zÀ-ú]+/, "") + ' <span class="muted sm">(' + T[2].length + ')' + (T[4] ? ' · por data' : '') + '</span></h2>'
-    + (T[2].length ? (T[4] ? listaPorData10(T[2]) : T[2].map(cardAcao).join("")) : '<p class="vazio">' + T[3] + '</p>') + '</div>';
+    + (T[0] === "conc" ? concHtml(T[2]) : T[2].length ? (T[4] ? listaPorData10(T[2]) : T[2].map(cardAcao).join("")) : '<p class="vazio">' + T[3] + '</p>') + '</div>';
   return h;
+}
+function concHtml(L){
+  var c = L.filter(function(a){ return a.status !== "parcial"; }), p = L.filter(function(a){ return a.status === "parcial"; });
+  return '<div class="gd10b">✅ Concluídas (' + c.length + ')</div>' + (c.length ? c.map(cardAcao).join("") : '<p class="vazio">Nenhuma ação concluída ainda.</p>')
+    + '<div class="gd10b">🟡 Concluídas parcialmente (' + p.length + ')</div>' + (p.length ? p.map(cardAcao).join("") : '<p class="vazio">Nenhuma ação concluída parcialmente.</p>');
 }
 function editForm10(a){
   var d = S.edDraft10 || {titulo:a.titulo, quando:a.quando || "", selo:a.selo};
@@ -2877,13 +2900,19 @@ function editForm10(a){
 function cardAcao(a){
   var key = "acao:" + a.id, st = a.feito ? "feito" : a.descartada ? "desc" : a.naoFeita ? "nao" : "";
   var vence = !st && a.quando && (a.quando.slice(0,10) < hojeISO() || (a.quando.slice(0,10) === hojeISO() && mm(a.quando.slice(11,16)) <= agoraMin() + 10));
-  var h = '<div class="acao' + (a.feito ? " feita" : "") + (a.descartada ? " desc" : "") + (vence || st === "nao" ? " vence" : "") + '"><button class="ck" data-a="ckAcao" data-id="' + esc(a.id) + '" aria-label="Concluir">✓</button><div class="tx"><b>' + esc(a.titulo) + '</b><span><span class="pill ' + esc(a.selo) + '">' + esc(a.selo) + '</span> ' + (eixoDaAcao(a) ? eixoChip(eixoDaAcao(a)) + ' ' : '') + (a.projeto && S.projetos[a.projeto] && !M5.proj ? '<span class="muted sm">📁 ' + esc(S.projetos[a.projeto].nome) + '</span> ' : '') + '<span class="muted sm">' + (a.quando ? fmtDT(a.quando) : "sem data") + (st === "nao" ? ' · <b style="color:var(--red)">não feito</b>' : vence ? ' · <b style="color:var(--red)">atrasado</b>' : '') + '</span></span>';
+  var h = '<div class="acao' + (a.feito ? " feita" : "") + (a.feito && a.status === "parcial" ? " parc" : "") + (a.descartada ? " desc" : "") + (vence || st === "nao" ? " vence" : "") + '"><button class="ck" data-a="ckAcao" data-id="' + esc(a.id) + '" aria-label="Concluir">✓</button><div class="tx"><b>' + esc(a.titulo) + '</b><span><span class="pill ' + esc(a.selo) + '">' + esc(a.selo) + '</span> ' + (eixoDaAcao(a) ? eixoChip(eixoDaAcao(a)) + ' ' : '') + (a.projeto && S.projetos[a.projeto] && !M5.proj ? '<span class="muted sm">📁 ' + esc(S.projetos[a.projeto].nome) + '</span> ' : '') + '<span class="muted sm">' + (a.quando ? fmtDT(a.quando) : "sem data") + (st === "nao" ? ' · <b style="color:var(--red)">não feito</b>' : vence ? ' · <b style="color:var(--red)">atrasado</b>' : '') + '</span></span>';
   if (a.feito){ var atr = atrasoAcao(a); h += '<span class="selfeito ' + (atr ? "tarde" : "ok") + '">' + (atr ? '🕒 Feito com ' + fmtAtraso(atr) + ' de atraso' : '✅ Feito no prazo') + (a.feitoEm ? ' · ' + fmtDT(a.feitoEm) : '') + '</span>'; }
+  if (a.feito && a.status === "parcial") h += '<span class="stpill parcial">🟡 Concluída parcialmente</span>';
+  if (a.iniciadoEm) h += '<span class="tagi">▶ Iniciada em ' + fmtDT(a.iniciadoEm) + '</span>';
+  if (a.prazoFinal) h += '<span class="prz' + (!a.feito && faltaFin(a.prazoFinal) === "vencido" ? ' venc' : '') + '">⏳ Prazo final: ' + fmtDT(a.prazoFinal) + (a.feito ? '' : ' · ' + faltaFin(a.prazoFinal)) + '</span>';
+  if (a.descricao) h += '<div class="desc">📝 ' + esc(a.descricao) + '</div>';
   if (a.prazos && a.prazos.length) h += '<span class="muted sm" style="display:block;margin-top:3px">⏱ ' + a.prazos.length + (a.prazos.length > 1 ? ' novos prazos' : ' novo prazo') + ' · prazo original ' + fmtDT(a.prazos[0].de) + '</span>';
   if (S.editAcao10 === a.id) return h + editForm10(a) + '</div></div>';
-  if (!a.feito && !a.descartada) h += '<div class="amini"><button data-e9="editar" data-id="' + esc(a.id) + '">✏️ Editar</button>' + (vence || st === "nao" ? '<button class="breal" data-a="ckAcao" data-id="' + esc(a.id) + '">✅ Realizado</button>' : '') + '<button data-a="adiarAcao" data-key="' + esc(key) + '">⏱ Novo prazo</button>' + (st === "nao" ? '' : '<button data-a="naoFiz" data-key="' + esc(key) + '">✖ Não fiz</button>') + '<button data-a="descartar" data-key="' + esc(key) + '">🗑 Descartar</button><button data-m5="fotoAcao" data-id="' + esc(a.id) + '">📷 Foto</button></div>';
-  else if (a.feito) h += '<div class="amini"><button data-e9="editar" data-id="' + esc(a.id) + '">✏️ Editar</button></div>';
+  if (!a.feito && !a.descartada) h += '<div class="amini">' + (a.iniciadoEm ? '<button class="bpzf" data-a="pzFinTg" data-id="' + esc(a.id) + '">⏳ ' + (a.prazoFinal ? 'Mudar prazo final' : 'Prazo final') + '</button>' : '<button class="bini" data-a="iniAcao" data-id="' + esc(a.id) + '">▶ Atividade iniciada</button>') + '<button class="bst" data-a="stAcTg" data-id="' + esc(a.id) + '">📝 Status</button><button data-e9="editar" data-id="' + esc(a.id) + '">✏️ Editar</button>' + (vence || st === "nao" ? '<button class="breal" data-a="ckAcao" data-id="' + esc(a.id) + '">✅ Realizado</button>' : '') + '<button data-a="adiarAcao" data-key="' + esc(key) + '">⏱ Novo prazo</button>' + (st === "nao" ? '' : '<button data-a="naoFiz" data-key="' + esc(key) + '">✖ Não fiz</button>') + '<button data-a="descartar" data-key="' + esc(key) + '">🗑 Descartar</button><button data-m5="fotoAcao" data-id="' + esc(a.id) + '">📷 Foto</button></div>';
+  else if (a.feito) h += '<div class="amini"><button data-e9="editar" data-id="' + esc(a.id) + '">✏️ Editar</button><button class="bst" data-a="reabrirAc" data-id="' + esc(a.id) + '">↺ Reabrir' + (a.status === "parcial" ? ' e continuar' : '') + '</button></div>';
   else if (a.descartada) h += '<div class="amini"><button data-a="desfazer" data-key="' + esc(key) + '">↩️ Recuperar</button><button data-a="delAcao" data-id="' + esc(a.id) + '">Excluir de vez</button></div>';
+  if (!a.feito && !a.descartada && S.pzFinAberto === a.id) h += '<div class="pzfin"><input type="datetime-local" id="pzf_' + esc(a.id) + '" value="' + sugFin(a) + '" aria-label="Prazo final (data e hora)"><button data-a="salvaPzFin" data-id="' + esc(a.id) + '">Salvar prazo final</button></div>';
+  if (!a.feito && !a.descartada && S.stAberto === a.id) h += '<div class="stbox"><textarea id="ds_' + esc(a.id) + '" rows="3" maxlength="1000" placeholder="O que foi feito? Descreva aqui.">' + esc(a.descricao || "") + '</textarea><div class="stbt"><button class="b1" data-a="stConc" data-id="' + esc(a.id) + '">✓ Concluída</button><button class="b2" data-a="stParc" data-id="' + esc(a.id) + '">🟡 Concluída parcialmente</button><button class="b3" data-a="stSalva" data-id="' + esc(a.id) + '">Salvar andamento (continua em aberto)</button></div></div>';
   if (S.prazoAberto === key) h += prazoForm({tipo:"acao", dia:(a.quando || hojeISO()).slice(0,10), ini:a.quando ? mm(a.quando.slice(11,16)) : agoraMin(), fim:(a.quando ? mm(a.quando.slice(11,16)) : agoraMin()) + 30}, key);
   if (a.foto) h += '<img class="afoto" src="' + fotoSrc(a.foto) + '" alt="Foto da ação">';
   return h + '</div></div>';
@@ -3005,7 +3034,19 @@ APP9.addEventListener("click", function(e){
     gravar("acoes", id, S.acoes[id]); SOM.play("feito"); toast("⚡ Tópico adicionado"); $("acTit").value = ""; render(); return;
   }
   if (a === "acTab"){ S.acTab = b.dataset.t; render(); return; }
-  if (a === "ckAcao"){ var ac = S.acoes[b.dataset.id]; if (!ac) return; S.acoes[b.dataset.id] = Object.assign({}, ac, {feito:!ac.feito, feitoEm:ac.feito ? "" : agoraStamp(), naoFeita:false}); gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); SOM.play(ac.feito ? "prazo" : "feito");
+  if (a === "iniAcao"){ var ai2 = S.acoes[b.dataset.id]; if (!ai2) return; S.acoes[b.dataset.id] = Object.assign({}, ai2, {iniciadoEm:agoraStamp()}); gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); S.pzFinAberto = b.dataset.id; SOM.play("feito"); toast("▶ Atividade iniciada. Agora defina o prazo final."); render(); setTimeout(function(){ var el = $("pzf_" + b.dataset.id); if (el) el.focus(); }, 60); return; }
+  if (a === "pzFinTg"){ S.pzFinAberto = S.pzFinAberto === b.dataset.id ? null : b.dataset.id; render(); return; }
+  if (a === "salvaPzFin"){ var vpf = ($("pzf_" + b.dataset.id) || {}).value || ""; if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(vpf)){ SOM.play("erro"); toast("Escolha a data e a hora do prazo final."); return; } S.acoes[b.dataset.id] = Object.assign({}, S.acoes[b.dataset.id], {prazoFinal:vpf.slice(0,16)}); gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); S.pzFinAberto = null; SOM.play("feito"); toast("⏳ Prazo final: " + fmtDT(vpf.slice(0,16))); render(); return; }
+  if (a === "stAcTg"){ S.stAberto = S.stAberto === b.dataset.id ? null : b.dataset.id; render(); setTimeout(function(){ var el = $("ds_" + b.dataset.id); if (el) el.focus(); }, 60); return; }
+  if (a === "stConc" || a === "stParc" || a === "stSalva"){
+    var as2 = S.acoes[b.dataset.id]; if (!as2) return; var ds2 = (($("ds_" + b.dataset.id) || {}).value || "").trim();
+    if (a === "stParc" && ds2.length < 3){ SOM.play("erro"); toast("Descreva o que foi feito e o que faltou."); return; }
+    if (a === "stSalva"){ S.acoes[b.dataset.id] = Object.assign({}, as2, {descricao:ds2}); gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); S.stAberto = null; toast("📝 Andamento salvo"); render(); return; }
+    S.acoes[b.dataset.id] = Object.assign({}, as2, {descricao:ds2, feito:true, naoFeita:false, status:a === "stParc" ? "parcial" : "concluida", feitoEm:agoraStamp()});
+    gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); S.stAberto = null; S.pzFinAberto = null; S.acTab = "conc"; SOM.play("feito"); toast(a === "stParc" ? "🟡 Concluída parcialmente. Está na aba Concluídas." : "✅ Concluída! Está na aba Concluídas."); render(); return;
+  }
+  if (a === "reabrirAc"){ var ar2 = S.acoes[b.dataset.id]; if (!ar2) return; S.acoes[b.dataset.id] = Object.assign({}, ar2, {feito:false, feitoEm:"", status:""}); gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); SOM.play("prazo"); toast("↺ Ação reaberta em Em aberto"); render(); return; }
+  if (a === "ckAcao"){ var ac = S.acoes[b.dataset.id]; if (!ac) return; S.acoes[b.dataset.id] = Object.assign({}, ac, {feito:!ac.feito, feitoEm:ac.feito ? "" : agoraStamp(), naoFeita:false, status:ac.feito ? "" : "concluida"}); gravar("acoes", b.dataset.id, S.acoes[b.dataset.id]); SOM.play(ac.feito ? "prazo" : "feito");
     if (!ac.feito){ var atx = atrasoAcao(S.acoes[b.dataset.id]); toast(atx ? "🕒 Realizado com " + fmtAtraso(atx) + " de atraso." : "✅ Realizado no prazo!"); }
     render(); return; }
   if (a === "delAcao"){ if (b.dataset.sure !== "1"){ b.dataset.sure = "1"; b.textContent = "Excluir?"; return; } delete S.acoes[b.dataset.id]; gravar("acoes", b.dataset.id, null); render(); return; }
